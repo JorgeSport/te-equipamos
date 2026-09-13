@@ -25,10 +25,6 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Publicar landing JOGFLOW
-        run: |
-          mkdir -p gh-pages/jogflow-100-1
-          cp jogflow-100-1/index.html gh-pages/jogflow-100-1/index.html
       - name: Actualizar noticias outdoor automáticamente
         run: python gh-pages/news/update-auto-news.py
       - name: Cargar actualidad y contenido Te Equipamos
