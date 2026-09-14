@@ -38,6 +38,9 @@ jobs:
       - name: Configurar menús de Ventas Reviews Vídeos Consejos Ofertas y Novedades
         run: python gh-pages/news/configure-owned-portal.py
 
+      - name: Activar etiquetas y temas con color estratégico
+        run: python gh-pages/news/enhance-tags.py
+
       - name: Instalar prueba visual de banners propios
         run: python gh-pages/news/install-promos.py
 
