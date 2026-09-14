@@ -37,16 +37,16 @@ html = html.replace('Información organizada para leer de un vistazo', 'Todo lo 
 html = html.replace("state.cat==='Todas'?'Últimas noticias':state.cat", "state.cat==='Todas'?'Últimos contenidos':state.cat")
 html = html.replace("state.cat==='Todas'?'Información organizada para leer de un vistazo':`Últimas noticias de ${state.cat.toLowerCase()}`", "state.cat==='Todas'?'Todo lo nuevo de Te Equipamos, organizado para leer de un vistazo':`Contenido de ${state.cat.toLowerCase()}`")
 html = html.replace('<h3>Lo más leído</h3>', '<h3>Destacados</h3>')
-html = html.replace('<span class="kicker">Resumen diario</span><h3>Las noticias importantes, sin ruido.</h3><p class="summary">Noticias, guías, reviews y selección outdoor de Te Equipamos.</p>', '<span class="kicker">TE EQUIPAMOS</span><h3>Todo nuestro contenido, en un solo lugar.</h3><p class="summary">Ventas, reviews, vídeos, consejos, ofertas y novedades publicadas desde GitHub.</p>')
+html = html.replace('<span class="kicker">Resumen diario</span><h3>Las noticias importantes, sin ruido.</h3><p class="summary">Noticias, guías, reviews y selección outdoor de Te Equipamos.</p>', '<span class="kicker">TE EQUIPAMOS</span><h3>Todo nuestro contenido, en un solo lugar.</h3><p class="summary">Ventas, reviews, vídeos, consejos, ofertas y novedades seleccionadas por Te Equipamos.</p>')
 
 # Elimina cualquier lenguaje heredado de la demo.
 html = html.replace('<span class="kicker">Tema de ejemplo</span>', '<span class="kicker">Explorar tema</span>')
-html = html.replace('<h3>No encontramos noticias</h3><p>Prueba otra búsqueda o categoría.</p>', '<h3>Aún no hay contenido en esta sección</h3><p>Cuando publiquemos algo nuevo en GitHub aparecerá aquí automáticamente.</p>')
+html = html.replace('<h3>No encontramos noticias</h3><p>Prueba otra búsqueda o categoría.</p>', '<h3>Aún no hay contenido en esta sección</h3><p>Cuando publiquemos algo nuevo, aparecerá aquí automáticamente.</p>')
 
 # apply-real-news.py genera este aviso durante el despliegue; aquí se convierte en identidad del nuevo portal.
 html = re.sub(
     r'<div class="demo"><b>EDICIÓN OUTDOOR · [^<]+</b><span>[^<]+</span></div>',
-    '<div class="demo" id="portalIntro"><b>CONTENIDO PROPIO · GITHUB</b><span>Ventas, reviews, vídeos, consejos, ofertas y novedades de Te Equipamos. Cada publicación se clasifica automáticamente desde su repositorio.</span></div>',
+    '<div class="demo" id="portalIntro"><b>CONTENIDO PROPIO · TE EQUIPAMOS</b><span>Ventas, reviews, vídeos, consejos, ofertas y novedades seleccionadas para ayudarte a descubrir, comparar y elegir mejor.</span></div>',
     html,
     count=1,
 )
