@@ -63,16 +63,17 @@ if '/* TE_DESKTOP_POLISH */' not in html:
 js = r'''<script id="teDesktopPolish">
 (function(){
   const mq=window.matchMedia('(min-width:1101px)');
+  function allNews(){return typeof NEWS!=='undefined'?NEWS:[]}
   function recentIds(){
     if(typeof teRecentIds==='function') return teRecentIds();
     try{return JSON.parse(localStorage.getItem('teRecentItems')||'[]').map(Number).filter(Boolean)}catch(e){return[]}
   }
   function topTags(limit){
     const counts=new Map();
-    (window.NEWS||NEWS||[]).forEach(n=>(n.tags||[]).forEach(t=>{const k=String(t||'').trim();if(k)counts.set(k,(counts.get(k)||0)+1)}));
+    allNews().forEach(n=>(n.tags||[]).forEach(t=>{const k=String(t||'').trim();if(k)counts.set(k,(counts.get(k)||0)+1)}));
     return [...counts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'es')).slice(0,limit).map(x=>x[0]);
   }
-  function savedCount(){return window.state&&state.saved&&typeof state.saved.size==='number'?state.saved.size:0}
+  function savedCount(){return typeof state!=='undefined'&&state.saved&&typeof state.saved.size==='number'?state.saved.size:0}
   function toneClass(t){return typeof tagTone==='function'?`tone-${tagTone(t)}`:'tone-neutral'}
   function escText(v){return typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
   function ensureLeft(){
@@ -102,7 +103,7 @@ js = r'''<script id="teDesktopPolish">
     const parts=ensureRail(); if(!parts)return;
     const tags=topTags(8);
     parts.topics.innerHTML=`<span class="kicker">Explorar</span><h3>Temas</h3><div class="teRailTags">${tags.map(t=>`<button type="button" class="tagPill ${toneClass(t)}" data-tag-filter="${escText(t)}">${escText(t)}</button>`).join('')}</div>`;
-    const recents=recentIds().map(id=>(window.NEWS||NEWS).find(n=>Number(n.id)===Number(id))).filter(Boolean).slice(0,3);
+    const recents=recentIds().map(id=>allNews().find(n=>Number(n.id)===Number(id))).filter(Boolean).slice(0,3);
     parts.recent.classList.toggle('hidden',!recents.length);
     if(recents.length)parts.recent.innerHTML=`<span class="kicker">Continúa</span><h3>Visto recientemente</h3><div class="teRailList">${recents.map(n=>`<button type="button" class="teRailItem" data-article="${n.id}"><small>${escText((n.sections||[])[0]||n.category||'Te Equipamos')}</small><b>${escText(n.title)}</b></button>`).join('')}</div>`;
     const count=savedCount();
