@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime
 from html import unescape
 import hashlib
 import json
 import re
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -17,31 +18,37 @@ OWNER = "JorgeSport"
 MANIFEST = "te-equipamos.json"
 
 HEADERS = {
-    "User-Agent": "TeEquipamosHub/2.0 (+https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/)"
+    "User-Agent": "TeEquipamosHub/3.0 (+https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/)"
 }
 
 TYPE_TO_SECTION = {
-    "sale": "Ventas",
-    "venta": "Ventas",
-    "ventas": "Ventas",
-    "review": "Reviews",
-    "reviews": "Reviews",
-    "video": "Vídeos",
-    "videos": "Vídeos",
-    "vídeo": "Vídeos",
-    "vídeos": "Vídeos",
-    "tip": "Consejos",
-    "tips": "Consejos",
-    "consejo": "Consejos",
-    "consejos": "Consejos",
-    "offer": "Ofertas",
-    "oferta": "Ofertas",
-    "ofertas": "Ofertas",
-    "news": "Novedades",
-    "novedad": "Novedades",
-    "novedades": "Novedades",
+    "sale": "Ventas", "venta": "Ventas", "ventas": "Ventas",
+    "review": "Reviews", "reviews": "Reviews",
+    "video": "Vídeos", "videos": "Vídeos", "vídeo": "Vídeos", "vídeos": "Vídeos",
+    "tip": "Consejos", "tips": "Consejos", "consejo": "Consejos", "consejos": "Consejos",
+    "offer": "Ofertas", "oferta": "Ofertas", "ofertas": "Ofertas",
+    "news": "Novedades", "novedad": "Novedades", "novedades": "Novedades",
 }
 VALID_SECTIONS = ["Ventas", "Reviews", "Vídeos", "Consejos", "Ofertas", "Novedades"]
+
+# IDs internos estables. Los textos visibles se resuelven en la interfaz.
+ACTIVITY_ALIASES = {
+    "senderismo": "senderismo", "hiking": "senderismo",
+    "trekking": "trekking",
+    "running": "running", "correr": "running",
+    "trail running": "trail-running", "trail-running": "trail-running", "trail": "trail-running",
+    "ciclismo": "ciclismo", "bicicleta": "ciclismo", "bike": "ciclismo", "mtb": "ciclismo",
+    "natacion": "natacion", "natación": "natacion", "swimming": "natacion",
+    "travel": "travel", "viaje": "travel", "viajes": "travel", "backpacking": "travel",
+    "alpinismo": "alpinismo",
+    "escalada": "escalada", "climbing": "escalada",
+    "camping": "camping",
+    "esqui": "esqui", "esquí": "esqui", "nieve": "esqui", "snowboard": "esqui",
+    "kayak": "kayak", "remo": "kayak",
+    "surf": "surf",
+    "fitness": "fitness", "gimnasio": "fitness", "entrenamiento": "fitness",
+}
+
 FALLBACK_IMAGES = {
     "Ventas": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=82",
     "Reviews": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=82",
@@ -50,6 +57,18 @@ FALLBACK_IMAGES = {
     "Ofertas": "https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1200&q=82",
     "Novedades": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=82",
 }
+
+PRODUCT_TYPES = [
+    ("mochila", ["mochila", "backpack"]),
+    ("bolso", ["bolso", "duffel"]),
+    ("sandalias", ["sandalia"]),
+    ("zapatillas", ["zapatilla", "calzado"]),
+    ("camiseta", ["camiseta"]),
+    ("chaqueta", ["chaqueta", "raincut", "plumón", "plumon"]),
+    ("sombrero", ["sombrero", "gorra"]),
+    ("pantalon", ["pantalón", "pantalon"]),
+    ("short", ["short"]),
+]
 
 
 def get_json(url: str):
@@ -72,12 +91,62 @@ def clean(value) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
 
 
+def plain(value) -> str:
+    text = unicodedata.normalize("NFKD", clean(value).lower())
+    return "".join(ch for ch in text if not unicodedata.combining(ch))
+
+
+def slug(value) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", plain(value)).strip("-")
+
+
 def normalize_section(value: str) -> str | None:
     text = clean(value)
     if text in VALID_SECTIONS:
         return text
-    key = text.lower()
-    return TYPE_TO_SECTION.get(key)
+    return TYPE_TO_SECTION.get(text.lower())
+
+
+def normalize_activity(value: str) -> str:
+    text = clean(value).lower()
+    if not text:
+        return ""
+    return ACTIVITY_ALIASES.get(text) or ACTIVITY_ALIASES.get(plain(text)) or slug(text)
+
+
+def infer_activities(raw: dict) -> list[str]:
+    values = []
+    tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
+    haystack = plain(" ".join([clean(raw.get("title")), clean(raw.get("summary")), " ".join(map(str, tags))]))
+    patterns = [
+        ("trail-running", ["trail running", "trail-running"]),
+        ("senderismo", ["senderismo", "hiking", "sendero"]),
+        ("trekking", ["trekking"]),
+        ("running", ["running", "correr"]),
+        ("ciclismo", ["ciclismo", "bicicleta", " mtb "]),
+        ("natacion", ["natacion", "swimming"]),
+        ("travel", ["travel", "viaje", "backpacking"]),
+        ("alpinismo", ["alpinismo"]),
+        ("escalada", ["escalada", "climbing"]),
+        ("camping", ["camping"]),
+        ("esqui", ["esqui", "nieve", "snowboard"]),
+        ("kayak", ["kayak", "remo"]),
+        ("surf", ["surf"]),
+        ("fitness", ["fitness", "gimnasio", "entrenamiento"]),
+    ]
+    for activity, words in patterns:
+        if any(word in haystack for word in words) and activity not in values:
+            values.append(activity)
+    return values
+
+
+def infer_product_type(raw: dict) -> str:
+    tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
+    haystack = plain(" ".join([clean(raw.get("title")), clean(raw.get("summary")), " ".join(map(str, tags))]))
+    for product_type, words in PRODUCT_TYPES:
+        if any(plain(word) in haystack for word in words):
+            return product_type
+    return "equipamiento"
 
 
 def discover_og_image(url: str) -> str:
@@ -160,15 +229,24 @@ def normalize_item(raw: dict, repo_name: str) -> dict | None:
         image = FALLBACK_IMAGES[primary]
 
     kind_label = {
-        "Ventas": "Venta",
-        "Reviews": "Review",
-        "Vídeos": "Vídeo",
-        "Consejos": "Consejo",
-        "Ofertas": "Oferta",
-        "Novedades": "Novedad",
+        "Ventas": "Venta", "Reviews": "Review", "Vídeos": "Vídeo",
+        "Consejos": "Consejo", "Ofertas": "Oferta", "Novedades": "Novedad",
     }[primary]
 
     tags = raw.get("tags") if isinstance(raw.get("tags"), list) else []
+    declared_activities = raw.get("activities") if isinstance(raw.get("activities"), list) else []
+    activities = []
+    for value in declared_activities:
+        activity = normalize_activity(value)
+        if activity and activity not in activities:
+            activities.append(activity)
+    inferred = False
+    if not activities:
+        activities = infer_activities(raw)
+        inferred = bool(activities)
+
+    product_type = slug(raw.get("product_type")) if clean(raw.get("product_type")) else infer_product_type(raw)
+
     return {
         "id": int(raw.get("id")) if str(raw.get("id", "")).isdigit() else stable_id(url + "|" + title),
         "title": title,
@@ -176,6 +254,9 @@ def normalize_item(raw: dict, repo_name: str) -> dict | None:
         "details": clean(raw.get("details")) or clean(raw.get("summary")) or "Contenido propio publicado por Te Equipamos.",
         "category": primary,
         "sections": sections,
+        "activities": activities,
+        "activities_inferred": inferred,
+        "product_type": product_type,
         "source": clean(raw.get("source")) or f"Te Equipamos · {kind_label}",
         "time": clean(raw.get("time")) or kind_label,
         "url": url,
@@ -199,12 +280,17 @@ def deduplicate(items: list[dict]) -> list[dict]:
             by_url[key] = item
             continue
         current = by_url[key]
-        merged_sections = current.get("sections", []) + item.get("sections", [])
-        current["sections"] = list(dict.fromkeys(merged_sections))
+        current["sections"] = list(dict.fromkeys(current.get("sections", []) + item.get("sections", [])))
+        current["activities"] = list(dict.fromkeys(current.get("activities", []) + item.get("activities", [])))
+        current["tags"] = list(dict.fromkeys(current.get("tags", []) + item.get("tags", [])))
         if item.get("score", 0) > current.get("score", 0):
             keep_sections = current["sections"]
+            keep_activities = current["activities"]
+            keep_tags = current["tags"]
             by_url[key] = item
             by_url[key]["sections"] = keep_sections
+            by_url[key]["activities"] = keep_activities
+            by_url[key]["tags"] = keep_tags
     return list(by_url.values())
 
 
@@ -226,7 +312,6 @@ def main() -> None:
         repos = []
         errors.append(f"No se pudo listar GitHub: {exc}")
 
-    # Garantiza que el manifiesto del propio portal se pueda usar incluso si GitHub API falla.
     local_manifest = ROOT / MANIFEST
     if local_manifest.exists():
         try:
@@ -256,7 +341,6 @@ def main() -> None:
     items = deduplicate(collected)
     items.sort(key=sort_key, reverse=True)
 
-    # La portada necesita hasta cuatro destacados. Respeta los elegidos y completa si faltan.
     featured_count = sum(1 for x in items if x.get("featured"))
     if featured_count < 4:
         for item in items:
@@ -271,15 +355,22 @@ def main() -> None:
 
     DATA_FILE.write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")
     counts = {section: 0 for section in VALID_SECTIONS}
+    activity_counts: dict[str, int] = {}
     for item in items:
         for section in item.get("sections", [item.get("category")]):
             if section in counts:
                 counts[section] += 1
+        for activity in item.get("activities", []):
+            activity_counts[activity] = activity_counts.get(activity, 0) + 1
 
     print(f"Te Equipamos Hub: {len(items)} contenidos propios detectados desde GitHub.")
     print("Menús:", ", ".join(f"{k}={v}" for k, v in counts.items()))
+    print("Actividades:", ", ".join(f"{k}={v}" for k, v in sorted(activity_counts.items())))
     repos_used = sorted({x.get("source_repo", "") for x in items})
     print("Repositorios usados:", ", ".join(repos_used))
+    inferred = [x for x in items if x.get("activities_inferred")]
+    if inferred:
+        print(f"Aviso: {len(inferred)} contenidos usan actividades inferidas; conviene declararlas en su te-equipamos.json.")
     if errors:
         print("Avisos no bloqueantes:")
         for error in errors:
