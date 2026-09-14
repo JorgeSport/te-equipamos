@@ -212,6 +212,15 @@ if root_index.exists():
     )
     root_index.write_text(root_html, encoding='utf-8')
 
+# Después de que el workflow añade breadcrumbs, convertimos la ruta técnica en un regreso limpio al Hub.
+product_nav_script = path.parent / 'polish-product-navigation.py'
+if not product_nav_script.exists():
+    raise RuntimeError('Falta polish-product-navigation.py')
+exec(
+    compile(product_nav_script.read_text(encoding='utf-8'), str(product_nav_script), 'exec'),
+    {'__name__': '__main__', '__file__': str(product_nav_script)},
+)
+
 # Comprobaciones mínimas: si fallan, el despliegue debe detenerse.
 for marker in [
     f'href="{OFFICIAL_URL}" class="brand"',
@@ -226,4 +235,4 @@ for marker in [
     if marker not in html:
         raise RuntimeError('Falta identidad oficial o metadato: ' + marker)
 
-print('Te Equipamos: enlace oficial, SEO y metadatos sociales activados con imagen 1200x630')
+print('Te Equipamos: enlace oficial, SEO, metadatos sociales y regreso desde productos activados')
