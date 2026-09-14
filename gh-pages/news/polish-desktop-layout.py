@@ -21,7 +21,9 @@ css = r'''/* TE_DESKTOP_POLISH */
   .teActivityList{display:grid;gap:1px;padding:0 1px}
   .teActivityLink{width:100%;border:0;background:transparent;color:var(--muted);border-radius:10px;min-height:40px;padding:8px 9px;text-align:left;cursor:pointer;font-size:15px;line-height:1.25}
   .teActivityLink:hover,.teActivityLink.isActive{background:var(--surface2);color:var(--text)}
-  .teActivityLink.teActivityMore{margin-top:4px;font-size:13px;font-weight:800;color:var(--accent)}
+  .teActivityLink.teActivityMore{margin-top:4px;font-size:13px;font-weight:800;color:var(--accent);display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .teActivityExtra{display:grid;gap:1px;margin:4px 0 3px;padding:4px 0 2px;border-top:1px solid var(--line)}
+  .teActivityExtra .teActivityLink{font-size:14px;min-height:37px;padding-left:16px}
   .main>.section{margin-top:24px}
   .feed{border-radius:16px}
   .feed .card{position:relative;display:block!important;padding:18px 56px 18px 22px!important;min-height:0!important;gap:0!important}
@@ -72,6 +74,18 @@ js = r'''<script id="teDesktopPolish">
     {label:'Natación',query:'natación'},
     {label:'Travel',query:'viaje'}
   ];
+  const EXTRA_ACTIVITIES=[
+    {label:'Trekking',query:'trekking'},
+    {label:'Trail running',query:'trail running'},
+    {label:'Alpinismo',query:'alpinismo'},
+    {label:'Escalada',query:'escalada'},
+    {label:'Camping',query:'camping'},
+    {label:'Esquí y nieve',query:'nieve'},
+    {label:'Kayak y remo',query:'kayak'},
+    {label:'Surf',query:'surf'},
+    {label:'Fitness outdoor',query:'fitness'}
+  ];
+  let activitiesOpen=false;
   function allNews(){return typeof NEWS!=='undefined'?NEWS:[]}
   function recentIds(){
     if(typeof teRecentIds==='function') return teRecentIds();
@@ -87,12 +101,17 @@ js = r'''<script id="teDesktopPolish">
   }
   function activeActivity(){
     const q=(typeof state!=='undefined'&&state.q?String(state.q):'').trim().toLowerCase();
-    return ACTIVITIES.find(a=>a.query.toLowerCase()===q)?.query||'';
+    const all=ACTIVITIES.concat(EXTRA_ACTIVITIES);
+    return all.find(a=>a.query.toLowerCase()===q)?.query||'';
+  }
+  function activityButtons(items,active){
+    return items.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}">${escText(a.label)}</button>`).join('');
   }
   function renderLeft(){
     const box=ensureLeft(); if(!box)return;
     const recent=recentIds().length, saved=savedCount(), active=activeActivity();
-    box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>☆ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teActivityList">${ACTIVITIES.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}">${escText(a.label)}</button>`).join('')}<button type="button" class="teActivityLink teActivityMore" data-desk-action="allActivities">Más actividades →</button></div></section>`;
+    const extras=activitiesOpen?`<div class="teActivityExtra" data-activity-extra>${activityButtons(EXTRA_ACTIVITIES,active)}</div>`:'';
+    box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>☆ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teActivityList">${activityButtons(ACTIVITIES,active)}${extras}<button type="button" class="teActivityLink teActivityMore" data-desk-action="allActivities" aria-expanded="${activitiesOpen?'true':'false'}"><span>${activitiesOpen?'Menos actividades':'Más actividades'}</span><span aria-hidden="true">${activitiesOpen?'↑':'↓'}</span></button></div></section>`;
   }
   function ensureRail(){
     const rail=document.querySelector('.rail'); if(!rail)return null;
@@ -138,10 +157,9 @@ js = r'''<script id="teDesktopPolish">
       if(action==='saved'&&typeof setCat==='function')setCat('Siguiendo');
       if(action==='recent')openRecent();
       if(action==='allActivities'){
-        if(typeof setCat==='function')setCat('Todas');
-        if(typeof state!=='undefined')state.q='';
-        if(typeof render==='function')render();
-        if(typeof toast==='function')toast('Aquí iremos añadiendo nuevas actividades');
+        activitiesOpen=!activitiesOpen;
+        renderLeft();
+        return;
       }
       setTimeout(refresh,80);return;
     }
@@ -163,4 +181,4 @@ else:
     html = html.replace('</body>', js + '</body>', 1)
 
 path.write_text(html, encoding='utf-8')
-print('Escritorio pulido: Tu espacio y navegación por actividades activados')
+print('Escritorio pulido: Más actividades despliega navegación ampliada')
