@@ -17,22 +17,37 @@ El repositorio `te-equipamos-arpenaz-27l` se mantiene como repositorio principal
 | ✅ | `quechua-nh500-ninos-remate` | Quechua NH500 niños |
 | ✅ | `escape-journal` | Quechua Escape 500 Rolltop |
 | ✅ | `move-500` | Move 500 25 L |
+| ✅ | `te-equipamos-quechua-raincut-mujer` | Raincut mujer |
+| ✅ | `te-equipamos-quechua-mh100-5l` | Mochila MH100 5 L |
+| ✅ | `te-equipamos-arpenaz-500-review` | Review Arpenaz 500 |
+| ✅ | `te-equipamos-forclaz-mt100-sombrero` | Sombrero Forclaz MT100 |
+| ✅ | `te-equipamos-nh100-sandalias` | Sandalias NH100 |
+| ✅ | `te-equipamos-player-t-mesh` | PLAYER T MESH |
+| ✅ | `te-equipamos-forclaz-compact-10l` | Forclaz Compact 10 L |
+| ✅ | `te-equipamos-arpenaz-100-20l-marron` | Arpenaz 100 20 L |
+| ✅ | `te-equipamos-kalenji-editorial` | Editorial Kalenji |
+| ✅ | `te-equipamos-nh100-mujer-naranja-remate` | NH100 mujer naranja · remate |
 
-## Proyectos que están dentro del repositorio principal y deben quedar independientes
+## Repositorios creados y pendientes de recibir su landing desde el repositorio principal
 
-| Estado | Nuevo repositorio previsto | Ubicación actual | Página actual |
-|---|---|---|---|
-| 🟡 Preparado | `te-equipamos-quechua-raincut-mujer` | `gh-pages/quechua-raincut-mujer/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/quechua-raincut-mujer/ |
-| 🟡 Preparado | `te-equipamos-quechua-mh100-5l` | `gh-pages/quechua-mh100-5l-promocion/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/quechua-mh100-5l-promocion/ |
-| 🟡 Preparado | `te-equipamos-plumon-quechua-mujer-xs` | `gh-pages/plumon-quechua-mujer-xs/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/plumon-quechua-mujer-xs/ |
-| 🟡 Preparado | `te-equipamos-arpenaz-500-review` | `gh-pages/arpenaz-500-review/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/arpenaz-500-review/ |
-| 🟡 Preparado | `te-equipamos-forclaz-mt100-sombrero` | `gh-pages/forclaz-mt100-sombrero/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/forclaz-mt100-sombrero/ |
-| 🟡 Preparado | `te-equipamos-nh100-sandalias` | `gh-pages/nh100-sandalias/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/nh100-sandalias/ |
-| 🟡 Preparado | `te-equipamos-player-t-mesh` | `gh-pages/player-t-mesh/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/player-t-mesh/ |
-| 🟡 Preparado | `te-equipamos-forclaz-compact-10l` | `gh-pages/forclaz-compact-10l/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/forclaz-compact-10l/ |
-| 🟡 Preparado | `te-equipamos-arpenaz-100-20l-marron` | `gh-pages/arpenaz-100-20l-marron/` | https://jorgesport.github.io/te-equipamos-arpenaz-27l/arpenaz-100-20l-marron/ |
-| 🟡 Preparado | `te-equipamos-kalenji-editorial` | `gh-pages/kalenji/` | Página editorial Kalenji |
-| 🟡 Preparado | `te-equipamos-studio` | `gh-pages/studio/` | Te Equipamos Studio |
+| Estado | Repositorio | Fuente actual |
+|---|---|---|
+| 🟡 Pendiente de migración | `te-equipamos-quechua-raincut-mujer` | `gh-pages/quechua-raincut-mujer/` |
+| 🟡 Pendiente de migración | `te-equipamos-quechua-mh100-5l` | `gh-pages/quechua-mh100-5l-promocion/` |
+| 🟡 Pendiente de migración | `te-equipamos-arpenaz-500-review` | `gh-pages/arpenaz-500-review/` |
+| 🟡 Pendiente de migración | `te-equipamos-forclaz-mt100-sombrero` | `gh-pages/forclaz-mt100-sombrero/` |
+| 🟡 Pendiente de migración | `te-equipamos-nh100-sandalias` | `gh-pages/nh100-sandalias/` |
+| 🟡 Pendiente de migración | `te-equipamos-player-t-mesh` | `gh-pages/player-t-mesh/` |
+| 🟡 Pendiente de migración | `te-equipamos-forclaz-compact-10l` | `gh-pages/forclaz-compact-10l/` |
+| 🟡 Pendiente de migración | `te-equipamos-arpenaz-100-20l-marron` | `gh-pages/arpenaz-100-20l-marron/` |
+| 🟡 Pendiente de migración | `te-equipamos-kalenji-editorial` | `gh-pages/kalenji/` |
+
+## Eliminados intencionalmente — NO recrear
+
+- `te-equipamos-plumon-quechua-mujer-xs`: eliminado por decisión del propietario. No debe volver a crearse automáticamente.
+- `te-equipamos-studio`: eliminado por decisión del propietario. No debe volver a crearse automáticamente.
+
+> Esta lista evita confundir un repositorio eliminado a propósito con uno que “falta”.
 
 ## Duplicados o carpetas que NO deben crear otro repositorio
 
@@ -44,6 +59,6 @@ El repositorio `te-equipamos-arpenaz-27l` se mantiene como repositorio principal
 
 ## Estado de la migración
 
-La estructura y los nombres de destino ya están definidos. Las URLs públicas actuales se mantienen activas hasta que cada repositorio independiente exista y GitHub Pages esté publicado. Solo entonces se deben actualizar los enlaces del Hub y dejar redirecciones desde las rutas antiguas.
+Los repositorios de destino que continúan activos ya están creados. Las URLs públicas actuales del repositorio principal se mantienen hasta que cada nuevo repositorio tenga su landing y GitHub Pages esté publicado. Después se podrán actualizar los enlaces del Hub y conservar redirecciones desde las rutas antiguas.
 
-Los datos técnicos para completar esa segunda fase están en `migration/repositorios.json`.
+Los datos técnicos de esta migración están en `migration/repositorios.json`.
