@@ -5,6 +5,7 @@ import re
 base = Path(__file__).resolve().parent
 index = base / 'index.html'
 data_file = base / 'news-data.json'
+restore_script = base / 'restore-desktop-card-images.py'
 
 errors = []
 warnings = []
@@ -16,6 +17,14 @@ if not data_file.exists():
 
 if errors:
     raise SystemExit('\n'.join(errors))
+
+# Normaliza el resultado final antes de verificarlo: las imágenes deben quedar visibles
+# en escritorio aunque un CSS anterior haya intentado ocultarlas.
+if restore_script.exists():
+    code = compile(restore_script.read_text(encoding='utf-8'), str(restore_script), 'exec')
+    exec(code, {'__name__': '__main__', '__file__': str(restore_script)})
+else:
+    errors.append('Falta restore-desktop-card-images.py')
 
 html = index.read_text(encoding='utf-8')
 items = json.loads(data_file.read_text(encoding='utf-8'))
@@ -93,13 +102,14 @@ duplicates = sorted({x for x in static_ids if static_ids.count(x) > 1 and not x.
 if duplicates:
     warnings.append('IDs repetidos detectados para revisar: ' + ', '.join(duplicates[:10]))
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · imágenes de escritorio verificadas')
-if warnings:
-    print('Avisos no bloqueantes:')
-    for w in warnings:
-        print(' - ' + w)
 if errors:
     print('Errores:')
     for e in errors:
         print(' - ' + e)
     raise SystemExit(1)
+
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · imágenes de escritorio verificadas')
+if warnings:
+    print('Avisos no bloqueantes:')
+    for w in warnings:
+        print(' - ' + w)
