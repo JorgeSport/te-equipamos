@@ -32,7 +32,7 @@ css = r'''/* TE_DESKTOP_POLISH */
   .feed .card .title{font-size:21px;line-height:1.22;margin:5px 0 8px;letter-spacing:-.012em}
   .feed .card:first-child .title{font-size:23px}
   .feed .card .summary{font-size:13.5px;line-height:1.46;margin:0 0 9px;max-width:920px}
-  .feed .card .tagRow{margin:7px 0 8px}
+  .feed .card .activityRow,.feed .card .tagRow{margin-top:7px;margin-bottom:8px}
   .feed .card .tagPill{font-size:9px;padding:5px 8px}
   .feed .card .cardShare{gap:6px;margin:7px 0 8px}
   .feed .card .cardShareBtn{width:30px;height:30px}
@@ -71,99 +71,43 @@ js = r'''<script id="teDesktopPolish">
     {label:'Senderismo',query:'senderismo'},
     {label:'Running',query:'running'},
     {label:'Ciclismo',query:'ciclismo'},
-    {label:'Natación',query:'natación'},
-    {label:'Travel',query:'viaje'}
+    {label:'Natación',query:'natacion'},
+    {label:'Travel',query:'travel'}
   ];
   const EXTRA_ACTIVITIES=[
     {label:'Trekking',query:'trekking'},
-    {label:'Trail running',query:'trail running'},
+    {label:'Trail running',query:'trail-running'},
     {label:'Alpinismo',query:'alpinismo'},
     {label:'Escalada',query:'escalada'},
     {label:'Camping',query:'camping'},
-    {label:'Esquí y nieve',query:'nieve'},
+    {label:'Esquí y nieve',query:'esqui'},
     {label:'Kayak y remo',query:'kayak'},
     {label:'Surf',query:'surf'},
-    {label:'Fitness outdoor',query:'fitness'}
+    {label:'Fitness',query:'fitness'}
   ];
   let activitiesOpen=false;
   function allNews(){return typeof NEWS!=='undefined'?NEWS:[]}
-  function recentIds(){
-    if(typeof teRecentIds==='function') return teRecentIds();
-    try{return JSON.parse(localStorage.getItem('teRecentItems')||'[]').map(Number).filter(Boolean)}catch(e){return[]}
-  }
+  function recentIds(){if(typeof teRecentIds==='function')return teRecentIds();try{return JSON.parse(localStorage.getItem('teRecentItems')||'[]').map(Number).filter(Boolean)}catch(e){return[]}}
   function savedCount(){return typeof state!=='undefined'&&state.saved&&typeof state.saved.size==='number'?state.saved.size:0}
   function escText(v){return typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
-  function ensureLeft(){
-    const side=document.querySelector('.side'); if(!side)return null;
-    let box=document.getElementById('teDesktopUtility');
-    if(!box){box=document.createElement('div');box.id='teDesktopUtility';box.className='teDesktopUtility';side.appendChild(box)}
-    return box;
-  }
-  function activeActivity(){
-    const q=(typeof state!=='undefined'&&state.q?String(state.q):'').trim().toLowerCase();
-    const all=ACTIVITIES.concat(EXTRA_ACTIVITIES);
-    return all.find(a=>a.query.toLowerCase()===q)?.query||'';
-  }
-  function activityButtons(items,active){
-    return items.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}">${escText(a.label)}</button>`).join('');
-  }
+  function ensureLeft(){const side=document.querySelector('.side');if(!side)return null;let box=document.getElementById('teDesktopUtility');if(!box){box=document.createElement('div');box.id='teDesktopUtility';box.className='teDesktopUtility';side.appendChild(box)}return box}
+  function activeActivity(){return typeof state!=='undefined'?String(state.activity||''):''}
+  function activityButtons(items,active){return items.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}">${escText(a.label)}</button>`).join('')}
   function renderLeft(){
-    const box=ensureLeft(); if(!box)return;
-    const recent=recentIds().length, saved=savedCount(), active=activeActivity();
+    const box=ensureLeft();if(!box)return;
+    const recent=recentIds().length,saved=savedCount(),active=activeActivity();
     const extras=activitiesOpen?`<div class="teActivityExtra" data-activity-extra>${activityButtons(EXTRA_ACTIVITIES,active)}</div>`:'';
     box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>☆ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teActivityList">${activityButtons(ACTIVITIES,active)}${extras}<button type="button" class="teActivityLink teActivityMore" data-desk-action="allActivities" aria-expanded="${activitiesOpen?'true':'false'}"><span>${activitiesOpen?'Menos actividades':'Más actividades'}</span><span aria-hidden="true">${activitiesOpen?'↑':'↓'}</span></button></div></section>`;
   }
-  function ensureRail(){
-    const rail=document.querySelector('.rail'); if(!rail)return null;
-    const legacy=[...rail.querySelectorAll(':scope > .railCard')][1]; if(legacy)legacy.classList.add('teLegacyRail');
-    const oldTopics=document.getElementById('teRailTopics'); if(oldTopics)oldTopics.remove();
-    let recent=document.getElementById('teRailRecent');
-    if(!recent){recent=document.createElement('section');recent.id='teRailRecent';recent.className='railCard teRailExtra';rail.appendChild(recent)}
-    let saved=document.getElementById('teRailSaved');
-    if(!saved){saved=document.createElement('section');saved.id='teRailSaved';saved.className='railCard teRailExtra';rail.appendChild(saved)}
-    return {recent,saved};
-  }
-  function renderRail(){
-    const parts=ensureRail(); if(!parts)return;
-    const recents=recentIds().map(id=>allNews().find(n=>Number(n.id)===Number(id))).filter(Boolean).slice(0,3);
-    parts.recent.classList.toggle('hidden',!recents.length);
-    if(recents.length)parts.recent.innerHTML=`<span class="kicker">Continúa</span><h3>Visto recientemente</h3><div class="teRailList">${recents.map(n=>`<button type="button" class="teRailItem" data-article="${n.id}"><small>${escText((n.sections||[])[0]||n.category||'Te Equipamos')}</small><b>${escText(n.title)}</b></button>`).join('')}</div>`;
-    const count=savedCount();
-    parts.saved.innerHTML=`<span class="kicker">Tu selección</span><h3>Guardados</h3><div class="teRailSavedRow"><strong>${count}</strong><span>${count?`contenido${count===1?'':'s'} para volver cuando quieras.`:'Usa la estrella para guardar productos y reviews.'}</span></div><button class="teRailOpen" type="button" data-desk-action="saved">Ver guardados →</button>`;
-  }
+  function ensureRail(){const rail=document.querySelector('.rail');if(!rail)return null;const legacy=[...rail.querySelectorAll(':scope > .railCard')][1];if(legacy)legacy.classList.add('teLegacyRail');const oldTopics=document.getElementById('teRailTopics');if(oldTopics)oldTopics.remove();let recent=document.getElementById('teRailRecent');if(!recent){recent=document.createElement('section');recent.id='teRailRecent';recent.className='railCard teRailExtra';rail.appendChild(recent)}let saved=document.getElementById('teRailSaved');if(!saved){saved=document.createElement('section');saved.id='teRailSaved';saved.className='railCard teRailExtra';rail.appendChild(saved)}return{recent,saved}}
+  function renderRail(){const parts=ensureRail();if(!parts)return;const recents=recentIds().map(id=>allNews().find(n=>Number(n.id)===Number(id))).filter(Boolean).slice(0,3);parts.recent.classList.toggle('hidden',!recents.length);if(recents.length)parts.recent.innerHTML=`<span class="kicker">Continúa</span><h3>Visto recientemente</h3><div class="teRailList">${recents.map(n=>`<button type="button" class="teRailItem" data-article="${n.id}"><small>${escText((n.sections||[])[0]||n.category||'Te Equipamos')}</small><b>${escText(n.title)}</b></button>`).join('')}</div>`;const count=savedCount();parts.saved.innerHTML=`<span class="kicker">Tu selección</span><h3>Guardados</h3><div class="teRailSavedRow"><strong>${count}</strong><span>${count?`contenido${count===1?'':'s'} para volver cuando quieras.`:'Usa la estrella para guardar productos y reviews.'}</span></div><button class="teRailOpen" type="button" data-desk-action="saved">Ver guardados →</button>`}
   function refresh(){if(!mq.matches)return;renderLeft();renderRail()}
-  function openRecent(){
-    const ids=recentIds();
-    if(!ids.length){if(typeof toast==='function')toast('Aún no has abierto contenidos recientemente');return}
-    if(typeof setCat==='function')setCat('Todas');
-    setTimeout(()=>{if(typeof renderRecent==='function')renderRecent();const r=document.getElementById('recentSection');if(r)r.scrollIntoView({behavior:'smooth',block:'start'})},80);
-  }
-  function applyActivity(query){
-    if(typeof applyTagFilter==='function')applyTagFilter(query);
-    else if(typeof state!=='undefined'){
-      state.q=query;
-      if(typeof setCat==='function')setCat('Todas');
-      if(typeof render==='function')render();
-    }
-    setTimeout(refresh,100);
-  }
+  function openRecent(){const ids=recentIds();if(!ids.length){if(typeof toast==='function')toast('Aún no has abierto contenidos recientemente');return}if(typeof setCat==='function')setCat('Todas');setTimeout(()=>{if(typeof renderRecent==='function')renderRecent();const r=document.getElementById('recentSection');if(r)r.scrollIntoView({behavior:'smooth',block:'start'})},80)}
+  function applyActivity(query){if(typeof applyActivityFilter==='function')applyActivityFilter(query);else if(typeof applyTagFilter==='function')applyTagFilter(query);setTimeout(refresh,100)}
   document.addEventListener('click',e=>{
-    const activity=e.target.closest&&e.target.closest('[data-activity-query]');
-    if(activity){e.preventDefault();applyActivity(activity.dataset.activityQuery||'');return}
-    const a=e.target.closest&&e.target.closest('[data-desk-action]');
-    if(a){
-      e.preventDefault();
-      const action=a.dataset.deskAction;
-      if(action==='saved'&&typeof setCat==='function')setCat('Siguiendo');
-      if(action==='recent')openRecent();
-      if(action==='allActivities'){
-        activitiesOpen=!activitiesOpen;
-        renderLeft();
-        return;
-      }
-      setTimeout(refresh,80);return;
-    }
-    if(e.target.closest&&e.target.closest('.save,[data-article],[data-tag-filter]'))setTimeout(refresh,120);
+    const activity=e.target.closest&&e.target.closest('[data-activity-query]');if(activity){e.preventDefault();applyActivity(activity.dataset.activityQuery||'');return}
+    const a=e.target.closest&&e.target.closest('[data-desk-action]');if(a){e.preventDefault();const action=a.dataset.deskAction;if(action==='saved'&&typeof setCat==='function')setCat('Siguiendo');if(action==='recent')openRecent();if(action==='allActivities'){activitiesOpen=!activitiesOpen;renderLeft();return}setTimeout(refresh,80);return}
+    if(e.target.closest&&e.target.closest('.save,[data-article],[data-tag-filter],[data-activity-filter]'))setTimeout(refresh,120);
   },true);
   window.addEventListener('pageshow',()=>setTimeout(refresh,60));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
@@ -173,12 +117,10 @@ js = r'''<script id="teDesktopPolish">
 </script>'''
 
 if 'id="teDesktopPolish"' in html:
-    a = html.find('<script id="teDesktopPolish">')
-    b = html.find('</script>', a)
-    if a != -1 and b != -1:
-        html = html[:a] + js + html[b+9:]
+    a=html.find('<script id="teDesktopPolish">');b=html.find('</script>',a)
+    if a!=-1 and b!=-1:html=html[:a]+js+html[b+9:]
 else:
-    html = html.replace('</body>', js + '</body>', 1)
+    html=html.replace('</body>',js+'</body>',1)
 
-path.write_text(html, encoding='utf-8')
-print('Escritorio pulido: Más actividades despliega navegación ampliada')
+path.write_text(html,encoding='utf-8')
+print('Escritorio pulido: Explorar usa categorías reales de actividad')
