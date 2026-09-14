@@ -151,6 +151,9 @@ jobs:
           target.write_text(html, encoding='utf-8')
           PY
 
+      - name: Evitar huecos blancos si falla una miniatura
+        run: python gh-pages/news/fix-card-image-gaps.py
+
       - name: Evitar versiones antiguas en caché
         run: python gh-pages/news/cache-policy.py
 
