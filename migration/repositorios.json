@@ -46,27 +46,6 @@
       }
     },
     {
-      "name": "te-equipamos-plumon-quechua-mujer-xs",
-      "source_path": "gh-pages/plumon-quechua-mujer-xs/index.html",
-      "current_url": "https://jorgesport.github.io/te-equipamos-arpenaz-27l/plumon-quechua-mujer-xs/",
-      "target_url": "https://jorgesport.github.io/te-equipamos-plumon-quechua-mujer-xs/",
-      "hub": true,
-      "item": {
-        "active": true,
-        "type": "review",
-        "sections": ["Reviews", "Ofertas", "Ventas"],
-        "title": "Plumón, poco peso y una talla XS: lo interesante está en cómo reparte el aislamiento",
-        "summary": "Quechua X-Light 2 de mujer con plumón 75/25, 540 CUIN y construcción híbrida para aportar calor sin demasiado volumen.",
-        "details": "Review técnica y oferta de segunda mano con poco uso e información de disponibilidad.",
-        "image": "https://contents.mediadecathlon.com/p1017638/k$acfc8255883c31e43fb353aa7ddfe230/daunenjacke-x-light2-damen-schwarz.jpg",
-        "time": "Review · Segunda mano",
-        "score": 94,
-        "featured": true,
-        "direct": true,
-        "tags": ["plumón", "frío", "mujer", "segunda mano"]
-      }
-    },
-    {
       "name": "te-equipamos-arpenaz-500-review",
       "source_path": "gh-pages/arpenaz-500-review/index.html",
       "current_url": "https://jorgesport.github.io/te-equipamos-arpenaz-27l/arpenaz-500-review/",
@@ -199,14 +178,16 @@
       "target_url": "https://jorgesport.github.io/te-equipamos-kalenji-editorial/",
       "hub": false,
       "title": "Kalenji: calidad, tecnología y precio inteligente"
+    }
+  ],
+  "deleted_intentionally": [
+    {
+      "name": "te-equipamos-plumon-quechua-mujer-xs",
+      "reason": "Eliminado por decisión del propietario; no recrear automáticamente"
     },
     {
       "name": "te-equipamos-studio",
-      "source_path": "gh-pages/studio/index.html",
-      "current_url": "https://jorgesport.github.io/te-equipamos-arpenaz-27l/studio/",
-      "target_url": "https://jorgesport.github.io/te-equipamos-studio/",
-      "hub": false,
-      "title": "Te Equipamos Studio"
+      "reason": "Eliminado por decisión del propietario; no recrear automáticamente"
     }
   ],
   "do_not_migrate": [
