@@ -1,4 +1,4 @@
-name: Publicar landing en GitHub Pages
+name: Publicar Te Equipamos Hub en GitHub Pages
 
 on:
   push:
@@ -25,16 +25,19 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Actualizar noticias outdoor automáticamente
-        run: python gh-pages/news/update-auto-news.py
-      - name: Incorporar todos los productos de venta
-        run: python gh-pages/news/add-sale-products.py
-      - name: Mejorar titulares de noticias y guías
-        run: python gh-pages/news/enhance-news-headlines.py
-      - name: Cargar actualidad y contenido Te Equipamos
+
+      - name: Sincronizar todo el contenido propio desde GitHub
+        run: python gh-pages/news/sync-github-content.py
+
+      - name: Cargar contenido Te Equipamos en el diseño actual
         run: python gh-pages/news/apply-real-news.py
-      - name: Hacer clic directo en productos
+
+      - name: Configurar menús de Ventas Reviews Vídeos Consejos Ofertas y Novedades
+        run: python gh-pages/news/configure-owned-portal.py
+
+      - name: Abrir directamente las landings marcadas como directas
         run: python gh-pages/news/enhance-product-cards.py
+
       - name: Activar vencimiento automático de la promoción
         run: |
           python - <<'PY'
@@ -46,6 +49,7 @@ jobs:
               html = html.replace('</body>', tag + '</body>', 1)
               target.write_text(html, encoding='utf-8')
           PY
+
       - name: Ajustar Raincut a la única variante en oferta
         run: |
           python - <<'PY'
@@ -59,6 +63,7 @@ jobs:
           html = html.replace('Quisiera%20informaci%C3%B3n%20sobre%20talla%2C%20color%20y%20disponibilidad.', 'Quisiera%20informaci%C3%B3n%20sobre%20talla%20y%20disponibilidad%20de%20la%20variante%20verde.')
           target.write_text(html, encoding='utf-8')
           PY
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
