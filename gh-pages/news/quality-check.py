@@ -73,7 +73,7 @@ if not block:
 elif '@media(min-width:1101px)' not in block.group(0):
     errors.append('El pulido de escritorio no está aislado por breakpoint')
 
-# La columna izquierda debe conservar Tu espacio y mostrar actividades, no temas duplicados.
+# La columna izquierda debe conservar Tu espacio y navegación por actividades.
 for label in ['Tu espacio','Explorar','Senderismo','Running','Ciclismo','Natación','Travel','Más actividades']:
     if label not in html:
         errors.append(f'Falta navegación lateral: {label}')
@@ -81,6 +81,14 @@ if 'const ACTIVITIES=[' not in html or 'data-activity-query=' not in html:
     errors.append('La navegación por actividades no está activa')
 if '#teRailTopics{display:none!important}' not in html:
     errors.append('La columna derecha puede volver a duplicar Explorar/Temas')
+
+# Más actividades debe ser un desplegable real, no un enlace muerto.
+for marker in ['const EXTRA_ACTIVITIES=[', 'let activitiesOpen=false', 'data-activity-extra', 'aria-expanded=', "activitiesOpen=!activitiesOpen"]:
+    if marker not in html:
+        errors.append('El desplegable Más actividades no está completo: falta ' + marker)
+for label in ['Trekking','Trail running','Alpinismo','Escalada','Camping','Esquí y nieve','Kayak y remo','Surf','Fitness outdoor']:
+    if label not in html:
+        errors.append(f'Falta actividad ampliada: {label}')
 
 polish_pos = html.find('/* TE_DESKTOP_POLISH */')
 images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
@@ -148,7 +156,7 @@ if errors:
         print(' - ' + e)
     raise SystemExit(1)
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · actividades laterales, escritorio y responsive verificados')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · Más actividades desplegable, escritorio y responsive verificados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings:
