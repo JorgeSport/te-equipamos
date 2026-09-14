@@ -1,13 +1,13 @@
 {
   "brand": "Te Equipamos",
+  "schema_version": 2,
   "items": [
     {
       "active": true,
       "type": "sale",
-      "sections": [
-        "Ventas",
-        "Novedades"
-      ],
+      "sections": ["Ventas", "Novedades"],
+      "activities": ["senderismo", "trekking", "travel"],
+      "product_type": "mochila",
       "title": "¿27 litros dan para una ruta y para el día a día? Esta Arpenaz intenta hacer las dos cosas",
       "summary": "Mochila Quechua Arpenaz 100 de 27 L para rutas, escapadas y uso cotidiano, con varios colores y consulta de disponibilidad.",
       "details": "Landing de venta de Te Equipamos con galería, características y acceso a consulta comercial.",
@@ -17,11 +17,7 @@
       "score": 99,
       "featured": true,
       "direct": true,
-      "tags": [
-        "senderismo",
-        "mochilas",
-        "quechua"
-      ]
+      "tags": ["senderismo", "mochilas", "quechua"]
     }
   ]
 }
