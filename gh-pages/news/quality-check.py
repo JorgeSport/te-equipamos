@@ -31,7 +31,9 @@ required_markers = {
     'Buscador y descubrimiento': 'TE_DISCOVERY_PHASE1_JS',
     'Etiquetas activas': 'function applyTagFilter(',
     'Filtro real por actividad': 'function applyActivityFilter(',
+    'Inicio completo tras filtrar actividad': 'function scrollActivityResultsStart()',
     'Etiquetas visuales de actividad': 'function renderActivityPills(',
+    'Etiquetas neutras globales': '/* TE_NEUTRAL_PRODUCT_TAGS */',
     'Etiquetas neutras responsive': '/* TE_RESPONSIVE_NEUTRAL_TAGS */',
     'Compartir tarjetas': 'function shareHubItem(id,action,button)',
     'Actividades responsive': '/* TE_RESPONSIVE_ACTIVITY_NAV */',
@@ -94,6 +96,17 @@ for label in ['Trekking','Trail running','Alpinismo','Escalada','Camping','Esqu�
 for marker in ['class="activityRow"', 'data-activity-filter=', 'teNormalTags(n)']:
     if marker not in html: errors.append('Falta separación visual entre actividades y etiquetas: ' + marker)
 
+# Las etiquetas de producto deben ser neutras tanto en escritorio como en responsive.
+global_neutral_pos = html.find('/* TE_NEUTRAL_PRODUCT_TAGS */')
+if global_neutral_pos == -1:
+    errors.append('No existe el estilo neutro global de etiquetas')
+else:
+    global_neutral_end = html.find('</style>', global_neutral_pos)
+    global_neutral_css = html[global_neutral_pos:global_neutral_end if global_neutral_end != -1 else len(html)]
+    for marker in ['.tagPill.tone-green,.tagPill.tone-blue,.tagPill.tone-amber,.tagPill.tone-violet,.tagPill.tone-neutral', 'background:transparent', 'border-color:var(--line)']:
+        if marker not in global_neutral_css:
+            errors.append('Etiquetas globales no están neutralizadas correctamente: falta ' + marker)
+
 neutral_pos = html.find('/* TE_RESPONSIVE_NEUTRAL_TAGS */')
 if neutral_pos == -1:
     errors.append('No existe el estilo neutro de etiquetas responsive')
@@ -103,6 +116,11 @@ else:
     for marker in ['@media(max-width:1100px)', 'background:transparent!important', 'border-color:var(--line)!important']:
         if marker not in neutral_css:
             errors.append('Etiquetas responsive no están neutralizadas correctamente: falta ' + marker)
+
+# Al filtrar por actividad, la primera tarjeta debe quedar debajo de la cabecera sticky y mostrar su imagen desde arriba.
+for marker in ["document.querySelector('#feed .card')", "document.querySelector('.top')", "getBoundingClientRect().height", "scrollActivityResultsStart()"]:
+    if marker not in html:
+        errors.append('El inicio de resultados por actividad puede quedar cortado: falta ' + marker)
 
 polish_pos = html.find('/* TE_DESKTOP_POLISH */')
 images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
@@ -163,7 +181,7 @@ if errors:
     raise SystemExit(1)
 
 activity_set = sorted({a for item in items for a in item.get('activities', [])})
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · responsive neutro e identidad Te Equipamos verificados')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · tarjetas completas y etiquetas neutras verificadas')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings: print(' - ' + w)
