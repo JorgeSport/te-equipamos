@@ -53,6 +53,9 @@ jobs:
       - name: Abrir directamente las landings marcadas como directas
         run: python gh-pages/news/enhance-product-cards.py
 
+      - name: Mejorar búsqueda filtros vistos recientemente y guardados
+        run: python gh-pages/news/enhance-discovery.py
+
       - name: Añadir recomendaciones estratégicas a las landings
         run: |
           python - <<'PY'
