@@ -56,6 +56,48 @@ jobs:
       - name: Mejorar búsqueda filtros vistos recientemente y guardados
         run: python gh-pages/news/enhance-discovery.py
 
+      - name: Añadir breadcrumbs a las fichas
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from urllib.parse import urlparse, quote
+          import html as h
+          import json
+          root = Path('gh-pages')
+          items = json.loads(Path('gh-pages/news/news-data.json').read_text(encoding='utf-8'))
+          preferred = ['Reviews','Ventas','Consejos','Ofertas','Novedades','Vídeos']
+          css = '<style id="teBreadcrumbCss">.te-breadcrumbbar{font-family:Arial,Helvetica,sans-serif;background:#fff;border-bottom:1px solid #e5e7eb;color:#5f6368}.te-breadcrumbbar-wrap{max-width:1120px;margin:auto;min-height:42px;padding:0 18px;display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap;overflow:hidden}.te-breadcrumbbar a{color:#1a73e8;text-decoration:none;font-weight:700}.te-breadcrumbbar strong{color:#3c4043;overflow:hidden;text-overflow:ellipsis}.te-breadcrumbbar span{color:#9aa0a6}@media(max-width:720px){.te-breadcrumbbar-wrap{min-height:40px;padding:0 14px;font-size:11px}}@media(prefers-color-scheme:dark){.te-breadcrumbbar{background:#111315;border-color:#303134;color:#aeb3b8}.te-breadcrumbbar strong{color:#e8eaed}}</style>'
+          count = 0
+          for item in items:
+              u = urlparse(str(item.get('url') or ''))
+              prefix = '/te-equipamos-arpenaz-27l/'
+              if u.netloc.lower() != 'jorgesport.github.io' or not u.path.startswith(prefix):
+                  continue
+              rel = u.path[len(prefix):].strip('/')
+              page = root / 'index.html' if not rel else root / rel / 'index.html'
+              if not page.exists():
+                  continue
+              text = page.read_text(encoding='utf-8')
+              if 'class="te-breadcrumbbar"' in text:
+                  continue
+              sections = item.get('sections') or []
+              section = next((s for s in preferred if s in sections), sections[0] if sections else '')
+              mid = ''
+              if section:
+                  mid = f'<a href="/te-equipamos-arpenaz-27l/news/?section={quote(section)}">{h.escape(section)}</a><span>›</span>'
+              bar = f'<nav class="te-breadcrumbbar" aria-label="Ruta de navegación"><div class="te-breadcrumbbar-wrap"><a href="/te-equipamos-arpenaz-27l/news/">Te Equipamos</a><span>›</span>{mid}<strong>{h.escape(str(item.get("title") or "Contenido"))}</strong></div></nav>'
+              if '</head>' in text:
+                  text = text.replace('</head>', css + '</head>', 1)
+              body = text.find('<body')
+              if body >= 0:
+                  end = text.find('>', body)
+                  if end >= 0:
+                      text = text[:end+1] + bar + text[end+1:]
+                      page.write_text(text, encoding='utf-8')
+                      count += 1
+          print(f'Breadcrumbs añadidos a {count} fichas.')
+          PY
+
       - name: Añadir recomendaciones estratégicas a las landings
         run: |
           python - <<'PY'
