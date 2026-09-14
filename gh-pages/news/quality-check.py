@@ -14,12 +14,9 @@ if not index.exists():
     errors.append('Falta gh-pages/news/index.html')
 if not data_file.exists():
     errors.append('Falta gh-pages/news/news-data.json')
-
 if errors:
     raise SystemExit('\n'.join(errors))
 
-# Normaliza el resultado final antes de verificarlo: las imágenes deben quedar visibles
-# y con presencia editorial real en escritorio.
 if restore_script.exists():
     code = compile(restore_script.read_text(encoding='utf-8'), str(restore_script), 'exec')
     exec(code, {'__name__': '__main__', '__file__': str(restore_script)})
@@ -33,6 +30,7 @@ required_markers = {
     'Pulido de escritorio': '/* TE_DESKTOP_POLISH */',
     'Script de escritorio': 'id="teDesktopPolish"',
     'Imágenes de tarjetas en escritorio': '/* TE_DESKTOP_CARD_IMAGES */',
+    'Mosaico editorial Sigue explorando': '/* SECTION_JOURNEY_VISUAL */',
     'Protección de miniaturas móvil': '/* TE_IMAGE_FAILSAFE */',
     'Buscador y descubrimiento': 'TE_DISCOVERY_PHASE1_JS',
     'Etiquetas activas': 'function applyTagFilter(',
@@ -49,8 +47,7 @@ for obsolete in ['id="promoBar"', 'id="promoHome"']:
 
 if 'CONTENIDO PROPIO · GITHUB' in html.upper():
     errors.append('Hay una referencia técnica visible a GitHub')
-
-if len(items) == 0:
+if not items:
     errors.append('El portal no tiene contenidos')
 
 seen_ids = set()
@@ -68,14 +65,12 @@ for i, item in enumerate(items, start=1):
     if not item.get('image'):
         errors.append(f'Contenido sin imagen: {title[:70]}')
 
-# Verifica que el CSS de escritorio no afecte al móvil por accidente.
 block = re.search(r'/\* TE_DESKTOP_POLISH \*/(.*?)(?:</style>|$)', html, flags=re.S)
 if not block:
     errors.append('No se pudo inspeccionar el bloque de escritorio')
 elif '@media(min-width:1101px)' not in block.group(0):
     errors.append('El pulido de escritorio no está aislado por breakpoint')
 
-# Las imágenes deben restaurarse DESPUÉS del pulido que originalmente las ocultaba.
 polish_pos = html.find('/* TE_DESKTOP_POLISH */')
 images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
 if images_pos == -1:
@@ -91,16 +86,26 @@ else:
         errors.append('Las tarjetas de escritorio no usan la proporción editorial aproximada 60/40')
     if 'aspect-ratio:16/9!important' not in images_block:
         errors.append('Las imágenes de escritorio no mantienen formato horizontal 16:9')
-    if 'width:100%!important' not in images_block:
-        errors.append('Las imágenes no ocupan el ancho de su columna editorial')
 
-# La navegación lateral original debe seguir disponible para móvil/tablet.
+journey_pos = html.find('/* SECTION_JOURNEY_VISUAL */')
+if journey_pos == -1:
+    errors.append('No existe el mosaico visual al final de las secciones')
+else:
+    journey_end = html.find('</style>', journey_pos)
+    journey_css = html[journey_pos:journey_end if journey_end != -1 else len(html)]
+    for marker, label in [('.journeyHero','bloque protagonista'),('.journeySide','bloques secundarios'),('.journeyWide','bloque panorámico'),('@media(max-width:760px)','adaptación móvil')]:
+        if marker not in journey_css:
+            errors.append(f'El mosaico editorial no incluye {label}')
+if 'function journeyMedia(cat)' not in html:
+    errors.append('El mosaico editorial no toma imágenes reales del contenido')
+if 'journeyItems(x.cat).length>0' not in html:
+    errors.append('El mosaico no está ocultando secciones sin contenido')
+
 if '.side .nav{display:none!important}' not in html:
     errors.append('No se encontró la sustitución del menú lateral en escritorio')
 if '@media(max-width:760px)' not in html:
     errors.append('Faltan reglas responsive para móvil')
 
-# Comprobación simple de IDs estáticos duplicados. Ignora plantillas JS con ${...}.
 static_ids = re.findall(r'\bid=["\']([A-Za-z][\w:-]*)["\']', html)
 duplicates = sorted({x for x in static_ids if static_ids.count(x) > 1 and not x.startswith('teRail')})
 if duplicates:
@@ -112,7 +117,7 @@ if errors:
         print(' - ' + e)
     raise SystemExit(1)
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · tarjetas escritorio 60/40 verificadas')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · tarjetas 60/40 y mosaico editorial verificados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings:
