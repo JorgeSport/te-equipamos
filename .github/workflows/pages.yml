@@ -154,6 +154,12 @@ jobs:
       - name: Evitar huecos blancos si falla una miniatura
         run: python gh-pages/news/fix-card-image-gaps.py
 
+      - name: Pulir experiencia editorial de escritorio
+        run: python gh-pages/news/polish-desktop-layout.py
+
+      - name: Control de calidad antes de publicar
+        run: python gh-pages/news/quality-check.py
+
       - name: Evitar versiones antiguas en caché
         run: python gh-pages/news/cache-policy.py
 
