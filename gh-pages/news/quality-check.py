@@ -33,6 +33,8 @@ required_markers = {
     'Filtro real por actividad': 'function applyActivityFilter(',
     'Etiquetas visuales de actividad': 'function renderActivityPills(',
     'Compartir tarjetas': 'function shareHubItem(id,action,button)',
+    'Actividades responsive': '/* TE_RESPONSIVE_ACTIVITY_NAV */',
+    'Script de actividades responsive': 'id="teResponsiveActivitiesScript"',
     'Menú de secciones': "const CATS=['Todas','Ventas','Reviews','Vídeos','Consejos','Ofertas','Novedades','Siguiendo'];",
 }
 for label, marker in required_markers.items():
@@ -42,6 +44,14 @@ for obsolete in ['id="promoBar"', 'id="promoHome"']:
     if obsolete in html: errors.append(f'Sigue presente un bloque promocional retirado: {obsolete}')
 if 'CONTENIDO PROPIO · GITHUB' in html.upper(): errors.append('Hay una referencia técnica visible a GitHub')
 if not items: errors.append('El portal no tiene contenidos')
+
+# La identidad pública ya no debe presentarse como Noticias/News.
+if '<title>Te Equipamos</title>' not in html:
+    errors.append('El título del portal no es Te Equipamos')
+if 'Te Equipamos News' in html:
+    errors.append('Sigue apareciendo la identidad antigua Te Equipamos News')
+if '<small>Noticias</small>' in html or '← Volver a noticias' in html:
+    errors.append('Sigue apareciendo Noticias en la identidad o navegación principal')
 
 seen_ids = set()
 for i, item in enumerate(items, start=1):
@@ -98,7 +108,7 @@ else:
     if 'grid-template-columns:minmax(0,3fr) minmax(280px,2fr)' not in images_block: errors.append('Las tarjetas de escritorio no usan 60/40')
     if 'aspect-ratio:16/9!important' not in images_block: errors.append('Las imágenes de escritorio no mantienen 16:9')
 
-# RESPONSIVE: no heredar las miniaturas laterales del escritorio.
+# RESPONSIVE: imagen grande arriba y navegación de actividades propia.
 rstart = html.find('<style id="teResponsiveRestore">')
 if rstart == -1:
     errors.append('No existe la restauración específica de responsive')
@@ -109,6 +119,18 @@ else:
         if marker not in responsive: errors.append('Responsive no restaurado correctamente: falta ' + marker)
     if '108px!important' in responsive or '118px!important' in responsive:
         errors.append('El responsive sigue forzando miniaturas laterales pequeñas')
+
+resp_nav_pos = html.find('/* TE_RESPONSIVE_ACTIVITY_NAV */')
+if resp_nav_pos == -1:
+    errors.append('No existe la navegación de actividades responsive')
+else:
+    resp_nav_end = html.find('</style>', resp_nav_pos)
+    resp_nav = html[resp_nav_pos:resp_nav_end if resp_nav_end != -1 else len(html)]
+    if '@media(max-width:1100px)' not in resp_nav:
+        errors.append('La navegación de actividades responsive no está limitada a tablet/móvil')
+for marker in ['id="teResponsiveActivities"', 'data-resp-activity=', 'data-resp-more', 'Explorar actividades']:
+    if marker not in html:
+        errors.append('Falta navegación responsive por actividad: ' + marker)
 
 journey_pos = html.find('/* SECTION_JOURNEY_VISUAL */')
 if journey_pos == -1:
@@ -132,7 +154,7 @@ if errors:
     raise SystemExit(1)
 
 activity_set = sorted({a for item in items for a in item.get('activities', [])})
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · clasificación nativa verificada')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · responsive e identidad Te Equipamos verificados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings: print(' - ' + w)
