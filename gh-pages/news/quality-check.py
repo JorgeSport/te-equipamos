@@ -19,7 +19,7 @@ if errors:
     raise SystemExit('\n'.join(errors))
 
 # Normaliza el resultado final antes de verificarlo: las imágenes deben quedar visibles
-# en escritorio aunque un CSS anterior haya intentado ocultarlas.
+# y con presencia editorial real en escritorio.
 if restore_script.exists():
     code = compile(restore_script.read_text(encoding='utf-8'), str(restore_script), 'exec')
     exec(code, {'__name__': '__main__', '__file__': str(restore_script)})
@@ -86,9 +86,13 @@ else:
     images_end = html.find('</style>', images_pos)
     images_block = html[images_pos:images_end if images_end != -1 else len(html)]
     if '.feed .card>.thumb{display:block!important' not in images_block:
-        errors.append('Las miniaturas de escritorio no están configuradas como visibles')
-    if 'grid-template-columns:minmax(0,1fr) 190px' not in images_block:
-        errors.append('Las tarjetas de escritorio no reservan espacio para la imagen')
+        errors.append('Las imágenes de escritorio no están configuradas como visibles')
+    if 'grid-template-columns:minmax(0,3fr) minmax(280px,2fr)' not in images_block:
+        errors.append('Las tarjetas de escritorio no usan la proporción editorial aproximada 60/40')
+    if 'aspect-ratio:16/9!important' not in images_block:
+        errors.append('Las imágenes de escritorio no mantienen formato horizontal 16:9')
+    if 'width:100%!important' not in images_block:
+        errors.append('Las imágenes no ocupan el ancho de su columna editorial')
 
 # La navegación lateral original debe seguir disponible para móvil/tablet.
 if '.side .nav{display:none!important}' not in html:
@@ -108,7 +112,7 @@ if errors:
         print(' - ' + e)
     raise SystemExit(1)
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · imágenes de escritorio verificadas')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · tarjetas escritorio 60/40 verificadas')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings:
