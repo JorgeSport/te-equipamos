@@ -41,16 +41,19 @@ source_css = '.sourceBtn{display:inline-block;margin-top:16px;background:var(--a
 if source_css not in html:
     html = html.replace('.empty{', source_css + '.empty{', 1)
 
-# Mejora exclusivamente responsive: el escritorio conserva su diseño actual.
+# Responsive móvil inspirado en Google News: tarjetas compactas con miniatura lateral.
 mobile_css = r'''.relMedia{display:none}
 @media(max-width:760px){
   .feed{border-left:0;border-right:0;border-radius:0;box-shadow:none;background:transparent}
-  .card{display:flex;flex-direction:column;gap:0;padding:0 0 22px;margin:0 0 14px;background:var(--surface);border-bottom:8px solid var(--bg)}
-  .card>div:first-child{padding:18px 18px 0}
-  .card .thumb{order:-1;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:0}
-  .card .title{font-size:23px;line-height:1.22;margin:8px 0 14px;letter-spacing:-.01em}
+  .card{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:12px;padding:16px 16px 18px;margin:0 0 10px;background:var(--surface);border-bottom:1px solid var(--line);align-items:start}
+  .card>div:first-child{padding:0;min-width:0}
+  .card .thumb{order:initial;width:108px;height:82px;aspect-ratio:auto;object-fit:cover;border-radius:11px;align-self:start;background:var(--surface2)}
+  .card.noThumb{grid-template-columns:1fr}
+  .card .title{font-size:20px;line-height:1.22;margin:7px 0 10px;letter-spacing:-.01em}
   .card .summary{display:none}
-  .card .cardMeta{font-size:13px;padding-bottom:2px}
+  .card .cardMeta{font-size:12px;padding-bottom:0}
+  .card .tagRow{margin:8px 0 8px}
+  .card .cardShare{margin:8px 0 8px}
   .articleWrap{padding-left:0;padding-right:0}
   .articleWrap>.back{margin-left:14px}
   .articleGrid{display:block}
@@ -86,4 +89,4 @@ if n != 1:
     raise RuntimeError("No se pudo actualizar renderArticle")
 
 target.write_text(html, encoding="utf-8")
-print(f"Te Equipamos News actualizado con {len(data)} contenidos y responsive móvil mejorado")
+print(f"Te Equipamos News actualizado con {len(data)} contenidos y tarjetas móviles compactas")
