@@ -29,6 +29,9 @@ jobs:
       - name: Sincronizar todo el contenido propio desde GitHub
         run: python gh-pages/news/sync-github-content.py
 
+      - name: Crear lectores para contenidos de otros repositorios
+        run: python gh-pages/news/wrap-external-content.py
+
       - name: Cargar contenido Te Equipamos en el diseño actual
         run: python gh-pages/news/apply-real-news.py
 
