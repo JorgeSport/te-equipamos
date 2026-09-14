@@ -7,6 +7,7 @@ index = base / 'index.html'
 data_file = base / 'news-data.json'
 restore_script = base / 'restore-desktop-card-images.py'
 errors, warnings = [], []
+OFFICIAL_URL = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/'
 
 if not index.exists(): errors.append('Falta gh-pages/news/index.html')
 if not data_file.exists(): errors.append('Falta gh-pages/news/news-data.json')
@@ -40,6 +41,8 @@ required_markers = {
     'Compartir tarjetas': 'function shareHubItem(id,action,button)',
     'Actividades responsive': '/* TE_RESPONSIVE_ACTIVITY_NAV */',
     'Script de actividades responsive': 'id="teResponsiveActivitiesScript"',
+    'Metadatos oficiales': '<!-- TE_OFFICIAL_SITE_META -->',
+    'Datos estructurados oficiales': 'id="teOfficialSchema"',
     'Menú de secciones': "const CATS=['Todas','Ventas','Reviews','Vídeos','Consejos','Ofertas','Novedades','Siguiendo'];",
 }
 for label, marker in required_markers.items():
@@ -50,13 +53,44 @@ for obsolete in ['id="promoBar"', 'id="promoHome"']:
 if 'CONTENIDO PROPIO · GITHUB' in html.upper(): errors.append('Hay una referencia técnica visible a GitHub')
 if not items: errors.append('El portal no tiene contenidos')
 
-# La identidad pública ya no debe presentarse como Noticias/News.
-if '<title>Te Equipamos</title>' not in html:
-    errors.append('El título del portal no es Te Equipamos')
+# La identidad pública ya no debe presentarse como Noticias/News y la marca debe volver al Hub oficial.
+if '<title>Te Equipamos | Deporte, actividades y equipamiento</title>' not in html:
+    errors.append('El título estratégico del portal no está activo')
 if 'Te Equipamos News' in html:
     errors.append('Sigue apareciendo la identidad antigua Te Equipamos News')
 if '<small>Noticias</small>' in html or '← Volver a noticias' in html:
     errors.append('Sigue apareciendo Noticias en la identidad o navegación principal')
+for marker in [
+    f'href="{OFFICIAL_URL}" class="brand"',
+    f'<link rel="canonical" href="{OFFICIAL_URL}">',
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="Te Equipamos">',
+    '<meta property="og:title"',
+    '<meta property="og:description"',
+    f'<meta property="og:url" content="{OFFICIAL_URL}">',
+    '<meta property="og:image"',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:title"',
+    '<meta name="twitter:description"',
+    '<meta name="twitter:image"',
+]:
+    if marker not in html:
+        errors.append('Falta metadato o enlace oficial: ' + marker)
+
+# Incluso la landing de producto principal debe usar TE EQUIPAMOS como acceso al Hub, no como enlace al producto.
+main_product = base.parent / 'index.html'
+if main_product.exists():
+    main_html = main_product.read_text(encoding='utf-8')
+    if f'href="{OFFICIAL_URL}"' not in main_html or 'aria-label="Ir al inicio de Te Equipamos"' not in main_html:
+        errors.append('La marca de la landing principal no vuelve al Hub oficial')
+
+# Los lectores centrales deben conservar siempre un camino al Hub oficial.
+read_root = base.parent / 'read'
+if read_root.exists():
+    for reader in read_root.glob('*/index.html'):
+        reader_html = reader.read_text(encoding='utf-8')
+        if OFFICIAL_URL not in reader_html:
+            errors.append(f'El lector {reader.parent.name} no enlaza al Hub oficial')
 
 seen_ids = set()
 for i, item in enumerate(items, start=1):
@@ -196,7 +230,7 @@ if errors:
     raise SystemExit(1)
 
 activity_set = sorted({a for item in items for a in item.get('activities', [])})
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · vacíos y alternativas ordenados correctamente')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · URL oficial, metadatos sociales y navegación verificados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings: print(' - ' + w)
