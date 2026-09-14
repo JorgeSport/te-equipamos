@@ -14,34 +14,48 @@ if data.exists():
 
 html = index.read_text(encoding='utf-8').replace(old_img, new_img)
 
-# Esta regla se inyecta al final y manda sobre el responsive anterior.
-# Mantiene en móvil el patrón Google News: texto + miniatura lateral.
-css = r'''/* TE_IMAGE_FAILSAFE */
+# Protección general: si una imagen falla, desaparece sin reservar espacio.
+failsafe_css = r'''/* TE_IMAGE_FAILSAFE */
 .card img.thumb.te-img-failed{display:none!important;width:0!important;height:0!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important}
+'''
+if '/* TE_IMAGE_FAILSAFE */' not in html:
+    html = html.replace('</style>', failsafe_css + '</style>', 1)
+
+# Restauración explícita del responsive original.
+# IMPORTANTE: los cambios editoriales 60/40 y mosaicos de tamaños distintos son SOLO escritorio.
+# En móvil volvemos al patrón visual con imagen principal grande arriba y texto debajo.
+responsive_css = r'''<style id="teResponsiveRestore">
 @media(max-width:760px){
-  .feed .card{display:grid!important;grid-template-columns:minmax(0,1fr) 108px!important;gap:12px!important;padding:16px 16px 18px!important;margin:0 0 10px!important;align-items:start!important;background:var(--surface)!important;border-bottom:1px solid var(--line)!important}
-  .feed .card>div:first-child{padding:0!important;min-width:0!important}
-  .feed .card .thumb{order:initial!important;width:108px!important;height:82px!important;min-height:0!important;aspect-ratio:auto!important;object-fit:cover!important;border-radius:11px!important;align-self:start!important;margin:0!important;background:var(--surface2)!important}
-  .feed .card.noThumb{grid-template-columns:1fr!important}
-  .feed .card.noThumb .thumb{display:none!important}
-  .feed .card .title{font-size:20px!important;line-height:1.22!important;margin:7px 0 10px!important}
+  .feed{border-left:0!important;border-right:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+  .feed .card{display:flex!important;flex-direction:column!important;grid-template-columns:none!important;gap:0!important;padding:0 0 22px!important;margin:0 0 14px!important;background:var(--surface)!important;border-bottom:8px solid var(--bg)!important;align-items:stretch!important}
+  .feed .card>div:first-child{padding:18px 18px 0!important;min-width:0!important;order:0!important}
+  .feed .card .thumb{display:block!important;order:-1!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:16/9!important;object-fit:cover!important;border-radius:0!important;align-self:stretch!important;margin:0!important;background:var(--surface2)!important}
+  .feed .card.noThumb{display:block!important}
+  .feed .card.noThumb .thumb,.feed .card .thumb.te-img-failed{display:none!important}
+  .feed .card .title{font-size:23px!important;line-height:1.22!important;margin:8px 0 14px!important;letter-spacing:-.01em!important}
   .feed .card .summary{display:none!important}
-  .feed .card .cardMeta{font-size:12px!important;padding-bottom:0!important}
+  .feed .card .cardMeta{font-size:13px!important;padding-bottom:2px!important}
   .feed .card .tagRow{margin:8px 0!important}
   .feed .card .cardShare{margin:8px 0!important}
+
+  /* Sigue explorando: nada de miniaturas laterales en responsive. */
+  .journeyGrid,.journeyGrid.count1,.journeyGrid.count2{grid-template-columns:1fr!important;grid-auto-rows:auto!important;gap:12px!important;padding:0 12px!important}
+  .journeyCard,.journeyGrid.count1 .journeyCard,.journeyGrid.count2 .journeyCard{grid-column:1!important;grid-row:auto!important;border-radius:16px!important}
+  .journeyCardInner,.journeyHero .journeyCardInner,.journeySide .journeyCardInner,.journeyWide .journeyCardInner{display:flex!important;flex-direction:column!important;grid-template-columns:none!important;min-height:0!important}
+  .journeyMedia,.journeyHero .journeyMedia,.journeySide .journeyMedia,.journeyWide .journeyMedia{order:-1!important;width:100%!important;aspect-ratio:16/9!important;min-height:0!important}
+  .journeyMedia img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .journeyCopy,.journeyHero .journeyCopy,.journeySide .journeyCopy,.journeyWide .journeyCopy{padding:18px!important}
+  .journeyCopy strong,.journeyHero .journeyCopy strong,.journeySide .journeyCopy strong,.journeyWide .journeyCopy strong{font-size:20px!important;line-height:1.22!important}
 }
-'''
-if '/* TE_IMAGE_FAILSAFE */' in html:
-    start = html.index('/* TE_IMAGE_FAILSAFE */')
+</style>'''
+
+# Elimina una versión previa de esta restauración y coloca la actual al final del <head>.
+start = html.find('<style id="teResponsiveRestore">')
+if start != -1:
     end = html.find('</style>', start)
     if end != -1:
-        # Solo sustituimos nuestro bloque anterior, no otros estilos.
-        old_end = html.find('\n', start)
-        # Si ya existe nuestra regla móvil nueva, no duplicar.
-        if '.feed .card{display:grid!important' not in html[start:end]:
-            html = html[:start] + css + html[end:]
-else:
-    html = html.replace('</style>', css + '</style>', 1)
+        html = html[:start] + html[end+8:]
+html = html.replace('</head>', responsive_css + '</head>', 1)
 
 js = r'''<script id="teImageFailsafe">
 (function(){
@@ -82,4 +96,4 @@ else:
     html = html.replace('</body>', js + '</body>', 1)
 
 index.write_text(html, encoding='utf-8')
-print('Tarjetas móviles compactas: eliminado el hueco blanco y añadida protección de miniaturas')
+print('Responsive restaurado: imagen grande arriba; cambios 60/40 reservados a escritorio')
