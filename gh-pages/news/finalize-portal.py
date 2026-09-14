@@ -46,6 +46,14 @@ css = r'''/* TE_RESPONSIVE_ACTIVITY_NAV */
 if '/* TE_RESPONSIVE_ACTIVITY_NAV */' not in html:
     html = html.replace('</style>', css + '</style>', 1)
 
+# El contenedor queda presente en el HTML y el script solo rellena su contenido.
+if 'id="teResponsiveActivities"' not in html:
+    html = html.replace(
+        '<nav class="cats" id="cats"></nav>',
+        '<nav class="cats" id="cats"></nav><section id="teResponsiveActivities" class="teResponsiveActivities" aria-label="Explorar actividades"></section>',
+        1,
+    )
+
 js = r'''<script id="teResponsiveActivitiesScript">
 (function(){
   const mq=window.matchMedia('(max-width:1100px)');
