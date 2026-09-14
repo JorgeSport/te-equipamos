@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Actualizar noticias outdoor automáticamente
         run: python gh-pages/news/update-auto-news.py
+      - name: Incorporar todos los productos de venta
+        run: python gh-pages/news/add-sale-products.py
       - name: Cargar actualidad y contenido Te Equipamos
         run: python gh-pages/news/apply-real-news.py
       - name: Activar vencimiento automático de la promoción
