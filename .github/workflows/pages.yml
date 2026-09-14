@@ -38,6 +38,33 @@ jobs:
       - name: Abrir directamente las landings marcadas como directas
         run: python gh-pages/news/enhance-product-cards.py
 
+      - name: Añadir recomendaciones estratégicas a las landings
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root = Path('gh-pages')
+          css = '<link rel="stylesheet" href="/te-equipamos-arpenaz-27l/related-content.css">'
+          js = '<script src="/te-equipamos-arpenaz-27l/related-content.js"></script>'
+          skip = {'news', 'studio', 'kalenji'}
+          count = 0
+          for page in root.rglob('index.html'):
+              rel = page.relative_to(root)
+              if rel.parts and rel.parts[0] in skip:
+                  continue
+              html = page.read_text(encoding='utf-8')
+              changed = False
+              if css not in html and '</head>' in html:
+                  html = html.replace('</head>', css + '</head>', 1)
+                  changed = True
+              if js not in html and '</body>' in html:
+                  html = html.replace('</body>', js + '</body>', 1)
+                  changed = True
+              if changed:
+                  page.write_text(html, encoding='utf-8')
+                  count += 1
+          print(f'Recomendaciones instaladas en {count} páginas propias.')
+          PY
+
       - name: Activar vencimiento automático de la promoción
         run: |
           python - <<'PY'
