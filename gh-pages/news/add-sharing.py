@@ -28,19 +28,16 @@ share_row = '''<div class="cardShare" aria-label="Compartir esta tarjeta">
 <button class="cardShareBtn" type="button" data-share-action="copy" data-share-id="${n.id}" aria-label="Copiar enlace" title="Copiar enlace"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10.6 13.4a4 4 0 0 0 5.7 0l2.1-2.1a4 4 0 0 0-5.7-5.7l-1.2 1.2M13.4 10.6a4 4 0 0 0-5.7 0l-2.1 2.1a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg></button>
 </div>'''
 
-# Compatible con tarjetas normales y con las nuevas etiquetas activas.
+# Compatible con tarjetas normales, tags y la nueva fila de actividades.
 card_points = [
-    '<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}<div class="cardMeta">',
-    '<p class="summary">${esc(n.summary)}</p><div class="cardMeta">',
+    ('<p class="summary">${esc(n.summary)}</p>${renderActivityPills(n)}${renderTagPills(n)}<div class="cardMeta">', '<p class="summary">${esc(n.summary)}</p>${renderActivityPills(n)}${renderTagPills(n)}'),
+    ('<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}<div class="cardMeta">', '<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}'),
+    ('<p class="summary">${esc(n.summary)}</p><div class="cardMeta">', '<p class="summary">${esc(n.summary)}</p>'),
 ]
 inserted = False
-for old_card in card_points:
+for old_card, prefix in card_points:
     if old_card in html:
-        if '${renderTagPills(n)}' in old_card:
-            new_card = '<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}' + share_row + '<div class="cardMeta">'
-        else:
-            new_card = '<p class="summary">${esc(n.summary)}</p>' + share_row + '<div class="cardMeta">'
-        html = html.replace(old_card, new_card, 1)
+        html = html.replace(old_card, prefix + share_row + '<div class="cardMeta">', 1)
         inserted = True
         break
 if not inserted and 'class="cardShare"' not in html:
@@ -90,7 +87,7 @@ for item in items:
 
     page = target.read_text(encoding='utf-8')
     title = str(item.get('title') or 'Te Equipamos').strip()
-    summary = str(item.get('summary') or 'Productos, reviews, ofertas y contenido outdoor de Te Equipamos.').strip()
+    summary = str(item.get('summary') or 'Productos, reviews, ofertas y contenidos de Te Equipamos.').strip()
     image = str(item.get('image') or '').strip()
 
     title_attr = html_lib.escape(title + ' | Te Equipamos', quote=True)
