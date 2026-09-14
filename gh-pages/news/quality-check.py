@@ -32,6 +32,7 @@ required_markers = {
     'Etiquetas activas': 'function applyTagFilter(',
     'Filtro real por actividad': 'function applyActivityFilter(',
     'Etiquetas visuales de actividad': 'function renderActivityPills(',
+    'Etiquetas neutras responsive': '/* TE_RESPONSIVE_NEUTRAL_TAGS */',
     'Compartir tarjetas': 'function shareHubItem(id,action,button)',
     'Actividades responsive': '/* TE_RESPONSIVE_ACTIVITY_NAV */',
     'Script de actividades responsive': 'id="teResponsiveActivitiesScript"',
@@ -90,9 +91,18 @@ for marker in ['const EXTRA_ACTIVITIES=[', 'let activitiesOpen=false', 'data-act
 for label in ['Trekking','Trail running','Alpinismo','Escalada','Camping','Esquí y nieve','Kayak y remo','Surf','Fitness']:
     if label not in html: errors.append(f'Falta actividad ampliada: {label}')
 
-# Las actividades se deben mostrar como chips distintos de los tags normales.
 for marker in ['class="activityRow"', 'data-activity-filter=', 'teNormalTags(n)']:
     if marker not in html: errors.append('Falta separación visual entre actividades y etiquetas: ' + marker)
+
+neutral_pos = html.find('/* TE_RESPONSIVE_NEUTRAL_TAGS */')
+if neutral_pos == -1:
+    errors.append('No existe el estilo neutro de etiquetas responsive')
+else:
+    neutral_end = html.find('</style>', neutral_pos)
+    neutral_css = html[neutral_pos:neutral_end if neutral_end != -1 else len(html)]
+    for marker in ['@media(max-width:1100px)', 'background:transparent!important', 'border-color:var(--line)!important']:
+        if marker not in neutral_css:
+            errors.append('Etiquetas responsive no están neutralizadas correctamente: falta ' + marker)
 
 polish_pos = html.find('/* TE_DESKTOP_POLISH */')
 images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
@@ -108,7 +118,6 @@ else:
     if 'grid-template-columns:minmax(0,3fr) minmax(280px,2fr)' not in images_block: errors.append('Las tarjetas de escritorio no usan 60/40')
     if 'aspect-ratio:16/9!important' not in images_block: errors.append('Las imágenes de escritorio no mantienen 16:9')
 
-# RESPONSIVE: imagen grande arriba y navegación de actividades propia.
 rstart = html.find('<style id="teResponsiveRestore">')
 if rstart == -1:
     errors.append('No existe la restauración específica de responsive')
@@ -154,7 +163,7 @@ if errors:
     raise SystemExit(1)
 
 activity_set = sorted({a for item in items for a in item.get('activities', [])})
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · responsive e identidad Te Equipamos verificados')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · responsive neutro e identidad Te Equipamos verificados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings: print(' - ' + w)
