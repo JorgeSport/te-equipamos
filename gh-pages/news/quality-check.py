@@ -31,7 +31,8 @@ required_markers = {
     'Script de escritorio': 'id="teDesktopPolish"',
     'Imágenes de tarjetas en escritorio': '/* TE_DESKTOP_CARD_IMAGES */',
     'Mosaico editorial Sigue explorando': '/* SECTION_JOURNEY_VISUAL */',
-    'Protección de miniaturas móvil': '/* TE_IMAGE_FAILSAFE */',
+    'Restauración responsive independiente': 'id="teResponsiveRestore"',
+    'Protección de imágenes': '/* TE_IMAGE_FAILSAFE */',
     'Buscador y descubrimiento': 'TE_DISCOVERY_PHASE1_JS',
     'Etiquetas activas': 'function applyTagFilter(',
     'Compartir tarjetas': 'function shareHubItem(id,action,button)',
@@ -65,6 +66,7 @@ for i, item in enumerate(items, start=1):
     if not item.get('image'):
         errors.append(f'Contenido sin imagen: {title[:70]}')
 
+# ESCRITORIO: todas las reglas nuevas deben vivir solo dentro de min-width:1101px.
 block = re.search(r'/\* TE_DESKTOP_POLISH \*/(.*?)(?:</style>|$)', html, flags=re.S)
 if not block:
     errors.append('No se pudo inspeccionar el bloque de escritorio')
@@ -80,6 +82,8 @@ elif polish_pos != -1 and images_pos < polish_pos:
 else:
     images_end = html.find('</style>', images_pos)
     images_block = html[images_pos:images_end if images_end != -1 else len(html)]
+    if '@media(min-width:1101px)' not in images_block:
+        errors.append('El formato 60/40 no está limitado a escritorio')
     if '.feed .card>.thumb{display:block!important' not in images_block:
         errors.append('Las imágenes de escritorio no están configuradas como visibles')
     if 'grid-template-columns:minmax(0,3fr) minmax(280px,2fr)' not in images_block:
@@ -87,13 +91,33 @@ else:
     if 'aspect-ratio:16/9!important' not in images_block:
         errors.append('Las imágenes de escritorio no mantienen formato horizontal 16:9')
 
+# RESPONSIVE: debe mantener imagen principal grande arriba; no miniatura lateral.
+rstart = html.find('<style id="teResponsiveRestore">')
+if rstart == -1:
+    errors.append('No existe la restauración específica de responsive')
+else:
+    rend = html.find('</style>', rstart)
+    responsive = html[rstart:rend if rend != -1 else len(html)]
+    required_responsive = [
+        '@media(max-width:760px)',
+        'flex-direction:column!important',
+        'order:-1!important;width:100%!important',
+        'aspect-ratio:16/9!important',
+        '.journeyCardInner,.journeyHero .journeyCardInner,.journeySide .journeyCardInner,.journeyWide .journeyCardInner{display:flex!important;flex-direction:column!important',
+    ]
+    for marker in required_responsive:
+        if marker not in responsive:
+            errors.append('Responsive no restaurado correctamente: falta ' + marker[:55])
+    if '108px!important' in responsive or '118px!important' in responsive:
+        errors.append('El responsive sigue forzando miniaturas laterales pequeñas')
+
 journey_pos = html.find('/* SECTION_JOURNEY_VISUAL */')
 if journey_pos == -1:
     errors.append('No existe el mosaico visual al final de las secciones')
 else:
     journey_end = html.find('</style>', journey_pos)
     journey_css = html[journey_pos:journey_end if journey_end != -1 else len(html)]
-    for marker, label in [('.journeyHero','bloque protagonista'),('.journeySide','bloques secundarios'),('.journeyWide','bloque panorámico'),('@media(max-width:760px)','adaptación móvil')]:
+    for marker, label in [('.journeyHero','bloque protagonista'),('.journeySide','bloques secundarios'),('.journeyWide','bloque panorámico')]:
         if marker not in journey_css:
             errors.append(f'El mosaico editorial no incluye {label}')
 if 'function journeyMedia(cat)' not in html:
@@ -103,8 +127,6 @@ if 'journeyItems(x.cat).length>0' not in html:
 
 if '.side .nav{display:none!important}' not in html:
     errors.append('No se encontró la sustitución del menú lateral en escritorio')
-if '@media(max-width:760px)' not in html:
-    errors.append('Faltan reglas responsive para móvil')
 
 static_ids = re.findall(r'\bid=["\']([A-Za-z][\w:-]*)["\']', html)
 duplicates = sorted({x for x in static_ids if static_ids.count(x) > 1 and not x.startswith('teRail')})
@@ -117,7 +139,7 @@ if errors:
         print(' - ' + e)
     raise SystemExit(1)
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · tarjetas 60/40 y mosaico editorial verificados')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · escritorio y responsive separados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings:
