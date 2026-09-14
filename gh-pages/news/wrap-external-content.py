@@ -9,6 +9,7 @@ data_path = base / 'news-data.json'
 items = json.loads(data_path.read_text(encoding='utf-8'))
 
 central_prefix = '/te-equipamos-arpenaz-27l/'
+home_url = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/'
 wrapped = 0
 
 for item in items:
@@ -35,12 +36,26 @@ for item in items:
 <style>*{{box-sizing:border-box}}html,body{{margin:0;background:#fff}}.reader{{width:100%;border:0;display:block;min-height:100vh}}.reader-fallback{{display:none;padding:24px;font-family:Arial,sans-serif}}footer{{padding:20px;text-align:center;font:13px Arial,sans-serif;color:#777;border-top:1px solid #eee}}footer a{{color:#1a73e8;text-decoration:none;font-weight:700}}</style></head><body>
 <iframe id="teFullContent" class="reader" src="{source}" title="{title}" loading="eager"></iframe>
 <div class="reader-fallback"><a href="{source}">Abrir contenido original →</a></div>
-<footer><a href="/te-equipamos-arpenaz-27l/news/">← Volver a Te Equipamos</a></footer>
+<footer><a href="{home_url}">← Volver a Te Equipamos</a></footer>
 <script>
 (function(){{
+ const HOME={json.dumps(home_url)};
  const frame=document.getElementById('teFullContent');
+ function wireBrand(){{
+   try{{
+     const d=frame.contentDocument;if(!d)return;
+     d.querySelectorAll('a').forEach(a=>{{
+       const label=(a.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+       if(label==='te equipamos'||label==='teequipamos'||(a.classList&&a.classList.contains('brand')&&label.includes('te equipamos'))){{
+         a.href=HOME;
+         a.target='_top';
+         a.setAttribute('aria-label','Ir al inicio de Te Equipamos');
+       }}
+     }});
+   }}catch(e){{}}
+ }}
  function fit(){{try{{const d=frame.contentDocument;if(!d)return;const h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);if(h>400)frame.style.height=h+'px';}}catch(e){{}}}}
- frame.addEventListener('load',function(){{fit();try{{const d=frame.contentDocument;new ResizeObserver(fit).observe(d.documentElement);}}catch(e){{}}setTimeout(fit,500);setTimeout(fit,1500);}});
+ frame.addEventListener('load',function(){{wireBrand();fit();try{{const d=frame.contentDocument;new ResizeObserver(function(){{wireBrand();fit();}}).observe(d.documentElement);}}catch(e){{}}setTimeout(function(){{wireBrand();fit();}},500);setTimeout(function(){{wireBrand();fit();}},1500);}});
  window.addEventListener('resize',fit);
 }})();
 </script></body></html>'''
@@ -51,4 +66,4 @@ for item in items:
     wrapped += 1
 
 data_path.write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding='utf-8')
-print(f'Lectores Te Equipamos creados para {wrapped} contenidos de repositorios externos.')
+print(f'Lectores Te Equipamos creados para {wrapped} contenidos externos y marca enlazada al Hub oficial.')
