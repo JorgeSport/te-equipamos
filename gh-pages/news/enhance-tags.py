@@ -1,0 +1,48 @@
+from pathlib import Path
+import re
+
+path = Path(__file__).resolve().parent / "index.html"
+html = path.read_text(encoding="utf-8")
+
+css = r'''/* TE_ACTIVE_TAGS */
+.topic{cursor:pointer;position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}.topic:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(60,64,67,.10)}.topic:focus-visible{outline:3px solid var(--soft);outline-offset:2px}.topic[data-tone="green"]{border-top:3px solid #34a853;background:linear-gradient(180deg,rgba(52,168,83,.08),var(--surface) 52%)}.topic[data-tone="blue"]{border-top:3px solid #4285f4;background:linear-gradient(180deg,rgba(66,133,244,.08),var(--surface) 52%)}.topic[data-tone="amber"]{border-top:3px solid #f9ab00;background:linear-gradient(180deg,rgba(249,171,0,.09),var(--surface) 52%)}.topic[data-tone="violet"]{border-top:3px solid #7e57c2;background:linear-gradient(180deg,rgba(126,87,194,.08),var(--surface) 52%)}.topic.active{box-shadow:0 0 0 2px var(--accent) inset}.tagRow{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.tagPill{border:1px solid transparent;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;line-height:1;cursor:pointer;transition:transform .12s ease,filter .12s ease}.tagPill:hover{transform:translateY(-1px);filter:saturate(1.15)}.tagPill.active{box-shadow:0 0 0 2px var(--text) inset}.tagPill.tone-green{background:#e8f5ec;color:#18763a;border-color:#cce9d5}.tagPill.tone-blue{background:#eaf2ff;color:#1769d2;border-color:#d2e2ff}.tagPill.tone-amber{background:#fff4d6;color:#8a5a00;border-color:#f7dfa2}.tagPill.tone-violet{background:#f1eafe;color:#6542a6;border-color:#dfd2f7}.tagPill.tone-neutral{background:var(--surface2);color:var(--muted);border-color:var(--line)}
+@media(max-width:760px){.tagRow{margin:2px 0 10px}.tagPill{font-size:10px;padding:5px 8px}.topic{border-top-width:3px}}
+@media(prefers-color-scheme:dark){.tagPill.tone-green{background:#173523;color:#9bd6ad;border-color:#28553a}.tagPill.tone-blue{background:#172b49;color:#a8c7fa;border-color:#294a78}.tagPill.tone-amber{background:#3b2d10;color:#f8cf72;border-color:#654d18}.tagPill.tone-violet{background:#2d2144;color:#d4bbff;border-color:#49356d}}
+'''
+if '/* TE_ACTIVE_TAGS */' not in html:
+    html = html.replace('</style>', css + '</style>', 1)
+
+# Temas destacados: ahora toda la tarjeta es interactiva y el color identifica el tema.
+pattern_topics = r"function renderTopics\(\)\{.*?\}\nfunction filtered"
+new_topics = r'''function topicTone(t){const s=String(t||'').toLowerCase();if(/sender|trek|monta/.test(s))return'green';if(/running|correr|calzado/.test(s))return'blue';if(/oferta|segunda|precio/.test(s))return'amber';return'violet'}
+function renderTopics(){$('#topics').innerHTML=TOPICS.map(t=>`<article class="topic ${state.q&&state.q.toLowerCase()===String(t[0]).toLowerCase()?'active':''}" data-topic="${esc(t[0])}" data-tone="${topicTone(t[0])}" tabindex="0" role="button" aria-label="Explorar ${esc(t[0])}"><div class="topicTop"><h3>${t[0]}</h3><button class="follow ${state.follow.has(t[0])?'on':''}" data-follow="${t[0]}">${state.follow.has(t[0])?'Siguiendo':'+ Seguir'}</button></div><p>${t[1]}</p><span class="kicker">Explorar tema →</span></article>`).join('')}
+function filtered'''
+html, count = re.subn(pattern_topics, new_topics, html, count=1, flags=re.S)
+if count != 1 and 'function topicTone(' not in html:
+    raise RuntimeError('No se pudo activar Temas destacados')
+
+helpers = r'''function tagTone(t){const s=String(t||'').toLowerCase();if(/sender|trek|monta|mochila|outdoor/.test(s))return'green';if(/running|calzado|zapat|mesh|cicl/.test(s))return'blue';if(/oferta|segunda|verano|sol|frío|frio/.test(s))return'amber';if(/quechua|forclaz|mujer|niñ|infantil/.test(s))return'violet';return'neutral'}
+function renderTagPills(n){return (n.tags||[]).slice(0,4).map(t=>`<button type="button" class="tagPill tone-${tagTone(t)} ${state.q&&state.q.toLowerCase()===String(t).toLowerCase()?'active':''}" data-tag-filter="${esc(t)}" aria-label="Ver contenido sobre ${esc(t)}">${esc(t)}</button>`).join('')?`<div class="tagRow">${(n.tags||[]).slice(0,4).map(t=>`<button type="button" class="tagPill tone-${tagTone(t)} ${state.q&&state.q.toLowerCase()===String(t).toLowerCase()?'active':''}" data-tag-filter="${esc(t)}" aria-label="Ver contenido sobre ${esc(t)}">${esc(t)}</button>`).join('')}</div>`:''}
+'''
+if 'function tagTone(' not in html:
+    html = html.replace('function renderFeed(){', helpers + 'function renderFeed(){', 1)
+
+old = '<p class="summary">${esc(n.summary)}</p><div class="cardMeta">'
+new = '<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}<div class="cardMeta">'
+if old in html:
+    html = html.replace(old, new, 1)
+elif '${renderTagPills(n)}' not in html:
+    raise RuntimeError('No se pudo añadir etiquetas a las tarjetas')
+
+filter_js = r'''function applyTagFilter(value){const tag=String(value||'').trim();if(!tag)return;state.q=tag;state.cat='Todas';$('#searchInput').value=tag;renderNav();renderTopics();$('#following').classList.add('hidden');$('#feedSection').classList.remove('hidden');$('#hero').classList.add('hidden');renderFeed();const feed=document.getElementById('feedSection');if(feed)feed.scrollIntoView({behavior:'smooth',block:'start'})}
+document.addEventListener('click',e=>{const tag=e.target.closest&&e.target.closest('[data-tag-filter]');if(tag){e.preventDefault();e.stopPropagation();applyTagFilter(tag.dataset.tagFilter);return}const topic=e.target.closest&&e.target.closest('[data-topic]');if(topic&&!e.target.closest('[data-follow]')){e.preventDefault();e.stopPropagation();applyTagFilter(topic.dataset.topic)}},true);
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.matches&&e.target.matches('[data-topic]')){e.preventDefault();applyTagFilter(e.target.dataset.topic)}});
+'''
+if 'function applyTagFilter(' not in html:
+    marker = "document.addEventListener('click',e=>{const a=e.target.closest('[data-article]');"
+    if marker not in html:
+        raise RuntimeError('No se encontró el controlador principal de clics')
+    html = html.replace(marker, filter_js + marker, 1)
+
+path.write_text(html, encoding='utf-8')
+print('Etiquetas activadas: temas y tags filtran contenido con color estratégico')
