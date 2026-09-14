@@ -44,6 +44,9 @@ jobs:
       - name: Añadir cierres estratégicos entre secciones
         run: python gh-pages/news/add-section-journeys.py
 
+      - name: Preparar tarjetas para compartir con imagen y enlace
+        run: python gh-pages/news/add-sharing.py
+
       - name: Abrir directamente las landings marcadas como directas
         run: python gh-pages/news/enhance-product-cards.py
 
