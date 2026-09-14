@@ -23,6 +23,7 @@ items = json.loads(data_file.read_text(encoding='utf-8'))
 required_markers = {
     'Pulido de escritorio': '/* TE_DESKTOP_POLISH */',
     'Script de escritorio': 'id="teDesktopPolish"',
+    'Imágenes de tarjetas en escritorio': '/* TE_DESKTOP_CARD_IMAGES */',
     'Protección de miniaturas móvil': '/* TE_IMAGE_FAILSAFE */',
     'Buscador y descubrimiento': 'TE_DISCOVERY_PHASE1_JS',
     'Etiquetas activas': 'function applyTagFilter(',
@@ -56,7 +57,7 @@ for i, item in enumerate(items, start=1):
         errors.append(f'ID duplicado: {iid}')
     seen_ids.add(iid)
     if not item.get('image'):
-        warnings.append(f'Contenido sin imagen: {title[:70]}')
+        errors.append(f'Contenido sin imagen: {title[:70]}')
 
 # Verifica que el CSS de escritorio no afecte al móvil por accidente.
 block = re.search(r'/\* TE_DESKTOP_POLISH \*/(.*?)(?:</style>|$)', html, flags=re.S)
@@ -64,6 +65,21 @@ if not block:
     errors.append('No se pudo inspeccionar el bloque de escritorio')
 elif '@media(min-width:1101px)' not in block.group(0):
     errors.append('El pulido de escritorio no está aislado por breakpoint')
+
+# Las imágenes deben restaurarse DESPUÉS del pulido que originalmente las ocultaba.
+polish_pos = html.find('/* TE_DESKTOP_POLISH */')
+images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
+if images_pos == -1:
+    errors.append('Falta la restauración de imágenes de escritorio')
+elif polish_pos != -1 and images_pos < polish_pos:
+    errors.append('La regla de imágenes se aplica antes del pulido y puede quedar anulada')
+else:
+    images_end = html.find('</style>', images_pos)
+    images_block = html[images_pos:images_end if images_end != -1 else len(html)]
+    if '.feed .card>.thumb{display:block!important' not in images_block:
+        errors.append('Las miniaturas de escritorio no están configuradas como visibles')
+    if 'grid-template-columns:minmax(0,1fr) 190px' not in images_block:
+        errors.append('Las tarjetas de escritorio no reservan espacio para la imagen')
 
 # La navegación lateral original debe seguir disponible para móvil/tablet.
 if '.side .nav{display:none!important}' not in html:
@@ -77,7 +93,7 @@ duplicates = sorted({x for x in static_ids if static_ids.count(x) > 1 and not x.
 if duplicates:
     warnings.append('IDs repetidos detectados para revisar: ' + ', '.join(duplicates[:10]))
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · imágenes de escritorio verificadas')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings:
