@@ -32,6 +32,8 @@ required_markers = {
     'Etiquetas activas': 'function applyTagFilter(',
     'Filtro real por actividad': 'function applyActivityFilter(',
     'Inicio completo tras filtrar actividad': 'function scrollActivityResultsStart()',
+    'Estado vacío por actividad': '/* TE_ACTIVITY_EMPTY_STATE */',
+    'Alternativas separadas por actividad': 'function renderActivityAlternatives(',
     'Etiquetas visuales de actividad': 'function renderActivityPills(',
     'Etiquetas neutras globales': '/* TE_NEUTRAL_PRODUCT_TAGS */',
     'Etiquetas neutras responsive': '/* TE_RESPONSIVE_NEUTRAL_TAGS */',
@@ -117,10 +119,23 @@ else:
         if marker not in neutral_css:
             errors.append('Etiquetas responsive no están neutralizadas correctamente: falta ' + marker)
 
-# Al filtrar por actividad, la primera tarjeta debe quedar debajo de la cabecera sticky y mostrar su imagen desde arriba.
-for marker in ["document.querySelector('#feed .card')", "document.querySelector('.top')", "getBoundingClientRect().height", "scrollActivityResultsStart()"]:
+# Al filtrar por actividad, la primera tarjeta o el estado vacío deben quedar completos bajo la cabecera sticky.
+for marker in ["document.querySelector('#feed .card')", "document.querySelector('#empty.activityEmptyPanel')", "document.querySelector('.top')", "getBoundingClientRect().height", "scrollActivityResultsStart()"]:
     if marker not in html:
         errors.append('El inicio de resultados por actividad puede quedar cortado: falta ' + marker)
+
+# Si una actividad no tiene contenido, primero debe mostrarse un estado vacío y solo después alternativas.
+for marker in ['id=\'activityAlternatives\'', 'className=\'activityAlternatives hidden\'', 'Aún no hay contenido en ${esc(label)}', 'También puedes explorar', 'data-activity-alt=', "if(feed)feed.classList.add('hidden')", "if(journey)journey.classList.add('hidden')"]:
+    if marker not in html:
+        errors.append('La experiencia de actividad vacía no está completa: falta ' + marker)
+
+empty_css_pos = html.find('/* TE_ACTIVITY_EMPTY_STATE */')
+if empty_css_pos != -1:
+    empty_css_end = html.find('</style>', empty_css_pos)
+    empty_css = html[empty_css_pos:empty_css_end if empty_css_end != -1 else len(html)]
+    for marker in ['#empty.activityEmptyPanel', '.activityAlternatives{margin-top:', '.activityAlternativesGrid']:
+        if marker not in empty_css:
+            errors.append('El estado vacío no mantiene la jerarquía visual esperada: falta ' + marker)
 
 polish_pos = html.find('/* TE_DESKTOP_POLISH */')
 images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
@@ -181,7 +196,7 @@ if errors:
     raise SystemExit(1)
 
 activity_set = sorted({a for item in items for a in item.get('activities', [])})
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · tarjetas completas y etiquetas neutras verificadas')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · {len(activity_set)} actividades · vacíos y alternativas ordenados correctamente')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings: print(' - ' + w)
