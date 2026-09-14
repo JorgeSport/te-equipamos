@@ -12,11 +12,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (current) {
       const engage = document.createElement('section');
       engage.className = 'te-engage';
-      engage.innerHTML = '<div class="te-engage-wrap"><div class="te-engage-copy"><span>COMPARTE TE EQUIPAMOS</span><h2>¿A alguien le puede servir esta ficha?</h2><p>Compártela con su imagen, titular y enlace. O sigue explorando más productos, reviews y oportunidades.</p></div><div class="te-engage-actions"><button type="button" id="teShareCurrent">↗ Compartir esta ficha</button><a href="/te-equipamos-arpenaz-27l/news/">Ver más productos y reviews →</a></div></div>';
+      engage.innerHTML = '<div class="te-engage-wrap"><div class="te-engage-copy"><span>COMPARTIR</span><h2>¿Conoces a alguien a quien le pueda interesar?</h2><p>Envíale esta ficha con su imagen, titular y enlace, o continúa descubriendo más contenido de Te Equipamos.</p></div><div class="te-engage-actions"><button type="button" id="teShareCurrent"><span class="te-share-socials"><i>W</i><i>f</i><i>M</i></span><span>Compartir en redes</span></button><a href="/te-equipamos-arpenaz-27l/news/">Seguir explorando Te Equipamos →</a></div></div>';
       if (footer) footer.parentNode.insertBefore(engage, footer);
       else document.body.appendChild(engage);
 
       const shareButton = engage.querySelector('#teShareCurrent');
+      const originalShare = shareButton.innerHTML;
       shareButton.addEventListener('click', async function () {
         const title = String(current.title || document.title || 'Te Equipamos');
         const url = String(current.url || location.href);
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function () {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(title + '\n' + url);
             shareButton.textContent = '✓ Enlace copiado';
-            setTimeout(() => shareButton.textContent = '↗ Compartir esta ficha', 1800);
+            setTimeout(() => shareButton.innerHTML = originalShare, 1800);
             return;
           }
         } catch (err) {
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.execCommand('copy');
         area.remove();
         shareButton.textContent = '✓ Enlace copiado';
-        setTimeout(() => shareButton.textContent = '↗ Compartir esta ficha', 1800);
+        setTimeout(() => shareButton.innerHTML = originalShare, 1800);
       });
     }
 
