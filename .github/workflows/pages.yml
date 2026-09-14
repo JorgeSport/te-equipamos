@@ -163,6 +163,9 @@ jobs:
       - name: Evitar versiones antiguas en caché
         run: python gh-pages/news/cache-policy.py
 
+      - name: Redirigir las páginas migradas a sus repositorios independientes
+        run: python migration/create-redirects.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
