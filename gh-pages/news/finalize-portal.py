@@ -1,8 +1,15 @@
 from pathlib import Path
+import json
 import re
 
 path = Path(__file__).resolve().parent / 'index.html'
 html = path.read_text(encoding='utf-8')
+
+OFFICIAL_URL = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/'
+SHARE_IMAGE = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/logo-te-equipamos.png'
+PAGE_TITLE = 'Te Equipamos | Deporte, actividades y equipamiento'
+SOCIAL_TITLE = 'Te Equipamos — Encuentra equipamiento para lo que te gusta hacer'
+DESCRIPTION = 'Productos, reviews, ofertas y guías para senderismo, running, ciclismo, natación, viajes y muchas más actividades.'
 
 # Identidad final: la marca es Te Equipamos, sin el antiguo apellido Noticias/News.
 html = html.replace('Te Equipamos News', 'Te Equipamos')
@@ -10,13 +17,73 @@ html = html.replace('<span>Te Equipamos <small>Noticias</small></span>', '<span>
 html = html.replace('← Volver a noticias', '← Volver a Te Equipamos')
 html = html.replace('Tus temas y noticias guardadas', 'Tus temas y contenidos guardados')
 html = html.replace('placeholder="Buscar temas, noticias y fuentes"', 'placeholder="Buscar productos, reviews, actividades y consejos"')
-html = re.sub(r'<title>.*?</title>', '<title>Te Equipamos</title>', html, count=1, flags=re.S)
+html = re.sub(r'<title>.*?</title>', f'<title>{PAGE_TITLE}</title>', html, count=1, flags=re.S)
 html = re.sub(
     r'<meta name="description" content="[^"]*">',
-    '<meta name="description" content="Te Equipamos — productos, reviews, ofertas y guías para deporte, aventura y todo tipo de actividades.">',
+    f'<meta name="description" content="{DESCRIPTION}">',
     html,
     count=1,
 )
+html = html.replace("document.title='Te Equipamos';", f"document.title='{PAGE_TITLE}';")
+
+# El nombre de la marca siempre vuelve al Hub oficial, nunca a una landing de producto.
+html = re.sub(
+    r'<a href="[^"]*" class="brand">',
+    f'<a href="{OFFICIAL_URL}" class="brand" aria-label="Ir al inicio de Te Equipamos">',
+    html,
+    count=1,
+)
+html = re.sub(
+    r'<a class="back" href="[^"]*">',
+    f'<a class="back" href="{OFFICIAL_URL}">',
+    html,
+    count=1,
+)
+
+# Metadatos oficiales para SEO y para compartir por WhatsApp, Facebook, Telegram, etc.
+html = re.sub(
+    r'<!-- TE_OFFICIAL_SITE_META -->.*?<!-- /TE_OFFICIAL_SITE_META -->',
+    '',
+    html,
+    flags=re.S,
+)
+schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': 'Te Equipamos',
+    'url': OFFICIAL_URL,
+    'description': DESCRIPTION,
+    'publisher': {
+        '@type': 'Organization',
+        'name': 'Te Equipamos',
+        'url': OFFICIAL_URL,
+        'logo': {
+            '@type': 'ImageObject',
+            'url': SHARE_IMAGE,
+        },
+    },
+}
+meta = f'''<!-- TE_OFFICIAL_SITE_META -->
+<link rel="canonical" href="{OFFICIAL_URL}">
+<link rel="icon" href="/te-equipamos-arpenaz-27l/favicon.svg" type="image/svg+xml">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="application-name" content="Te Equipamos">
+<meta name="apple-mobile-web-app-title" content="Te Equipamos">
+<meta property="og:locale" content="es_ES">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Te Equipamos">
+<meta property="og:title" content="{SOCIAL_TITLE}">
+<meta property="og:description" content="{DESCRIPTION}">
+<meta property="og:url" content="{OFFICIAL_URL}">
+<meta property="og:image" content="{SHARE_IMAGE}">
+<meta property="og:image:alt" content="Te Equipamos — deporte, actividades y equipamiento">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{SOCIAL_TITLE}">
+<meta name="twitter:description" content="{DESCRIPTION}">
+<meta name="twitter:image" content="{SHARE_IMAGE}">
+<script type="application/ld+json" id="teOfficialSchema">{json.dumps(schema, ensure_ascii=False, separators=(',', ':'))}</script>
+<!-- /TE_OFFICIAL_SITE_META -->'''
+html = html.replace('</head>', meta + '\n</head>', 1)
 
 css = r'''/* TE_RESPONSIVE_ACTIVITY_NAV */
 .teResponsiveActivities{display:none}
@@ -128,4 +195,28 @@ if 'id="teResponsiveActivitiesScript"' not in html:
     html = html.replace('</body>', js + '</body>', 1)
 
 path.write_text(html, encoding='utf-8')
-print('Identidad Te Equipamos cerrada y actividades responsive activadas')
+
+# La landing principal del repositorio sigue siendo un producto. Su nombre de marca debe volver al Hub oficial.
+root_index = path.parent.parent / 'index.html'
+if root_index.exists():
+    root_html = root_index.read_text(encoding='utf-8')
+    root_html = root_html.replace(
+        '<div class="brand">TE EQUIPAMOS</div>',
+        f'<a class="brand" href="{OFFICIAL_URL}" aria-label="Ir al inicio de Te Equipamos" style="background:transparent;color:inherit;padding:0;border-radius:0">TE EQUIPAMOS</a>',
+        1,
+    )
+    root_index.write_text(root_html, encoding='utf-8')
+
+# Comprobaciones mínimas: si fallan, el despliegue debe detenerse.
+for marker in [
+    f'href="{OFFICIAL_URL}" class="brand"',
+    f'<link rel="canonical" href="{OFFICIAL_URL}">',
+    'property="og:title"',
+    'property="og:image"',
+    'name="twitter:card"',
+    'id="teOfficialSchema"',
+]:
+    if marker not in html:
+        raise RuntimeError('Falta identidad oficial o metadato: ' + marker)
+
+print('Te Equipamos: enlace oficial, SEO y metadatos sociales activados')
