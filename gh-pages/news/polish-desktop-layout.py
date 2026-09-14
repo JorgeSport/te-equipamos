@@ -11,14 +11,17 @@ css = r'''/* TE_DESKTOP_POLISH */
   .chip{padding:9px 16px}
   .shell{max-width:1600px;grid-template-columns:190px minmax(0,1fr) 300px;gap:24px;padding:28px 28px 70px}
   .side .nav{display:none!important}
-  .teDesktopUtility{display:grid;gap:18px;position:sticky;top:136px;height:max-content}
+  .teDesktopUtility{display:grid;gap:28px;position:sticky;top:136px;height:max-content}
   .teDeskBlock{display:grid;gap:8px}
-  .teDeskEyebrow{font-size:10px;line-height:1;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 8px 4px}
-  .teDeskAction{width:100%;border:0;background:transparent;color:var(--muted);border-radius:12px;min-height:38px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer;font-size:13px}
+  .teDeskBlock+.teDeskBlock{border-top:1px solid var(--line);padding-top:24px}
+  .teDeskEyebrow{font-size:15px;line-height:1.2;font-weight:800;letter-spacing:-.01em;color:var(--text);padding:0 8px 8px;text-transform:none}
+  .teDeskAction{width:100%;border:0;background:transparent;color:var(--muted);border-radius:10px;min-height:42px;padding:8px 9px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer;font-size:14px}
   .teDeskAction:hover{background:var(--surface2);color:var(--text)}
-  .teDeskAction strong{font-size:12px;color:var(--accent);background:var(--soft);border-radius:999px;padding:3px 7px;min-width:24px;text-align:center}
-  .teDeskTags{display:flex;flex-wrap:wrap;gap:6px;padding:0 4px}
-  .teDeskTags .tagPill{font-size:9px;padding:6px 8px}
+  .teDeskAction strong{font-size:11px;color:var(--muted);background:var(--surface2);border-radius:999px;padding:3px 7px;min-width:24px;text-align:center}
+  .teActivityList{display:grid;gap:1px;padding:0 1px}
+  .teActivityLink{width:100%;border:0;background:transparent;color:var(--muted);border-radius:10px;min-height:40px;padding:8px 9px;text-align:left;cursor:pointer;font-size:15px;line-height:1.25}
+  .teActivityLink:hover,.teActivityLink.isActive{background:var(--surface2);color:var(--text)}
+  .teActivityLink.teActivityMore{margin-top:4px;font-size:13px;font-weight:800;color:var(--accent)}
   .main>.section{margin-top:24px}
   .feed{border-radius:16px}
   .feed .card{position:relative;display:block!important;padding:18px 56px 18px 22px!important;min-height:0!important;gap:0!important}
@@ -37,10 +40,9 @@ css = r'''/* TE_DESKTOP_POLISH */
   .feed .card .save:hover{background:var(--surface2)}
   .rail{position:sticky;top:132px;height:max-content;max-height:calc(100vh - 150px);overflow:auto;padding-bottom:14px;scrollbar-width:thin}
   .rail .teLegacyRail{display:none!important}
+  #teRailTopics{display:none!important}
   .teRailExtra{display:block}
   .teRailExtra h3{margin:4px 0 12px;font-size:17px}
-  .teRailTags{display:flex;flex-wrap:wrap;gap:6px}
-  .teRailTags .tagPill{font-size:9px;padding:6px 8px}
   .teRailList{display:grid;gap:0}
   .teRailItem{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;padding:10px 0;cursor:pointer;color:var(--text)}
   .teRailItem:last-child{border-bottom:0;padding-bottom:0}
@@ -63,18 +65,19 @@ if '/* TE_DESKTOP_POLISH */' not in html:
 js = r'''<script id="teDesktopPolish">
 (function(){
   const mq=window.matchMedia('(min-width:1101px)');
+  const ACTIVITIES=[
+    {label:'Senderismo',query:'senderismo'},
+    {label:'Running',query:'running'},
+    {label:'Ciclismo',query:'ciclismo'},
+    {label:'Natación',query:'natación'},
+    {label:'Travel',query:'viaje'}
+  ];
   function allNews(){return typeof NEWS!=='undefined'?NEWS:[]}
   function recentIds(){
     if(typeof teRecentIds==='function') return teRecentIds();
     try{return JSON.parse(localStorage.getItem('teRecentItems')||'[]').map(Number).filter(Boolean)}catch(e){return[]}
   }
-  function topTags(limit){
-    const counts=new Map();
-    allNews().forEach(n=>(n.tags||[]).forEach(t=>{const k=String(t||'').trim();if(k)counts.set(k,(counts.get(k)||0)+1)}));
-    return [...counts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'es')).slice(0,limit).map(x=>x[0]);
-  }
   function savedCount(){return typeof state!=='undefined'&&state.saved&&typeof state.saved.size==='number'?state.saved.size:0}
-  function toneClass(t){return typeof tagTone==='function'?`tone-${tagTone(t)}`:'tone-neutral'}
   function escText(v){return typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
   function ensureLeft(){
     const side=document.querySelector('.side'); if(!side)return null;
@@ -82,27 +85,27 @@ js = r'''<script id="teDesktopPolish">
     if(!box){box=document.createElement('div');box.id='teDesktopUtility';box.className='teDesktopUtility';side.appendChild(box)}
     return box;
   }
+  function activeActivity(){
+    const q=(typeof state!=='undefined'&&state.q?String(state.q):'').trim().toLowerCase();
+    return ACTIVITIES.find(a=>a.query.toLowerCase()===q)?.query||'';
+  }
   function renderLeft(){
     const box=ensureLeft(); if(!box)return;
-    const recent=recentIds().length, saved=savedCount();
-    const tags=topTags(7);
-    box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>★ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teDeskTags">${tags.map(t=>`<button type="button" class="tagPill ${toneClass(t)}" data-tag-filter="${escText(t)}">${escText(t)}</button>`).join('')}</div></section>`;
+    const recent=recentIds().length, saved=savedCount(), active=activeActivity();
+    box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>☆ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teActivityList">${ACTIVITIES.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}">${escText(a.label)}</button>`).join('')}<button type="button" class="teActivityLink teActivityMore" data-desk-action="allActivities">Más actividades →</button></div></section>`;
   }
   function ensureRail(){
     const rail=document.querySelector('.rail'); if(!rail)return null;
     const legacy=[...rail.querySelectorAll(':scope > .railCard')][1]; if(legacy)legacy.classList.add('teLegacyRail');
-    let topics=document.getElementById('teRailTopics');
-    if(!topics){topics=document.createElement('section');topics.id='teRailTopics';topics.className='railCard teRailExtra';rail.appendChild(topics)}
+    const oldTopics=document.getElementById('teRailTopics'); if(oldTopics)oldTopics.remove();
     let recent=document.getElementById('teRailRecent');
     if(!recent){recent=document.createElement('section');recent.id='teRailRecent';recent.className='railCard teRailExtra';rail.appendChild(recent)}
     let saved=document.getElementById('teRailSaved');
     if(!saved){saved=document.createElement('section');saved.id='teRailSaved';saved.className='railCard teRailExtra';rail.appendChild(saved)}
-    return {topics,recent,saved};
+    return {recent,saved};
   }
   function renderRail(){
     const parts=ensureRail(); if(!parts)return;
-    const tags=topTags(8);
-    parts.topics.innerHTML=`<span class="kicker">Explorar</span><h3>Temas</h3><div class="teRailTags">${tags.map(t=>`<button type="button" class="tagPill ${toneClass(t)}" data-tag-filter="${escText(t)}">${escText(t)}</button>`).join('')}</div>`;
     const recents=recentIds().map(id=>allNews().find(n=>Number(n.id)===Number(id))).filter(Boolean).slice(0,3);
     parts.recent.classList.toggle('hidden',!recents.length);
     if(recents.length)parts.recent.innerHTML=`<span class="kicker">Continúa</span><h3>Visto recientemente</h3><div class="teRailList">${recents.map(n=>`<button type="button" class="teRailItem" data-article="${n.id}"><small>${escText((n.sections||[])[0]||n.category||'Te Equipamos')}</small><b>${escText(n.title)}</b></button>`).join('')}</div>`;
@@ -116,9 +119,32 @@ js = r'''<script id="teDesktopPolish">
     if(typeof setCat==='function')setCat('Todas');
     setTimeout(()=>{if(typeof renderRecent==='function')renderRecent();const r=document.getElementById('recentSection');if(r)r.scrollIntoView({behavior:'smooth',block:'start'})},80);
   }
+  function applyActivity(query){
+    if(typeof applyTagFilter==='function')applyTagFilter(query);
+    else if(typeof state!=='undefined'){
+      state.q=query;
+      if(typeof setCat==='function')setCat('Todas');
+      if(typeof render==='function')render();
+    }
+    setTimeout(refresh,100);
+  }
   document.addEventListener('click',e=>{
+    const activity=e.target.closest&&e.target.closest('[data-activity-query]');
+    if(activity){e.preventDefault();applyActivity(activity.dataset.activityQuery||'');return}
     const a=e.target.closest&&e.target.closest('[data-desk-action]');
-    if(a){e.preventDefault();const action=a.dataset.deskAction;if(action==='saved'&&typeof setCat==='function')setCat('Siguiendo');if(action==='recent')openRecent();setTimeout(refresh,80);return}
+    if(a){
+      e.preventDefault();
+      const action=a.dataset.deskAction;
+      if(action==='saved'&&typeof setCat==='function')setCat('Siguiendo');
+      if(action==='recent')openRecent();
+      if(action==='allActivities'){
+        if(typeof setCat==='function')setCat('Todas');
+        if(typeof state!=='undefined')state.q='';
+        if(typeof render==='function')render();
+        if(typeof toast==='function')toast('Aquí iremos añadiendo nuevas actividades');
+      }
+      setTimeout(refresh,80);return;
+    }
     if(e.target.closest&&e.target.closest('.save,[data-article],[data-tag-filter]'))setTimeout(refresh,120);
   },true);
   window.addEventListener('pageshow',()=>setTimeout(refresh,60));
@@ -137,4 +163,4 @@ else:
     html = html.replace('</body>', js + '</body>', 1)
 
 path.write_text(html, encoding='utf-8')
-print('Escritorio pulido: navegación complementaria, tarjetas editoriales y lateral útil')
+print('Escritorio pulido: Tu espacio y navegación por actividades activados')
