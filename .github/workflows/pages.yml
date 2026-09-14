@@ -38,6 +38,9 @@ jobs:
       - name: Configurar menús de Ventas Reviews Vídeos Consejos Ofertas y Novedades
         run: python gh-pages/news/configure-owned-portal.py
 
+      - name: Añadir cierres estratégicos entre secciones
+        run: python gh-pages/news/add-section-journeys.py
+
       - name: Abrir directamente las landings marcadas como directas
         run: python gh-pages/news/enhance-product-cards.py
 
