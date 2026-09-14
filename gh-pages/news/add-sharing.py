@@ -28,11 +28,22 @@ share_row = '''<div class="cardShare" aria-label="Compartir esta tarjeta">
 <button class="cardShareBtn" type="button" data-share-action="copy" data-share-id="${n.id}" aria-label="Copiar enlace" title="Copiar enlace"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10.6 13.4a4 4 0 0 0 5.7 0l2.1-2.1a4 4 0 0 0-5.7-5.7l-1.2 1.2M13.4 10.6a4 4 0 0 0-5.7 0l-2.1 2.1a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg></button>
 </div>'''
 
-old_card = '<p class="summary">${esc(n.summary)}</p><div class="cardMeta">'
-new_card = '<p class="summary">${esc(n.summary)}</p>' + share_row + '<div class="cardMeta">'
-if old_card in html:
-    html = html.replace(old_card, new_card, 1)
-elif 'class="cardShare"' not in html:
+# Compatible con tarjetas normales y con las nuevas etiquetas activas.
+card_points = [
+    '<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}<div class="cardMeta">',
+    '<p class="summary">${esc(n.summary)}</p><div class="cardMeta">',
+]
+inserted = False
+for old_card in card_points:
+    if old_card in html:
+        if '${renderTagPills(n)}' in old_card:
+            new_card = '<p class="summary">${esc(n.summary)}</p>${renderTagPills(n)}' + share_row + '<div class="cardMeta">'
+        else:
+            new_card = '<p class="summary">${esc(n.summary)}</p>' + share_row + '<div class="cardMeta">'
+        html = html.replace(old_card, new_card, 1)
+        inserted = True
+        break
+if not inserted and 'class="cardShare"' not in html:
     raise RuntimeError('No se encontró el punto para añadir los iconos de compartir en las tarjetas')
 
 share_js = r'''function copyShareLink(title,url,button){
