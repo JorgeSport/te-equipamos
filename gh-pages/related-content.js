@@ -3,10 +3,52 @@ document.addEventListener('DOMContentLoaded', async function () {
     const response = await fetch('/te-equipamos-arpenaz-27l/news/news-data.json');
     if (!response.ok) return;
     const items = await response.json();
-    if (!Array.isArray(items) || items.length < 2) return;
+    if (!Array.isArray(items) || !items.length) return;
 
     const here = (location.origin + location.pathname).replace(/\/$/, '').toLowerCase();
     const current = items.find(x => String(x.url || '').replace(/\/$/, '').toLowerCase() === here);
+    const footer = document.querySelector('footer');
+
+    if (current) {
+      const engage = document.createElement('section');
+      engage.className = 'te-engage';
+      engage.innerHTML = '<div class="te-engage-wrap"><div class="te-engage-copy"><span>COMPARTE TE EQUIPAMOS</span><h2>¿A alguien le puede servir esta ficha?</h2><p>Compártela con su imagen, titular y enlace. O sigue explorando más productos, reviews y oportunidades.</p></div><div class="te-engage-actions"><button type="button" id="teShareCurrent">↗ Compartir esta ficha</button><a href="/te-equipamos-arpenaz-27l/news/">Ver más productos y reviews →</a></div></div>';
+      if (footer) footer.parentNode.insertBefore(engage, footer);
+      else document.body.appendChild(engage);
+
+      const shareButton = engage.querySelector('#teShareCurrent');
+      shareButton.addEventListener('click', async function () {
+        const title = String(current.title || document.title || 'Te Equipamos');
+        const url = String(current.url || location.href);
+        const text = 'Mira esto en Te Equipamos: ' + title;
+        try {
+          if (navigator.share) {
+            await navigator.share({title, text, url});
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(title + '\n' + url);
+            shareButton.textContent = '✓ Enlace copiado';
+            setTimeout(() => shareButton.textContent = '↗ Compartir esta ficha', 1800);
+            return;
+          }
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+        }
+        const area = document.createElement('textarea');
+        area.value = title + '\n' + url;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        area.remove();
+        shareButton.textContent = '✓ Enlace copiado';
+        setTimeout(() => shareButton.textContent = '↗ Compartir esta ficha', 1800);
+      });
+    }
+
+    if (items.length < 2) return;
     const currentTags = new Set((current && current.tags || []).map(x => String(x).toLowerCase()));
     const currentSections = current && current.sections || [];
 
@@ -28,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     block.className = 'te-related';
     block.innerHTML = '<div class="te-related-wrap"><div class="te-related-title"><span>SIGUE DESCUBRIENDO</span><h2>También te puede interesar</h2><p>Más contenido de Te Equipamos relacionado con lo que acabas de ver.</p></div><div class="te-related-grid">' + related.map(x => '<a class="te-related-card" href="' + x.url + '"><img src="' + x.image + '" alt=""><div><span>' + (x.category || 'Te Equipamos') + '</span><h3>' + x.title + '</h3><small>' + (x.source || 'Te Equipamos') + '</small></div></a>').join('') + '</div><a class="te-related-more" href="/te-equipamos-arpenaz-27l/news/">Ver más contenido en Te Equipamos →</a></div>';
 
-    const footer = document.querySelector('footer');
     if (footer) footer.parentNode.insertBefore(block, footer);
     else document.body.appendChild(block);
   } catch (e) {}
