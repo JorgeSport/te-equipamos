@@ -15,31 +15,42 @@ items = json.loads(DATA.read_text(encoding='utf-8'))
 html = INDEX.read_text(encoding='utf-8')
 
 css = r'''/* TE_SHARE_HUB */
-.shareCard{border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:800;cursor:pointer;padding:4px 7px;border-radius:999px;white-space:nowrap}.shareCard:hover{background:var(--soft)}
-@media(max-width:760px){.shareCard{font-size:12px;padding:5px 7px}.cardMeta{flex-wrap:wrap}}
+.cardShare{display:flex;align-items:center;gap:8px;margin:10px 0 12px}.cardShareBtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}.cardShareBtn:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08);background:var(--surface2)}.cardShareBtn svg{width:20px;height:20px;display:block}.cardShareBtn[data-share-action="whatsapp"] svg{color:#25D366}.cardShareBtn[data-share-action="facebook"] svg{color:#1877F2}.cardShareBtn[data-share-action="telegram"] svg{color:#229ED9}.cardShareBtn[data-share-action="copy"] svg{color:var(--muted)}
+@media(max-width:760px){.cardShare{gap:7px;margin:11px 0 10px}.cardShareBtn{width:38px;height:38px}.cardShareBtn svg{width:21px;height:21px}.cardMeta{flex-wrap:wrap}}
 '''
 if '/* TE_SHARE_HUB */' not in html:
     html = html.replace('</style>', css + '</style>', 1)
 
-old = '<span>${n.category}</span><button class="save '
-new = '<span>${n.category}</span><button class="shareCard" type="button" data-share-id="${n.id}" aria-label="Compartir ${esc(n.title)}">↗ Compartir</button><button class="save '
-if old in html:
-    html = html.replace(old, new, 1)
-elif 'data-share-id="${n.id}"' not in html:
-    raise RuntimeError('No se encontró el punto para añadir Compartir en las tarjetas')
+share_row = '''<div class="cardShare" aria-label="Compartir esta tarjeta">
+<button class="cardShareBtn" type="button" data-share-action="whatsapp" data-share-id="${n.id}" aria-label="Compartir por WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M20 11.7a8 8 0 0 1-11.8 7L4 20l1.3-4.1A8 8 0 1 1 20 11.7Z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8.8 8.4c.4 3 2.2 4.9 5.2 6l1.3-1.3 2 .8c.2.1.3.3.2.6-.4 1.2-1.5 1.9-2.7 1.7-4.4-.8-7.6-4-8.3-8.3-.2-1.2.5-2.3 1.7-2.7.3-.1.5 0 .6.2l.8 2-1 1Z"/></svg></button>
+<button class="cardShareBtn" type="button" data-share-action="facebook" data-share-id="${n.id}" aria-label="Compartir en Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.6 22v-8.2h2.8l.4-3.2h-3.2V8.5c0-.9.3-1.6 1.7-1.6H17V4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.5v3.2h2.8V22h3.3Z"/></svg></button>
+<button class="cardShareBtn" type="button" data-share-action="telegram" data-share-id="${n.id}" aria-label="Compartir por Telegram" title="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.4 4.2 18.7 19c-.2 1-.8 1.3-1.6.8l-4.1-3-2 1.9c-.2.2-.4.4-.8.4l.3-4.2 7.6-6.9c.3-.3-.1-.5-.5-.2l-9.4 5.9-4-1.3c-.9-.3-.9-.9.2-1.3L20.1 4c.7-.3 1.5.2 1.3.2Z"/></svg></button>
+<button class="cardShareBtn" type="button" data-share-action="copy" data-share-id="${n.id}" aria-label="Copiar enlace" title="Copiar enlace"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10.6 13.4a4 4 0 0 0 5.7 0l2.1-2.1a4 4 0 0 0-5.7-5.7l-1.2 1.2M13.4 10.6a4 4 0 0 0-5.7 0l-2.1 2.1a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg></button>
+</div>'''
 
-share_js = r'''async function shareHubItem(id){
- const n=NEWS.find(x=>x.id===Number(id));if(!n)return;
- const url=String(n.url||location.href);const text=`Mira esto en Te Equipamos: ${n.title}`;
- try{
-   if(navigator.share){await navigator.share({title:n.title,text,url});return}
-   if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(`${n.title}\n${url}`);toast('Enlace copiado');return}
- }catch(err){if(err&&err.name==='AbortError')return}
- const area=document.createElement('textarea');area.value=`${n.title}\n${url}`;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();toast('Enlace copiado')
+old_card = '<p class="summary">${esc(n.summary)}</p><div class="cardMeta">'
+new_card = '<p class="summary">${esc(n.summary)}</p>' + share_row + '<div class="cardMeta">'
+if old_card in html:
+    html = html.replace(old_card, new_card, 1)
+elif 'class="cardShare"' not in html:
+    raise RuntimeError('No se encontró el punto para añadir los iconos de compartir en las tarjetas')
+
+share_js = r'''function copyShareLink(title,url,button){
+ const value=`${title}\n${url}`;
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(()=>{toast('Enlace copiado');if(button){button.style.transform='scale(.92)';setTimeout(()=>button.style.transform='',180)}});return}
+ const area=document.createElement('textarea');area.value=value;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();toast('Enlace copiado')
 }
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-share-id]');if(!b)return;e.preventDefault();e.stopPropagation();shareHubItem(b.dataset.shareId)},true);
+function shareHubItem(id,action,button){
+ const n=NEWS.find(x=>x.id===Number(id));if(!n)return;
+ const url=String(n.url||location.href);const title=String(n.title||'Te Equipamos');const text=`Mira esto en Te Equipamos: ${title}`;
+ if(action==='whatsapp'){window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}`,'_blank','noopener,noreferrer');return}
+ if(action==='facebook'){window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,'_blank','noopener,noreferrer');return}
+ if(action==='telegram'){window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,'_blank','noopener,noreferrer');return}
+ if(action==='copy'){copyShareLink(title,url,button)}
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-share-action][data-share-id]');if(!b)return;e.preventDefault();e.stopPropagation();shareHubItem(b.dataset.shareId,b.dataset.shareAction,b)},true);
 '''
-if 'async function shareHubItem' not in html:
+if 'function shareHubItem(id,action,button)' not in html:
     marker = "document.addEventListener('click',e=>{const a=e.target.closest('[data-article]');"
     if marker not in html:
         raise RuntimeError('No se encontró el manejador principal para conectar Compartir')
@@ -90,4 +101,4 @@ for item in items:
     target.write_text(page, encoding='utf-8')
     updated += 1
 
-print(f'Compartir activado en el hub y metadatos sociales preparados en {updated} fichas.')
+print(f'Iconos sociales activados en tarjetas y metadatos preparados en {updated} fichas.')
