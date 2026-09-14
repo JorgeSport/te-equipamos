@@ -73,6 +73,15 @@ if not block:
 elif '@media(min-width:1101px)' not in block.group(0):
     errors.append('El pulido de escritorio no está aislado por breakpoint')
 
+# La columna izquierda debe conservar Tu espacio y mostrar actividades, no temas duplicados.
+for label in ['Tu espacio','Explorar','Senderismo','Running','Ciclismo','Natación','Travel','Más actividades']:
+    if label not in html:
+        errors.append(f'Falta navegación lateral: {label}')
+if 'const ACTIVITIES=[' not in html or 'data-activity-query=' not in html:
+    errors.append('La navegación por actividades no está activa')
+if '#teRailTopics{display:none!important}' not in html:
+    errors.append('La columna derecha puede volver a duplicar Explorar/Temas')
+
 polish_pos = html.find('/* TE_DESKTOP_POLISH */')
 images_pos = html.find('/* TE_DESKTOP_CARD_IMAGES */')
 if images_pos == -1:
@@ -139,7 +148,7 @@ if errors:
         print(' - ' + e)
     raise SystemExit(1)
 
-print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · escritorio y responsive separados')
+print(f'CONTROL DE CALIDAD OK · {len(items)} contenidos · actividades laterales, escritorio y responsive verificados')
 if warnings:
     print('Avisos no bloqueantes:')
     for w in warnings:
