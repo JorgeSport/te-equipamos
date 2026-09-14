@@ -6,7 +6,7 @@ path = Path(__file__).resolve().parent / 'index.html'
 html = path.read_text(encoding='utf-8')
 
 OFFICIAL_URL = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/'
-SHARE_IMAGE = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/logo-te-equipamos.png'
+SHARE_IMAGE = 'https://res.cloudinary.com/detstbpo9/image/upload/v1789420923/te-equipamos-social-share.png'
 PAGE_TITLE = 'Te Equipamos | Deporte, actividades y equipamiento'
 SOCIAL_TITLE = 'Te Equipamos — Encuentra equipamiento para lo que te gusta hacer'
 DESCRIPTION = 'Productos, reviews, ofertas y guías para senderismo, running, ciclismo, natación, viajes y muchas más actividades.'
@@ -76,11 +76,16 @@ meta = f'''<!-- TE_OFFICIAL_SITE_META -->
 <meta property="og:description" content="{DESCRIPTION}">
 <meta property="og:url" content="{OFFICIAL_URL}">
 <meta property="og:image" content="{SHARE_IMAGE}">
+<meta property="og:image:secure_url" content="{SHARE_IMAGE}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Te Equipamos — deporte, actividades y equipamiento">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{SOCIAL_TITLE}">
 <meta name="twitter:description" content="{DESCRIPTION}">
 <meta name="twitter:image" content="{SHARE_IMAGE}">
+<meta name="twitter:image:alt" content="Te Equipamos — deporte, actividades y equipamiento">
 <script type="application/ld+json" id="teOfficialSchema">{json.dumps(schema, ensure_ascii=False, separators=(',', ':'))}</script>
 <!-- /TE_OFFICIAL_SITE_META -->'''
 html = html.replace('</head>', meta + '\n</head>', 1)
@@ -212,11 +217,13 @@ for marker in [
     f'href="{OFFICIAL_URL}" class="brand"',
     f'<link rel="canonical" href="{OFFICIAL_URL}">',
     'property="og:title"',
-    'property="og:image"',
+    f'property="og:image" content="{SHARE_IMAGE}"',
+    'property="og:image:width" content="1200"',
+    'property="og:image:height" content="630"',
     'name="twitter:card"',
     'id="teOfficialSchema"',
 ]:
     if marker not in html:
         raise RuntimeError('Falta identidad oficial o metadato: ' + marker)
 
-print('Te Equipamos: enlace oficial, SEO y metadatos sociales activados')
+print('Te Equipamos: enlace oficial, SEO y metadatos sociales activados con imagen 1200x630')
