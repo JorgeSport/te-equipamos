@@ -157,6 +157,9 @@ jobs:
       - name: Pulir experiencia editorial de escritorio
         run: python gh-pages/news/polish-desktop-layout.py
 
+      - name: Adaptar actividades a responsive y cerrar identidad
+        run: python gh-pages/news/finalize-portal.py
+
       - name: Control de calidad antes de publicar
         run: python gh-pages/news/quality-check.py
 
