@@ -31,6 +31,8 @@ jobs:
         run: python gh-pages/news/add-sale-products.py
       - name: Cargar actualidad y contenido Te Equipamos
         run: python gh-pages/news/apply-real-news.py
+      - name: Hacer clic directo en productos
+        run: python gh-pages/news/enhance-product-cards.py
       - name: Activar vencimiento automático de la promoción
         run: |
           python - <<'PY'
