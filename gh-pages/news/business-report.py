@@ -11,17 +11,22 @@ sponsors = json.loads((NEWS / 'sponsored-campaigns.json').read_text(encoding='ut
 
 sections = Counter()
 activities = Counter()
-products = 0
 owned = 0
 for item in items:
     if item.get('owned'):
         owned += 1
-    if item.get('kind') == 'product':
-        products += 1
     for section in item.get('sections') or []:
         sections[str(section)] += 1
     for activity in item.get('activities') or []:
         activities[str(activity)] += 1
+
+# El portal usa internamente la sección "Ventas" y la muestra al público como "Productos".
+# Se cuenta esa clasificación real, con kind=product como respaldo para futuras fichas.
+product_ids = {
+    item.get('id') for item in items
+    if item.get('kind') == 'product' or 'Ventas' in (item.get('sections') or [])
+}
+products = len(product_ids)
 
 active_sponsors = sum(1 for x in sponsors if isinstance(x, dict) and x.get('active') is True)
 report = {
