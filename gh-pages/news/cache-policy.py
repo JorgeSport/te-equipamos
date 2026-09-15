@@ -65,6 +65,56 @@ if start != -1:
         html = html[:start] + html[end+8:]
 html = html.replace('</head>', identity_css + '</head>', 1)
 
+# TE_EDITORIAL_MICRO_POLISH: micro-pulido premium sin alterar estructura.
+# Solo afina jerarquía, aire, separadores, imágenes e interacción visual.
+polish_css = r'''<style id="teEditorialMicroPolish">/* TE_EDITORIAL_MICRO_POLISH */
+:root{--te-hairline:color-mix(in srgb,var(--line) 72%,transparent)}
+html{text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{letter-spacing:-.004em}
+.welcome{margin-bottom:28px}
+.welcome h1,.heroCopy h2,.head h2,.journeyHead h2,.recentHead h2,.articleBody h1,.copy h2{font-weight:700;letter-spacing:-.035em}
+.welcome p,.head p,.journeyHead p,.summary,.deck,.meta,.cardMeta{color:var(--muted)}
+.section{margin-top:34px}
+.head{margin-bottom:16px}
+.feed,.panel,.railCard,.topic,.place,.recentCard,.article,.related{box-shadow:var(--shadow)}
+.card,.heroItem,.journeyCard,.recentCard,.trend li,.rel{transition:background-color .18s ease,color .18s ease}
+.card .title,.heroItem h3,.journeyCard strong,.recentCard b,.rel b{transition:color .18s ease}
+.card:hover,.heroItem:hover,.recentCard:hover,.rel:hover{background:color-mix(in srgb,var(--surface2) 44%,transparent)}
+.card:hover .title,.heroItem:hover h3,.journeyCard:hover strong,.recentCard:hover b,.rel:hover b{color:var(--accent)}
+.title:hover{text-decoration:none}
+.thumb,.heroMain img,.heroItem img,.journeyMedia img,.recentCard img,.articleHero{object-position:center;background:var(--surface2);transition:filter .18s ease,opacity .18s ease}
+.card:hover .thumb,.heroItem:hover img,.journeyCard:hover img,.recentCard:hover img{filter:saturate(.94) contrast(1.01)}
+.feed .card,.heroItem,.journeyCard,.trend li,.rel,.byline{border-color:var(--te-hairline)}
+.kicker,.journeyCopy small,.recentCard small{letter-spacing:.075em}
+.sourceBtn,.follow,.chip,.teRespActivityChip,.saleFilter{transition:background-color .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
+.sourceBtn:hover,.follow:hover,.chip:hover,.teRespActivityChip:hover,.saleFilter:hover{transform:translateY(-1px)}
+.copy{line-height:1.82}
+.copy p{margin-top:0;margin-bottom:1.35em}
+.articleBody h1{max-width:18ch}
+.related h3,.railCard h3{letter-spacing:-.02em}
+@media(min-width:1101px){
+  .shell{padding-top:32px}
+  .section{margin-top:38px}
+  .journey{margin-top:44px}
+  .articleWrap{padding-top:40px}
+}
+@media(max-width:760px){
+  .section{margin-top:28px}
+  .head{margin-bottom:12px}
+  .journey{margin-top:32px}
+  .welcome{margin-bottom:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  .card,.heroItem,.journeyCard,.recentCard,.trend li,.rel,.card .title,.heroItem h3,.journeyCard strong,.recentCard b,.rel b,.thumb,.heroMain img,.heroItem img,.journeyMedia img,.recentCard img,.articleHero,.sourceBtn,.follow,.chip,.teRespActivityChip,.saleFilter{transition:none!important}
+}
+</style>'''
+start = html.find('<style id="teEditorialMicroPolish">')
+if start != -1:
+    end = html.find('</style>', start)
+    if end != -1:
+        html = html[:start] + html[end+8:]
+html = html.replace('</head>', polish_css + '</head>', 1)
+
 # TE_STRATEGIC_MENU: mantener los nombres internos para no romper filtros,
 # pero presentar al visitante un orden más comercial y claro.
 menu_script = r'''<script id="teStrategicMenuScript">
@@ -111,4 +161,4 @@ if 'id="teStrategicMenuScript"' not in html:
     html = html.replace('</body>', menu_script + '</body>', 1)
 
 path.write_text(html, encoding="utf-8")
-print('Política de caché actualizada · imagen social oficial v2 activa · identidad Bosque Editorial activa · menú estratégico activo')
+print('Política de caché actualizada · imagen social oficial v2 activa · identidad Bosque Editorial activa · micro-pulido editorial activo · menú estratégico activo')
