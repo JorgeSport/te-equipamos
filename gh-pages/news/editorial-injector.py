@@ -50,6 +50,13 @@ if not premium_header.exists():
 code = compile(premium_header.read_text(encoding='utf-8'), str(premium_header), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(premium_header)})
 
+# La marca completa se aplica como una capa mínima sobre la cabecera ya instalada.
+full_brand = news_dir / 'full-brand-header.py'
+if not full_brand.exists():
+    raise RuntimeError('Falta full-brand-header.py')
+code = compile(full_brand.read_text(encoding='utf-8'), str(full_brand), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(full_brand)})
+
 # Y por último se comprueba el artefacto ya con la nueva cabecera instalada.
 quality = news_dir / 'quality-check.py'
 if not quality.exists():
@@ -57,4 +64,4 @@ if not quality.exists():
 code = compile(quality.read_text(encoding='utf-8'), str(quality), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(quality)})
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium activa y verificada')
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium con nombre completo activa y verificada')
