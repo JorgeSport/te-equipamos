@@ -72,11 +72,34 @@ if not homepage_hierarchy.exists():
 code = compile(homepage_hierarchy.read_text(encoding='utf-8'), str(homepage_hierarchy), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(homepage_hierarchy)})
 
-# Y por último se comprueba el artefacto ya con la nueva cabecera instalada.
+# Pulido móvil y rendimiento progresivo. Se instala después de la estructura final
+# para poder ajustar también elementos creados dinámicamente.
+mobile_performance = news_dir / 'mobile-performance-polish.py'
+if not mobile_performance.exists():
+    raise RuntimeError('Falta mobile-performance-polish.py')
+code = compile(mobile_performance.read_text(encoding='utf-8'), str(mobile_performance), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(mobile_performance)})
+
+# Comparador: máximo tres productos del mismo tipo y únicamente datos documentados.
+comparator = news_dir / 'install-product-comparator.py'
+if not comparator.exists():
+    raise RuntimeError('Falta install-product-comparator.py')
+code = compile(comparator.read_text(encoding='utf-8'), str(comparator), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(comparator)})
+
+# Control de calidad funcional del artefacto final.
 quality = news_dir / 'quality-check.py'
 if not quality.exists():
     raise RuntimeError('Falta quality-check.py')
 code = compile(quality.read_text(encoding='utf-8'), str(quality), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(quality)})
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium activa · portada sin marca duplicada y categorías navegables')
+# Presupuesto estático de rendimiento: evita que futuros cambios disparen el peso
+# del documento o eliminen protecciones esenciales de carga.
+performance_budget = news_dir / 'performance-budget.py'
+if not performance_budget.exists():
+    raise RuntimeError('Falta performance-budget.py')
+code = compile(performance_budget.read_text(encoding='utf-8'), str(performance_budget), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(performance_budget)})
+
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium activa · portada limpia · pulido móvil activo · comparador verificado activo · presupuesto de rendimiento superado')
