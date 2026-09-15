@@ -7,9 +7,9 @@ if 'http-equiv="Cache-Control"' not in html:
     html = html.replace('</head>', meta + '</head>', 1)
 
 # TE_OFFICIAL_SOCIAL_IMAGE: imagen editorial propia usada por Facebook, WhatsApp,
-# Telegram y tarjetas sociales. Vive dentro del propio GitHub Pages para que la
-# URL sea estable y no dependa de una landing de producto ni de un CDN externo.
-social_image = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/assets/te-equipamos-og-oficial.jpg'
+# Telegram y tarjetas sociales. Se entrega desde una URL versionada para evitar
+# que las plataformas sigan mostrando una miniatura antigua en caché.
+social_image = 'https://res.cloudinary.com/detstbpo9/image/upload/v1789444910/te-equipamos-social-share-v2.jpg'
 old_social_image = 'https://res.cloudinary.com/detstbpo9/image/upload/v1789420923/te-equipamos-social-share.png'
 html = html.replace(old_social_image, social_image)
 html = html.replace('<meta property="og:image:type" content="image/png">', '<meta property="og:image:type" content="image/jpeg">')
@@ -67,4 +67,4 @@ if 'id="teStrategicMenuScript"' not in html:
     html = html.replace('</body>', menu_script + '</body>', 1)
 
 path.write_text(html, encoding="utf-8")
-print('Política de caché actualizada · imagen social oficial activa · menú estratégico activo')
+print('Política de caché actualizada · imagen social oficial v2 activa · menú estratégico activo')
