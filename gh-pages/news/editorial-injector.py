@@ -57,6 +57,13 @@ if not full_brand.exists():
 code = compile(full_brand.read_text(encoding='utf-8'), str(full_brand), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(full_brand)})
 
+# Navegación rápida únicamente en escritorio: desaparece en móvil y al hacer scroll.
+quick_nav = news_dir / 'install-desktop-quick-nav.py'
+if not quick_nav.exists():
+    raise RuntimeError('Falta install-desktop-quick-nav.py')
+code = compile(quick_nav.read_text(encoding='utf-8'), str(quick_nav), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(quick_nav)})
+
 # Y por último se comprueba el artefacto ya con la nueva cabecera instalada.
 quality = news_dir / 'quality-check.py'
 if not quality.exists():
@@ -64,4 +71,4 @@ if not quality.exists():
 code = compile(quality.read_text(encoding='utf-8'), str(quality), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(quality)})
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium con nombre completo activa y verificada')
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium con nombre completo y navegación rápida de escritorio activa y verificada')
