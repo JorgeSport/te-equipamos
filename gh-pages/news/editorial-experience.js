@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  if (!window.NEWS || !Array.isArray(window.NEWS)) return;
+  if (typeof NEWS === 'undefined' || !Array.isArray(NEWS)) return;
 
   const VIEW_KEY = 'teContentViewsV1';
   const escHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
@@ -51,7 +51,8 @@
     const section = ensureSelection();
     if (!section) return;
     const portal = document.getElementById('portal');
-    const show = portal && !portal.classList.contains('hidden') && window.state && state.cat === 'Todas' && !state.q;
+    const hasState = typeof state !== 'undefined' && state;
+    const show = portal && !portal.classList.contains('hidden') && hasState && state.cat === 'Todas' && !state.q;
     section.classList.toggle('hidden', !show);
     if (!show) return;
 
@@ -146,24 +147,24 @@
     requestAnimationFrame(updateProgress);
   }
 
-  if (typeof window.renderTrend === 'function') {
-    window.renderTrend = function(){ renderAdaptiveTrend(); };
+  if (typeof renderTrend === 'function') {
+    renderTrend = function(){ renderAdaptiveTrend(); };
   }
-  if (typeof window.renderPortal === 'function') {
-    const base = window.renderPortal;
-    window.renderPortal = function(){ const result = base.apply(this, arguments); renderSelection(); renderAdaptiveTrend(); scheduleProgress(); return result; };
+  if (typeof renderPortal === 'function') {
+    const base = renderPortal;
+    renderPortal = function(){ const result = base.apply(this, arguments); renderSelection(); renderAdaptiveTrend(); scheduleProgress(); return result; };
   }
-  if (typeof window.renderFeed === 'function') {
-    const base = window.renderFeed;
-    window.renderFeed = function(){ const result = base.apply(this, arguments); renderSelection(); return result; };
+  if (typeof renderFeed === 'function') {
+    const base = renderFeed;
+    renderFeed = function(){ const result = base.apply(this, arguments); renderSelection(); return result; };
   }
-  if (typeof window.setCat === 'function') {
-    const base = window.setCat;
-    window.setCat = function(){ const result = base.apply(this, arguments); renderSelection(); return result; };
+  if (typeof setCat === 'function') {
+    const base = setCat;
+    setCat = function(){ const result = base.apply(this, arguments); renderSelection(); return result; };
   }
-  if (typeof window.renderArticle === 'function') {
-    const base = window.renderArticle;
-    window.renderArticle = function(){ const result = base.apply(this, arguments); setTimeout(scheduleProgress, 0); return result; };
+  if (typeof renderArticle === 'function') {
+    const base = renderArticle;
+    renderArticle = function(){ const result = base.apply(this, arguments); setTimeout(scheduleProgress, 0); return result; };
   }
 
   document.addEventListener('click', event => {
