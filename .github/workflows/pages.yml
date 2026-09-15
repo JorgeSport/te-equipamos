@@ -175,6 +175,9 @@ jobs:
       - name: Preparar proveedor de analítica con consentimiento
         run: python gh-pages/news/analytics-provider.py
 
+      - name: Generar radiografía de negocio y crecimiento
+        run: python gh-pages/news/business-report.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
