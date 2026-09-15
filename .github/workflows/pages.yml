@@ -178,6 +178,9 @@ jobs:
       - name: Generar radiografía de negocio y crecimiento
         run: python gh-pages/news/business-report.py
 
+      - name: Normalizar automáticamente la URL pública del repositorio
+        run: python gh-pages/news/site-slug-migration.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
