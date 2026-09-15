@@ -102,6 +102,7 @@ css = r'''/* TE_RESPONSIVE_ACTIVITY_NAV */
   .teRespActivityRow::-webkit-scrollbar{display:none}
   .teRespActivityChip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;min-height:36px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
   .teRespActivityChip:hover,.teRespActivityChip.isActive{background:var(--soft);border-color:color-mix(in srgb,var(--accent) 38%,var(--line));color:var(--accent)}
+  .teRespActivityChip small{margin-left:5px;color:inherit;font-size:9px;font-weight:900;opacity:.72}
   .teRespActivityMore{color:var(--accent);font-weight:900}
   .teRespActivityExtra{display:flex;gap:7px;flex-wrap:wrap;padding-top:9px;margin-top:7px;border-top:1px solid var(--line)}
   .teRespActivityExtra .teRespActivityChip{font-size:11px;min-height:34px;padding:6px 10px}
@@ -149,6 +150,8 @@ js = r'''<script id="teResponsiveActivitiesScript">
   ];
   let open=false;
   function escHtml(value){return String(value||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
+  function countActivity(slug){return (typeof NEWS!=='undefined'?NEWS:[]).filter(n=>Array.isArray(n.activities)&&n.activities.includes(slug)).length}
+  function available(items){return items.map(pair=>[pair[0],pair[1],countActivity(pair[0])]).filter(pair=>pair[2]>0)}
   function ensure(){
     const cats=document.getElementById('cats');
     if(!cats)return null;
@@ -163,15 +166,18 @@ js = r'''<script id="teResponsiveActivitiesScript">
     return host;
   }
   function button(pair,active){
-    const slug=pair[0],label=pair[1];
-    return `<button type="button" class="teRespActivityChip ${active===slug?'isActive':''}" data-resp-activity="${escHtml(slug)}" aria-pressed="${active===slug?'true':'false'}">${escHtml(label)}</button>`;
+    const slug=pair[0],label=pair[1],count=pair[2];
+    return `<button type="button" class="teRespActivityChip ${active===slug?'isActive':''}" data-resp-activity="${escHtml(slug)}" aria-pressed="${active===slug?'true':'false'}" aria-label="${escHtml(label)} · ${count} ${count===1?'contenido':'contenidos'}">${escHtml(label)}<small>${count}</small></button>`;
   }
   function render(){
     const host=ensure();
     if(!host)return;
     const active=(typeof state!=='undefined'&&state.activity)?String(state.activity):'';
-    if(active&&EXTRA.some(x=>x[0]===active))open=true;
-    host.innerHTML=`<div class="teRespActivitiesInner"><div class="teRespActivitiesHead"><strong>Explorar actividades</strong><span>Elige lo que quieres practicar</span></div><div class="teRespActivityRow">${MAIN.map(x=>button(x,active)).join('')}<button type="button" class="teRespActivityChip teRespActivityMore" data-resp-more aria-expanded="${open?'true':'false'}">${open?'Menos':'Más actividades'} ${open?'↑':'↓'}</button></div>${open?`<div class="teRespActivityExtra">${EXTRA.map(x=>button(x,active)).join('')}</div>`:''}</div>`;
+    const main=available(MAIN),extra=available(EXTRA);
+    if(active&&extra.some(x=>x[0]===active))open=true;
+    const more=extra.length?`<button type="button" class="teRespActivityChip teRespActivityMore" data-resp-more aria-expanded="${open?'true':'false'}">${open?'Menos':'Más actividades'} ${open?'↑':'↓'}</button>`:'';
+    host.innerHTML=`<div class="teRespActivitiesInner"><div class="teRespActivitiesHead"><strong>Explorar actividades</strong><span>Solo actividades con contenido disponible</span></div><div class="teRespActivityRow">${main.map(x=>button(x,active)).join('')}${more}</div>${open&&extra.length?`<div class="teRespActivityExtra">${extra.map(x=>button(x,active)).join('')}</div>`:''}</div>`;
+    host.classList.toggle('hidden',main.length===0&&extra.length===0);
   }
   function choose(slug){
     if(typeof applyActivityFilter==='function')applyActivityFilter(slug);
@@ -235,4 +241,4 @@ for marker in [
     if marker not in html:
         raise RuntimeError('Falta identidad oficial o metadato: ' + marker)
 
-print('Te Equipamos: enlace oficial, SEO, metadatos sociales y regreso desde productos activados')
+print('Te Equipamos: navegación responsive muestra solo actividades con contenido real')
