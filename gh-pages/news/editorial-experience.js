@@ -26,12 +26,14 @@
   function curatedSelection(){
     const owned = NEWS.filter(n => n && n.owned).sort((a,b) => Number(b.score || 0) - Number(a.score || 0));
     if (!owned.length) return [];
+    const nonFeatured = owned.filter(n => !n.featured);
+    const pool = [...nonFeatured, ...owned.filter(n => n.featured)];
     const picks = [];
     ['Reviews','Ofertas','Ventas'].forEach(section => {
-      const item = owned.find(n => (n.sections || []).includes(section) && !picks.includes(n));
+      const item = pool.find(n => (n.sections || []).includes(section) && !picks.includes(n));
       if (item) picks.push(item);
     });
-    owned.forEach(n => { if (picks.length < 3 && !picks.includes(n)) picks.push(n); });
+    pool.forEach(n => { if (picks.length < 3 && !picks.includes(n)) picks.push(n); });
     return picks.slice(0,3);
   }
 
@@ -52,7 +54,7 @@
     if (!section) return;
     const portal = document.getElementById('portal');
     const hasState = typeof state !== 'undefined' && state;
-    const show = portal && !portal.classList.contains('hidden') && hasState && state.cat === 'Todas' && !state.q;
+    const show = portal && !portal.classList.contains('hidden') && hasState && state.cat === 'Todas' && !state.q && !state.activity;
     section.classList.toggle('hidden', !show);
     if (!show) return;
 
@@ -69,7 +71,7 @@
       </div>
       <div class="te-editorial-grid">
         <a class="te-editorial-main" href="${escHtml(itemHref(main))}" data-editorial-id="${escHtml(main.id)}">
-          <img src="${escHtml(main.image || '')}" alt="">
+          <img src="${escHtml(main.image || '')}" alt="" loading="lazy" decoding="async">
           <div class="te-editorial-main-copy">
             <small>${escHtml(itemMeta(main))}</small>
             <h3>${escHtml(main.title || '')}</h3>
@@ -80,7 +82,7 @@
         <div class="te-editorial-side">
           ${rest.map(item => `
             <a class="te-editorial-side-item" href="${escHtml(itemHref(item))}" data-editorial-id="${escHtml(item.id)}">
-              <img src="${escHtml(item.image || '')}" alt="">
+              <img src="${escHtml(item.image || '')}" alt="" loading="lazy" decoding="async">
               <div><small>${escHtml(itemMeta(item))}</small><strong>${escHtml(item.title || '')}</strong><span>Explorar →</span></div>
             </a>`).join('')}
         </div>
@@ -104,7 +106,7 @@
     const heading = card && card.querySelector('h3');
     const {title, rows} = adaptiveTrendRows();
     if (heading) heading.textContent = title;
-    list.innerHTML = rows.map(n => `<li data-article="${escHtml(n.id)}"><span>${escHtml(n.title || '')}</span></li>`).join('');
+    list.innerHTML = rows.map(n => `<li><a href="?id=${escHtml(n.id)}" data-article="${escHtml(n.id)}">${escHtml(n.title || '')}</a></li>`).join('');
   }
 
   function ensureProgress(){
