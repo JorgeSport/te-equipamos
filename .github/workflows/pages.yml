@@ -169,6 +169,9 @@ jobs:
       - name: Redirigir las páginas migradas a sus repositorios independientes
         run: python migration/create-redirects.py
 
+      - name: Preparar SEO medición monetización y Media Kit
+        run: python gh-pages/news/business-ready.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
