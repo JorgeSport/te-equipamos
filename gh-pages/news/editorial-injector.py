@@ -64,6 +64,14 @@ if not quick_nav.exists():
 code = compile(quick_nav.read_text(encoding='utf-8'), str(quick_nav), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(quick_nav)})
 
+# Ajuste de jerarquía de portada: evita duplicar la marca y convierte las
+# categorías del destacado en navegación real sin hacer clicable el estado.
+homepage_hierarchy = news_dir / 'homepage-hierarchy.py'
+if not homepage_hierarchy.exists():
+    raise RuntimeError('Falta homepage-hierarchy.py')
+code = compile(homepage_hierarchy.read_text(encoding='utf-8'), str(homepage_hierarchy), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(homepage_hierarchy)})
+
 # Y por último se comprueba el artefacto ya con la nueva cabecera instalada.
 quality = news_dir / 'quality-check.py'
 if not quality.exists():
@@ -71,4 +79,4 @@ if not quality.exists():
 code = compile(quality.read_text(encoding='utf-8'), str(quality), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(quality)})
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium con nombre completo y navegación rápida de escritorio activa y verificada')
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium activa · portada sin marca duplicada y categorías navegables')
