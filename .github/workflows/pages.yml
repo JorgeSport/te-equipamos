@@ -181,6 +181,9 @@ jobs:
       - name: Normalizar automáticamente la URL pública del repositorio
         run: python gh-pages/news/site-slug-migration.py
 
+      - name: Convertir el Hub en la portada oficial de Te Equipamos
+        run: python gh-pages/news/promote-hub-to-root.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
