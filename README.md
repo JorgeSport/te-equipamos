@@ -1,19 +1,15 @@
-# Te Equipamos — Mochila Arpenaz 100 de 27 L
+# Te Equipamos
 
-Landing pública de **Te Equipamos** para la mochila Arpenaz 100 de 27 L y repositorio principal del Hub Te Equipamos.
+Repositorio principal del Hub **Te Equipamos**: productos, reviews, ofertas, novedades y contenidos relacionados con actividades outdoor.
 
 ## Mapa maestro de proyectos
 
-Para localizar rápidamente todos los productos, reviews y landings, consulta:
+Para localizar rápidamente los productos, reviews y landings, consulta:
 
 **[REPOSITORIOS-TE-EQUIPAMOS.md](REPOSITORIOS-TE-EQUIPAMOS.md)**
 
-Ahí se indica qué proyectos ya tienen repositorio independiente, cuáles siguen dentro de este repositorio y cuál será su nombre de destino durante la migración.
+El repositorio centraliza la publicación del Hub y enlaza los proyectos independientes de Te Equipamos.
 
-- Precio especial: S/179.00
-- Tres colores y 27 imágenes
-- Consultas y ventas directas por WhatsApp
-- Información de entregas en Lima y provincias
-- Metadatos optimizados para compartir en redes sociales
+Sitio principal: https://jorgesport.github.io/te-equipamos/
 
-Sitio: https://jorgesport.github.io/te-equipamos-arpenaz-27l/
+Hub editorial: https://jorgesport.github.io/te-equipamos/news/
