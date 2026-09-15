@@ -21,9 +21,9 @@ failsafe_css = r'''/* TE_IMAGE_FAILSAFE */
 if '/* TE_IMAGE_FAILSAFE */' not in html:
     html = html.replace('</style>', failsafe_css + '</style>', 1)
 
-# Restauración explícita del responsive original.
-# IMPORTANTE: los cambios editoriales 60/40 y mosaicos de tamaños distintos son SOLO escritorio.
-# En móvil volvemos al patrón visual con imagen principal grande arriba y texto debajo.
+# Restauración explícita del responsive de las tarjetas principales.
+# IMPORTANTE: este bloque no modifica "Sigue explorando". Esa sección se controla
+# exclusivamente desde add-section-journeys.py para evitar reglas contradictorias.
 responsive_css = r'''<style id="teResponsiveRestore">
 @media(max-width:760px){
   .feed{border-left:0!important;border-right:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
@@ -37,15 +37,6 @@ responsive_css = r'''<style id="teResponsiveRestore">
   .feed .card .cardMeta{font-size:13px!important;padding-bottom:2px!important}
   .feed .card .tagRow{margin:8px 0!important}
   .feed .card .cardShare{margin:8px 0!important}
-
-  /* Sigue explorando: nada de miniaturas laterales en responsive. */
-  .journeyGrid,.journeyGrid.count1,.journeyGrid.count2{grid-template-columns:1fr!important;grid-auto-rows:auto!important;gap:12px!important;padding:0 12px!important}
-  .journeyCard,.journeyGrid.count1 .journeyCard,.journeyGrid.count2 .journeyCard{grid-column:1!important;grid-row:auto!important;border-radius:16px!important}
-  .journeyCardInner,.journeyHero .journeyCardInner,.journeySide .journeyCardInner,.journeyWide .journeyCardInner{display:flex!important;flex-direction:column!important;grid-template-columns:none!important;min-height:0!important}
-  .journeyMedia,.journeyHero .journeyMedia,.journeySide .journeyMedia,.journeyWide .journeyMedia{order:-1!important;width:100%!important;aspect-ratio:16/9!important;min-height:0!important}
-  .journeyMedia img{width:100%!important;height:100%!important;object-fit:cover!important}
-  .journeyCopy,.journeyHero .journeyCopy,.journeySide .journeyCopy,.journeyWide .journeyCopy{padding:18px!important}
-  .journeyCopy strong,.journeyHero .journeyCopy strong,.journeySide .journeyCopy strong,.journeyWide .journeyCopy strong{font-size:20px!important;line-height:1.22!important}
 }
 </style>'''
 
@@ -96,4 +87,4 @@ else:
     html = html.replace('</body>', js + '</body>', 1)
 
 index.write_text(html, encoding='utf-8')
-print('Responsive restaurado: imagen grande arriba; cambios 60/40 reservados a escritorio')
+print('Responsive de tarjetas restaurado sin modificar Sigue explorando')
