@@ -3,12 +3,16 @@ from pathlib import Path
 path = Path(__file__).resolve().parent / 'index.html'
 html = path.read_text(encoding='utf-8')
 
-# Evitar duplicar la marca: la cabecera ya muestra "Te Equipamos" completo.
-html = html.replace('<h1>Te Equipamos</h1>', '<h1>Lo último</h1>', 1)
+# Evitar duplicar visualmente la marca: la cabecera ya muestra "Te Equipamos" completo.
+# Conservamos un H1 semántico para estructura y accesibilidad, pero no ocupa espacio visual.
+html = html.replace('<h1>Te Equipamos</h1>', '<h1 class="teHomeSemanticTitle">Te Equipamos</h1>', 1)
 
 css = r'''<style id="teHomepageHierarchyCss">/* TE_HOMEPAGE_HIERARCHY */
+.welcome .teHomeSemanticTitle{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
+.welcome .teHomeSemanticTitle + #today{margin:0!important}
 #hero .teKickerLink{appearance:none;border:0;background:transparent;padding:0;margin:0;color:var(--accent);font:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
 #hero .teKickerLink:hover{text-decoration:underline;text-underline-offset:3px}
+#hero .teKickerLink:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
 #hero .teKickerStatus{color:var(--muted);font-weight:800;letter-spacing:.075em;text-transform:uppercase}
 #hero .teKickerSep{color:var(--muted);padding:0 4px}
 @media(prefers-reduced-motion:reduce){#hero .teKickerLink{transition:none!important}}
@@ -62,9 +66,11 @@ if 'id="teHomepageHierarchyScript"' not in html:
     html = html.replace('</body>', script + '</body>', 1)
 
 if '<h1>Te Equipamos</h1>' in html:
-    raise RuntimeError('Sigue existiendo el título duplicado de Te Equipamos en portada')
-if '<h1>Lo último</h1>' not in html:
-    raise RuntimeError('No se instaló el nuevo encabezado de portada')
+    raise RuntimeError('Sigue existiendo el título duplicado visible de Te Equipamos en portada')
+if '<h1 class="teHomeSemanticTitle">Te Equipamos</h1>' not in html:
+    raise RuntimeError('No se instaló el H1 semántico de portada')
+if 'data-te-kicker-cat' not in html:
+    raise RuntimeError('No se instaló la navegación de categorías del destacado')
 
 path.write_text(html, encoding='utf-8')
-print('Portada corregida: marca no duplicada y categorías del hero navegables')
+print('Portada corregida: solo fecha visible bajo la cabecera y categorías del hero navegables')
