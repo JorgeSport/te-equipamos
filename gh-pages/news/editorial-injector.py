@@ -35,6 +35,15 @@ for page in root.rglob('index.html'):
         page.write_text(text, encoding='utf-8')
         updated += 1
 
+# La cabecera premium se instala al final del build, después de todas las capas
+# visuales anteriores y antes de la auditoría final. Así no se pierde en futuras
+# publicaciones automáticas.
+premium_header = news_dir / 'install-premium-header.py'
+if not premium_header.exists():
+    raise RuntimeError('Falta install-premium-header.py')
+code = compile(premium_header.read_text(encoding='utf-8'), str(premium_header), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(premium_header)})
+
 # Última capa del build: auditoría integral y una segunda comprobación de calidad
 # sobre el artefacto que realmente será publicado.
 for script_name in ('final-site-audit.py', 'quality-check.py'):
@@ -44,4 +53,4 @@ for script_name in ('final-site-audit.py', 'quality-check.py'):
     code = compile(script.read_text(encoding='utf-8'), str(script), 'exec')
     exec(code, {'__name__': '__main__', '__file__': str(script)})
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría final superada')
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · cabecera premium activa · auditoría final superada')
