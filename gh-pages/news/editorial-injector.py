@@ -35,4 +35,13 @@ for page in root.rglob('index.html'):
         page.write_text(text, encoding='utf-8')
         updated += 1
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales')
+# Última capa del build: auditoría integral y una segunda comprobación de calidad
+# sobre el artefacto que realmente será publicado.
+for script_name in ('final-site-audit.py', 'quality-check.py'):
+    script = news_dir / script_name
+    if not script.exists():
+        raise RuntimeError(f'Falta {script_name}')
+    code = compile(script.read_text(encoding='utf-8'), str(script), 'exec')
+    exec(code, {'__name__': '__main__', '__file__': str(script)})
+
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría final superada')
