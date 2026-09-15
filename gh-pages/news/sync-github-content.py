@@ -317,7 +317,7 @@ def main() -> None:
         try:
             manifest = json.loads(local_manifest.read_text(encoding="utf-8"))
             for raw in manifest_items(manifest):
-                item = normalize_item(raw, "te-equipamos-arpenaz-27l")
+                item = normalize_item(raw, "te-equipamos")
                 if item:
                     collected.append(item)
         except Exception as exc:
@@ -325,7 +325,7 @@ def main() -> None:
 
     for repo in repos:
         name = repo.get("name", "")
-        if name == "te-equipamos-arpenaz-27l":
+        if name == "te-equipamos":
             continue
         manifest = load_manifest(repo)
         if not manifest:

@@ -6,6 +6,8 @@ BASE = "https://jorgesport.github.io/te-equipamos/"
 NEWS_BASE = BASE + "news/"
 PRODUCT_SLUG = "arpenaz-100-27l"
 PRODUCT_URL = BASE + PRODUCT_SLUG + "/"
+PRODUCT_REPOSITORY = "te-equipamos-arpenaz-100-27l"
+PRODUCT_TARGET = "https://jorgesport.github.io/te-equipamos-arpenaz-100-27l/"
 PUBLIC_ROOT = "/te-equipamos/"
 
 root_index = ROOT / "index.html"
@@ -16,14 +18,23 @@ sitemap = ROOT / "sitemap.xml"
 if not root_index.exists() or not news_index.exists():
     raise RuntimeError("Falta la landing histórica o el Hub antes de promover la portada")
 
-# 1) Conserva la landing histórica de la Arpenaz en una URL propia antes de
-# sustituir el index raíz por el Hub editorial.
+# 1) La landing histórica ya vive en un repositorio independiente. Conserva
+# esta ruta como redirección compatible antes de sustituir la portada.
 product_html = root_index.read_text(encoding="utf-8")
 if "Arpenaz 100 27 L" not in product_html and "ARPENAZ 100" not in product_html:
     raise RuntimeError("La portada histórica ya no parece ser la landing Arpenaz esperada")
-product_html = product_html.replace(BASE, PRODUCT_URL)
 product_index.parent.mkdir(parents=True, exist_ok=True)
-product_index.write_text(product_html, encoding="utf-8")
+product_index.write_text(f'''<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="{PRODUCT_TARGET}">
+<title>Arpenaz 100 27 L · Te Equipamos</title></head>
+<body><p>Comprobando la nueva dirección… <a href="{PRODUCT_TARGET}">Abrir producto</a>.</p>
+<script>fetch('https://api.github.com/repos/JorgeSport/{PRODUCT_REPOSITORY}',{{cache:'no-store'}})
+.then(r=>location.replace(r.status===404?'{BASE}':'{PRODUCT_TARGET}'+location.search+location.hash))
+.catch(()=>location.replace('{PRODUCT_TARGET}'+location.search+location.hash));</script>
+</body></html>''', encoding="utf-8")
 
 # 2) Promueve el Hub generado a la raíz sin mover sus assets. Los CSS/JS
 # editoriales siguen viviendo bajo /news/, pero canonical, Open Graph,
@@ -74,8 +85,8 @@ checks = {
     "canonical_raiz": f'href="{BASE}"' in root_html,
     "sin_canonical_news": f'href="{NEWS_BASE}"' not in root_html,
     "redirect_news_noindex": 'name="robots" content="noindex,follow"' in redirect_html,
-    "producto_conservado": "Arpenaz 100 27 L" in product_check or "ARPENAZ 100" in product_check,
-    "producto_url_propia": PRODUCT_URL in product_check,
+    "producto_conservado": "Arpenaz 100 27 L" in product_check,
+    "producto_url_propia": PRODUCT_TARGET in product_check,
     "asset_css_presente": (NEWS / "editorial-experience.css").exists(),
     "asset_js_presente": (NEWS / "editorial-experience.js").exists(),
 }
@@ -90,5 +101,5 @@ if sitemap.exists():
 
 print(
     "PORTADA OFICIAL ACTIVA · "
-    f"{BASE} · Hub promovido · /news/ redirige · producto conservado en {PRODUCT_URL}"
+    f"{BASE} · Hub promovido · /news/ redirige · producto independiente en {PRODUCT_TARGET}"
 )

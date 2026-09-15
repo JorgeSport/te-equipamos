@@ -1,7 +1,7 @@
 {
   "owner": "JorgeSport",
   "strategy": "one-public-project-one-repository",
-  "main_repository": "te-equipamos-arpenaz-27l",
+  "main_repository": "te-equipamos",
   "repositories": [
     {
       "name": "te-equipamos-quechua-raincut-mujer",
@@ -12,7 +12,11 @@
       "item": {
         "active": true,
         "type": "review",
-        "sections": ["Reviews", "Ofertas", "Ventas"],
+        "sections": [
+          "Reviews",
+          "Ofertas",
+          "Ventas"
+        ],
         "title": "Una chaqueta de 250 g que puede salvarte cuando cambia el tiempo",
         "summary": "Review de la Quechua Raincut Mujer: impermeabilidad de 5000 mm, cortaviento, ventilación y formato compacto.",
         "details": "Análisis propio de Te Equipamos con oferta y consulta de la variante disponible.",
@@ -21,7 +25,12 @@
         "score": 97,
         "featured": true,
         "direct": true,
-        "tags": ["senderismo", "impermeable", "mujer", "quechua"]
+        "tags": [
+          "senderismo",
+          "impermeable",
+          "mujer",
+          "quechua"
+        ]
       }
     },
     {
@@ -33,7 +42,11 @@
       "item": {
         "active": true,
         "type": "offer",
-        "sections": ["Ofertas", "Ventas", "Novedades"],
+        "sections": [
+          "Ofertas",
+          "Ventas",
+          "Novedades"
+        ],
         "title": "Pequeña por fuera, preparada para empezar: una mochila infantil de solo 5 litros",
         "summary": "Quechua MH100 infantil de 5 L, 150 g y espalda acolchada, presentada con sus variantes y promoción Te Equipamos.",
         "details": "Producto de venta con colección de colores, especificaciones y promoción comercial.",
@@ -42,7 +55,11 @@
         "score": 95,
         "featured": false,
         "direct": true,
-        "tags": ["niños", "mochilas", "senderismo"]
+        "tags": [
+          "niños",
+          "mochilas",
+          "senderismo"
+        ]
       }
     },
     {
@@ -54,7 +71,11 @@
       "item": {
         "active": true,
         "type": "review",
-        "sections": ["Reviews", "Ofertas", "Ventas"],
+        "sections": [
+          "Reviews",
+          "Ofertas",
+          "Ventas"
+        ],
         "title": "Piel, EVA y tacos de 4 mm: una zapatilla de senderismo más seria de lo que parece",
         "summary": "Review de la Quechua Arpenaz 500 sobre comodidad, agarre, protección y el terreno donde realmente tiene sentido.",
         "details": "Análisis propio que termina mostrando la oferta disponible de Te Equipamos.",
@@ -63,7 +84,12 @@
         "score": 93,
         "featured": true,
         "direct": true,
-        "tags": ["senderismo", "calzado", "quechua", "piel"]
+        "tags": [
+          "senderismo",
+          "calzado",
+          "quechua",
+          "piel"
+        ]
       }
     },
     {
@@ -75,7 +101,10 @@
       "item": {
         "active": true,
         "type": "review",
-        "sections": ["Reviews", "Ventas"],
+        "sections": [
+          "Reviews",
+          "Ventas"
+        ],
         "title": "El accesorio que muchos olvidan hasta que llevan horas caminando bajo el sol",
         "summary": "Forclaz MT100 con protección UPF50+, ala de 7 cm, ventilación y bajo peso para trekking con buen tiempo.",
         "details": "Review y ficha de producto propia de Te Equipamos con acceso a consulta.",
@@ -84,7 +113,12 @@
         "score": 91,
         "featured": false,
         "direct": true,
-        "tags": ["trekking", "sol", "protección UV", "forclaz"]
+        "tags": [
+          "trekking",
+          "sol",
+          "protección UV",
+          "forclaz"
+        ]
       }
     },
     {
@@ -96,7 +130,9 @@
       "item": {
         "active": true,
         "type": "sale",
-        "sections": ["Ventas"],
+        "sections": [
+          "Ventas"
+        ],
         "title": "Dos ajustes, plantilla EVA y verano: una sandalia sencilla que sabe para qué terreno nació",
         "summary": "Quechua NH100 de hombre para senderos naturales, con plantilla EVA extraíble y doble ajuste.",
         "details": "Landing de producto con galería, características y contacto comercial.",
@@ -105,7 +141,12 @@
         "score": 89,
         "featured": false,
         "direct": true,
-        "tags": ["sandalias", "senderismo", "hombre", "verano"]
+        "tags": [
+          "sandalias",
+          "senderismo",
+          "hombre",
+          "verano"
+        ]
       }
     },
     {
@@ -117,7 +158,10 @@
       "item": {
         "active": true,
         "type": "sale",
-        "sections": ["Ventas", "Novedades"],
+        "sections": [
+          "Ventas",
+          "Novedades"
+        ],
         "title": "Mesh, ligereza y un diseño clásico: una zapatilla pensada para moverse sin complicarse",
         "summary": "PLAYER T MESH mujer con upper ventilado y enfoque urbano y casual.",
         "details": "Landing de venta de Te Equipamos con tallas, ficha visual y acceso a consulta.",
@@ -126,7 +170,11 @@
         "score": 88,
         "featured": false,
         "direct": true,
-        "tags": ["zapatillas", "mujer", "mesh"]
+        "tags": [
+          "zapatillas",
+          "mujer",
+          "mesh"
+        ]
       }
     },
     {
@@ -138,7 +186,10 @@
       "item": {
         "active": true,
         "type": "sale",
-        "sections": ["Ventas", "Novedades"],
+        "sections": [
+          "Ventas",
+          "Novedades"
+        ],
         "title": "45 gramos y 10 litros: la mochila que casi desaparece cuando no la usas",
         "summary": "Forclaz Compact 10 L, una mochila auxiliar plegable y ultraligera para viajes y trekking.",
         "details": "Landing de producto con galería, datos técnicos y módulo de compra o consulta.",
@@ -147,7 +198,12 @@
         "score": 92,
         "featured": false,
         "direct": true,
-        "tags": ["mochilas", "viaje", "trekking", "ultraligero"]
+        "tags": [
+          "mochilas",
+          "viaje",
+          "trekking",
+          "ultraligero"
+        ]
       }
     },
     {
@@ -159,7 +215,10 @@
       "item": {
         "active": true,
         "type": "sale",
-        "sections": ["Ventas", "Novedades"],
+        "sections": [
+          "Ventas",
+          "Novedades"
+        ],
         "title": "20 litros, cinco bolsillos y espacio para portátil: cuando una mochila quiere servir para dos mundos",
         "summary": "Quechua Arpenaz 100 de 20 L para combinar ciudad y senderismo ocasional.",
         "details": "Landing de venta con colores, galería, ficha técnica y opciones comerciales.",
@@ -168,7 +227,12 @@
         "score": 87,
         "featured": false,
         "direct": true,
-        "tags": ["mochilas", "ciudad", "senderismo", "quechua"]
+        "tags": [
+          "mochilas",
+          "ciudad",
+          "senderismo",
+          "quechua"
+        ]
       }
     },
     {
