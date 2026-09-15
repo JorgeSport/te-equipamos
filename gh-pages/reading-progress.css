@@ -1,0 +1,4 @@
+.te-page-reading-progress{position:fixed;left:0;top:0;width:100%;height:3px;z-index:9999;background:#355345;transform:scaleX(0);transform-origin:left center;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.te-page-reading-progress.show{opacity:1}
+@media(prefers-color-scheme:dark){.te-page-reading-progress{background:#A6B9AD}}
+@media(prefers-reduced-motion:reduce){.te-page-reading-progress{transition:none}}
