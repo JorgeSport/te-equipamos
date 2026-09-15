@@ -19,8 +19,10 @@ css = r'''/* TE_DESKTOP_POLISH */
   .teDeskAction:hover{background:var(--surface2);color:var(--text)}
   .teDeskAction strong{font-size:11px;color:var(--muted);background:var(--surface2);border-radius:999px;padding:3px 7px;min-width:24px;text-align:center}
   .teActivityList{display:grid;gap:1px;padding:0 1px}
-  .teActivityLink{width:100%;border:0;background:transparent;color:var(--muted);border-radius:10px;min-height:40px;padding:8px 9px;text-align:left;cursor:pointer;font-size:15px;line-height:1.25}
+  .teActivityLink{width:100%;border:0;background:transparent;color:var(--muted);border-radius:10px;min-height:40px;padding:8px 9px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer;font-size:15px;line-height:1.25}
   .teActivityLink:hover,.teActivityLink.isActive{background:var(--surface2);color:var(--text)}
+  .teActivityCount{flex:0 0 auto;min-width:22px;padding:2px 6px;border-radius:999px;background:var(--surface2);color:var(--muted);font-size:10px;font-weight:800;text-align:center}
+  .teActivityLink.isActive .teActivityCount{background:var(--soft);color:var(--accent)}
   .teActivityLink.teActivityMore{margin-top:4px;font-size:13px;font-weight:800;color:var(--accent);display:flex;align-items:center;justify-content:space-between;gap:8px}
   .teActivityExtra{display:grid;gap:1px;margin:4px 0 3px;padding:4px 0 2px;border-top:1px solid var(--line)}
   .teActivityExtra .teActivityLink{font-size:14px;min-height:37px;padding-left:16px}
@@ -87,17 +89,21 @@ js = r'''<script id="teDesktopPolish">
   ];
   let activitiesOpen=false;
   function allNews(){return typeof NEWS!=='undefined'?NEWS:[]}
+  function activityCount(query){return allNews().filter(n=>Array.isArray(n.activities)&&n.activities.includes(query)).length}
+  function availableActivities(items){return items.map(a=>({...a,count:activityCount(a.query)})).filter(a=>a.count>0)}
   function recentIds(){if(typeof teRecentIds==='function')return teRecentIds();try{return JSON.parse(localStorage.getItem('teRecentItems')||'[]').map(Number).filter(Boolean)}catch(e){return[]}}
   function savedCount(){return typeof state!=='undefined'&&state.saved&&typeof state.saved.size==='number'?state.saved.size:0}
   function escText(v){return typeof esc==='function'?esc(String(v||'')):String(v||'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
   function ensureLeft(){const side=document.querySelector('.side');if(!side)return null;let box=document.getElementById('teDesktopUtility');if(!box){box=document.createElement('div');box.id='teDesktopUtility';box.className='teDesktopUtility';side.appendChild(box)}return box}
   function activeActivity(){return typeof state!=='undefined'?String(state.activity||''):''}
-  function activityButtons(items,active){return items.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}">${escText(a.label)}</button>`).join('')}
+  function activityButtons(items,active){return items.map(a=>`<button type="button" class="teActivityLink ${active===a.query?'isActive':''}" data-activity-query="${escText(a.query)}" aria-label="${escText(a.label)} · ${a.count} ${a.count===1?'contenido':'contenidos'}"><span>${escText(a.label)}</span><span class="teActivityCount">${a.count}</span></button>`).join('')}
   function renderLeft(){
     const box=ensureLeft();if(!box)return;
     const recent=recentIds().length,saved=savedCount(),active=activeActivity();
-    const extras=activitiesOpen?`<div class="teActivityExtra" data-activity-extra>${activityButtons(EXTRA_ACTIVITIES,active)}</div>`:'';
-    box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>☆ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teActivityList">${activityButtons(ACTIVITIES,active)}${extras}<button type="button" class="teActivityLink teActivityMore" data-desk-action="allActivities" aria-expanded="${activitiesOpen?'true':'false'}"><span>${activitiesOpen?'Menos actividades':'Más actividades'}</span><span aria-hidden="true">${activitiesOpen?'↑':'↓'}</span></button></div></section>`;
+    const mainActivities=availableActivities(ACTIVITIES),extraActivities=availableActivities(EXTRA_ACTIVITIES);
+    const extras=activitiesOpen&&extraActivities.length?`<div class="teActivityExtra" data-activity-extra>${activityButtons(extraActivities,active)}</div>`:'';
+    const more=extraActivities.length?`<button type="button" class="teActivityLink teActivityMore" data-desk-action="allActivities" aria-expanded="${activitiesOpen?'true':'false'}"><span>${activitiesOpen?'Menos actividades':'Más actividades'}</span><span aria-hidden="true">${activitiesOpen?'↑':'↓'}</span></button>`:'';
+    box.innerHTML=`<section class="teDeskBlock"><div class="teDeskEyebrow">Tu espacio</div><button class="teDeskAction" type="button" data-desk-action="saved"><span>☆ Guardados</span><strong>${saved}</strong></button><button class="teDeskAction" type="button" data-desk-action="recent"><span>◷ Visto recientemente</span><strong>${recent}</strong></button></section><section class="teDeskBlock"><div class="teDeskEyebrow">Explorar</div><div class="teActivityList">${activityButtons(mainActivities,active)}${extras}${more}</div></section>`;
   }
   function ensureRail(){const rail=document.querySelector('.rail');if(!rail)return null;const legacy=[...rail.querySelectorAll(':scope > .railCard')][1];if(legacy)legacy.classList.add('teLegacyRail');const oldTopics=document.getElementById('teRailTopics');if(oldTopics)oldTopics.remove();let recent=document.getElementById('teRailRecent');if(!recent){recent=document.createElement('section');recent.id='teRailRecent';recent.className='railCard teRailExtra';rail.appendChild(recent)}let saved=document.getElementById('teRailSaved');if(!saved){saved=document.createElement('section');saved.id='teRailSaved';saved.className='railCard teRailExtra';rail.appendChild(saved)}return{recent,saved}}
   function renderRail(){const parts=ensureRail();if(!parts)return;const recents=recentIds().map(id=>allNews().find(n=>Number(n.id)===Number(id))).filter(Boolean).slice(0,3);parts.recent.classList.toggle('hidden',!recents.length);if(recents.length)parts.recent.innerHTML=`<span class="kicker">Continúa</span><h3>Visto recientemente</h3><div class="teRailList">${recents.map(n=>`<button type="button" class="teRailItem" data-article="${n.id}"><small>${escText((n.sections||[])[0]||n.category||'Te Equipamos')}</small><b>${escText(n.title)}</b></button>`).join('')}</div>`;const count=savedCount();parts.saved.innerHTML=`<span class="kicker">Tu selección</span><h3>Guardados</h3><div class="teRailSavedRow"><strong>${count}</strong><span>${count?`contenido${count===1?'':'s'} para volver cuando quieras.`:'Usa la estrella para guardar productos y reviews.'}</span></div><button class="teRailOpen" type="button" data-desk-action="saved">Ver guardados →</button>`}
@@ -123,4 +129,4 @@ else:
     html=html.replace('</body>',js+'</body>',1)
 
 path.write_text(html,encoding='utf-8')
-print('Escritorio pulido: Explorar usa categorías reales de actividad')
+print('Escritorio pulido: Explorar muestra solo actividades con contenido real')
