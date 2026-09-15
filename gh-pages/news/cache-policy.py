@@ -160,10 +160,34 @@ menu_script = r'''<script id="teStrategicMenuScript">
 if 'id="teStrategicMenuScript"' not in html:
     html = html.replace('</body>', menu_script + '</body>', 1)
 
+# TE_ACTIVITY_DEPTH: las actividades con muy poco contenido no terminan en un callejón sin salida.
+activity_depth_script = r'''<script id="teActivityDepthScript">
+(function(){
+  function enhanceSparseActivity(slug){
+    if(!slug||typeof NEWS==='undefined'||typeof renderActivityAlternatives!=='function')return;
+    const count=NEWS.filter(n=>Array.isArray(n.activities)&&n.activities.includes(slug)).length;
+    if(count>0&&count<=2){
+      setTimeout(()=>{
+        renderActivityAlternatives(slug);
+        const host=document.getElementById('activityAlternatives');
+        const head=host&&host.querySelector('.activityAlternativesHead');
+        if(head)head.innerHTML='<h3>Sigue explorando</h3><p>Esta actividad todavía tiene pocos contenidos. Aquí tienes otras actividades con publicaciones disponibles.</p>';
+      },60);
+    }
+  }
+  if(typeof applyActivityFilter==='function'){
+    const original=applyActivityFilter;
+    window.applyActivityFilter=function(value){const result=original.apply(this,arguments);enhanceSparseActivity(String(value||'').trim().toLowerCase());return result};
+  }
+})();
+</script>'''
+if 'id="teActivityDepthScript"' not in html:
+    html = html.replace('</body>', activity_depth_script + '</body>', 1)
+
 path.write_text(html, encoding="utf-8")
 
 injector = Path(__file__).resolve().parent / 'editorial-injector.py'
 code = compile(injector.read_text(encoding='utf-8'), str(injector), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(injector)})
 
-print('Política de caché actualizada · imagen social oficial v2 activa · identidad Bosque Editorial activa · micro-pulido editorial activo · selección editorial y progreso de lectura activos · menú estratégico activo')
+print('Política de caché actualizada · imagen social oficial v2 activa · identidad Bosque Editorial activa · micro-pulido editorial activo · actividades sin callejones sin salida · selección editorial y progreso de lectura activos · menú estratégico activo')
