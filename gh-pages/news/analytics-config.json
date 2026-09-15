@@ -2,5 +2,6 @@
   "enabled": false,
   "provider": "none",
   "measurement_id": "",
+  "requires_consent": true,
   "note": "Los eventos de Te Equipamos quedan preparados localmente. No se envían a terceros hasta configurar y activar un proveedor real."
 }
