@@ -21,34 +21,14 @@ if f'<meta property="og:image" content="{social_image}">' not in html:
 if f'<meta name="twitter:image" content="{social_image}">' not in html:
     raise RuntimeError('La nueva imagen social oficial no quedó conectada a twitter:image')
 
-# TE_RESPONSIVE_JOURNEY_COMPACT: solo corrige la capa secundaria "Sigue explorando"
-# en móvil. No modifica tarjetas principales, navegación, escritorio ni filtros.
-responsive_journey_css = r'''<style id="teResponsiveJourneyCompact">/* TE_RESPONSIVE_JOURNEY_COMPACT */
-@media(max-width:760px){
-  .journey{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
-  .journeyHead{display:block;padding:0 14px;margin-bottom:8px}
-  .journeyHead .kicker{font-size:9px;letter-spacing:.08em}
-  .journeyHead h2{margin-top:3px;font-size:20px;line-height:1.15}
-  .journeyHead p{margin-top:5px;font-size:12px;line-height:1.45}
-  .journeyGrid,.journeyGrid.count1,.journeyGrid.count2{display:block;padding:0 12px}
-  .journeyCard,.journeyGrid.count1 .journeyCard,.journeyGrid.count2 .journeyCard{display:block;width:100%;margin:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;box-shadow:none;overflow:visible}
-  .journeyCard:hover{transform:none;box-shadow:none;background:var(--surface2)}
-  .journeyCardInner,.journeyHero .journeyCardInner,.journeySide .journeyCardInner,.journeyWide .journeyCardInner{height:auto;min-height:88px;display:grid;grid-template-columns:minmax(0,1fr) 84px;align-items:center;gap:10px}
-  .journeyCopy,.journeyHero .journeyCopy,.journeySide .journeyCopy,.journeyWide .journeyCopy{padding:11px 4px 11px 2px}
-  .journeyCopy small{margin-bottom:4px;font-size:9px;letter-spacing:.06em}
-  .journeyCopy strong,.journeyHero .journeyCopy strong,.journeyWide .journeyCopy strong{font-size:14px;line-height:1.28}
-  .journeyCopy p,.journeySide .journeyCopy p,.journeyWide .journeyCopy p{display:none}
-  .journeyCta{margin-top:5px;font-size:10px}
-  .journeyMedia,.journeyHero .journeyMedia,.journeyWide .journeyMedia{order:0;width:84px;height:68px;aspect-ratio:auto;border-radius:10px;overflow:hidden}
-  .journeyMedia img{width:100%;height:100%;object-fit:cover}
-  .journeyCard:nth-child(even) .journeyCardInner{grid-template-columns:1fr}
-  .journeyCard:nth-child(even) .journeyMedia{display:none}
-}
-</style>'''
-if 'id="teResponsiveJourneyCompact"' not in html:
-    html = html.replace('</head>', responsive_journey_css + '</head>', 1)
-if '/* TE_RESPONSIVE_JOURNEY_COMPACT */' not in html:
-    raise RuntimeError('No se pudo fijar el diseño compacto de Sigue explorando en responsive')
+# "Sigue explorando" se gestiona exclusivamente desde add-section-journeys.py.
+# Si existe una capa antigua de override responsive de despliegues anteriores,
+# se elimina para evitar que vuelva a convertir las miniaturas en tarjetas grandes.
+start = html.find('<style id="teResponsiveJourneyCompact">')
+if start != -1:
+    end = html.find('</style>', start)
+    if end != -1:
+        html = html[:start] + html[end+8:]
 
 # TE_STRATEGIC_MENU: mantener los nombres internos para no romper filtros,
 # pero presentar al visitante un orden más comercial y claro.
@@ -96,4 +76,4 @@ if 'id="teStrategicMenuScript"' not in html:
     html = html.replace('</body>', menu_script + '</body>', 1)
 
 path.write_text(html, encoding="utf-8")
-print('Política de caché actualizada · imagen social oficial v2 activa · menú estratégico activo · Sigue explorando compacto en responsive')
+print('Política de caché actualizada · imagen social oficial v2 activa · menú estratégico activo')
