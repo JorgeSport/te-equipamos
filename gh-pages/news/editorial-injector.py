@@ -87,6 +87,14 @@ if not comparator.exists():
 code = compile(comparator.read_text(encoding='utf-8'), str(comparator), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(comparator)})
 
+# Refuerzo para que los controles del comparador reaparezcan cuando el feed se
+# reconstruye al cambiar filtros, actividades o secciones.
+comparator_dynamic = news_dir / 'fix-comparator-dynamic.py'
+if not comparator_dynamic.exists():
+    raise RuntimeError('Falta fix-comparator-dynamic.py')
+code = compile(comparator_dynamic.read_text(encoding='utf-8'), str(comparator_dynamic), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(comparator_dynamic)})
+
 # Control de calidad funcional del artefacto final.
 quality = news_dir / 'quality-check.py'
 if not quality.exists():
@@ -102,4 +110,4 @@ if not performance_budget.exists():
 code = compile(performance_budget.read_text(encoding='utf-8'), str(performance_budget), 'exec')
 exec(code, {'__name__': '__main__', '__file__': str(performance_budget)})
 
-print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium activa · portada limpia · pulido móvil activo · comparador verificado activo · presupuesto de rendimiento superado')
+print(f'Experiencia editorial conectada · progreso de lectura instalado en {updated} páginas largas potenciales · auditoría integral superada · cabecera premium activa · portada limpia · pulido móvil activo · comparador verificado y dinámico activo · presupuesto de rendimiento superado')
