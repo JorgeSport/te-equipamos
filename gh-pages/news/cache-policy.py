@@ -161,4 +161,9 @@ if 'id="teStrategicMenuScript"' not in html:
     html = html.replace('</body>', menu_script + '</body>', 1)
 
 path.write_text(html, encoding="utf-8")
-print('Política de caché actualizada · imagen social oficial v2 activa · identidad Bosque Editorial activa · micro-pulido editorial activo · menú estratégico activo')
+
+injector = Path(__file__).resolve().parent / 'editorial-injector.py'
+code = compile(injector.read_text(encoding='utf-8'), str(injector), 'exec')
+exec(code, {'__name__': '__main__', '__file__': str(injector)})
+
+print('Política de caché actualizada · imagen social oficial v2 activa · identidad Bosque Editorial activa · micro-pulido editorial activo · selección editorial y progreso de lectura activos · menú estratégico activo')
