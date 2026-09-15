@@ -1,7 +1,7 @@
 {
-  "enabled": false,
-  "provider": "none",
-  "measurement_id": "",
+  "enabled": true,
+  "provider": "ga4",
+  "measurement_id": "G-V6SS7KT9JV",
   "requires_consent": true,
-  "note": "Los eventos de Te Equipamos quedan preparados localmente. No se envían a terceros hasta configurar y activar un proveedor real."
+  "note": "GA4 activo para Te Equipamos. La carga del proveedor permanece condicionada al consentimiento del usuario."
 }
