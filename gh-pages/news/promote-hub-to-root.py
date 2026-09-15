@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parent.parent
 NEWS = ROOT / "news"
@@ -70,9 +71,16 @@ redirect = f'''<!doctype html>
 news_index.write_text(redirect, encoding="utf-8")
 
 # 4) El sitemap debe considerar la raíz como portada canónica y no /news/.
+# Tras sustituir /news/ por la raíz se deduplican también todas las URLs,
+# para impedir que una transformación posterior deje dos entradas iguales.
 if sitemap.exists():
     xml = sitemap.read_text(encoding="utf-8")
     xml = xml.replace(f"<loc>{NEWS_BASE}</loc>", f"<loc>{BASE}</loc>")
+    locations = re.findall(r"<loc>([^<]+)</loc>", xml)
+    unique_locations = list(dict.fromkeys(locations))
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(
+        f'  <url>\n    <loc>{url}</loc>\n  </url>\n' for url in unique_locations
+    ) + '</urlset>\n'
     sitemap.write_text(xml, encoding="utf-8")
 
 # 5) Validaciones de migración. Fallar aquí impide publicar una portada rota.
@@ -98,8 +106,11 @@ if sitemap.exists():
     xml = sitemap.read_text(encoding="utf-8")
     if f"<loc>{NEWS_BASE}</loc>" in xml:
         raise RuntimeError("El sitemap todavía publica /news/ como portada")
+    locations = re.findall(r"<loc>([^<]+)</loc>", xml)
+    if len(locations) != len(set(locations)):
+        raise RuntimeError("El sitemap contiene URLs duplicadas")
 
 print(
     "PORTADA OFICIAL ACTIVA · "
-    f"{BASE} · Hub promovido · /news/ redirige · producto independiente en {PRODUCT_TARGET}"
+    f"{BASE} · Hub promovido · /news/ redirige · producto independiente en {PRODUCT_TARGET} · sitemap sin duplicados"
 )
