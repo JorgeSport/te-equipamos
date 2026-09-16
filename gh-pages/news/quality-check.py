@@ -116,12 +116,15 @@ for i, item in enumerate(items, start=1):
     if source_repo and source_repo not in legacy_repositories and schema_version < 3:
         errors.append(f'Repositorio nuevo sin schema_version 3: {source_repo}')
     if schema_version >= 3:
+        stable_id = item.get('id')
         card_title = str(item.get('card_title') or '').strip()
         seo_title = str(item.get('seo_title') or '').strip()
         seo_description = str(item.get('seo_description') or '').strip()
         seo_keywords = item.get('seo_keywords') if isinstance(item.get('seo_keywords'), list) else []
         if not item.get('seo_ready'):
             errors.append(f'Contenido schema 3 incompleto para SEO: {source_repo or title[:70]}')
+        if not isinstance(stable_id, int) or stable_id <= 0:
+            errors.append(f'Contenido schema 3 sin ID estable: {source_repo or title[:70]}')
         if not 35 <= len(card_title) <= 95:
             errors.append(f'card_title fuera de longitud estratégica: {card_title[:70]}')
         if not 35 <= len(seo_title) <= 75:
