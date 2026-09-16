@@ -1,25 +1,45 @@
 document.addEventListener('DOMContentLoaded', async function () {
+  const BASE = '/te-equipamos-arpenaz-27l/news/';
+  const GENERIC_TAGS = new Set(['senderismo', 'trekking', 'travel', 'urbano', 'outdoor']);
+  const BRAND_TAGS = new Set(['quechua', 'forclaz', 'kalenji', 'simond', 'wedze', 'kiprun']);
+  const PRODUCT_FAMILIES = {
+    mochila: 'carga', bolso: 'carga', riñonera: 'carga',
+    zapatillas: 'calzado', sandalias: 'calzado', botas: 'calzado',
+    chaqueta: 'ropa', camiseta: 'ropa', pantalon: 'ropa', short: 'ropa', legging: 'ropa',
+    sombrero: 'accesorios', gorra: 'accesorios', guantes: 'accesorios',
+    'editorial-running': 'calzado'
+  };
+
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  }[character]));
+  const normalize = value => String(value || '').trim().toLowerCase();
+  const normalizeUrl = value => normalize(value).replace(/\/$/, '');
+  const asArray = value => Array.isArray(value) ? value : [];
+  const asSet = value => new Set(asArray(value).map(normalize).filter(Boolean));
+  const intersects = (left, right) => [...left].filter(value => right.has(value));
+  const publicSection = section => section === 'Ventas' ? 'Productos' : (section || 'Te Equipamos');
+  const sectionUrl = section => BASE + '?section=' + encodeURIComponent(section || '');
+  const familyOf = item => PRODUCT_FAMILIES[normalize(item && item.product_type)] || normalize(item && item.product_type) || 'general';
+  const imageOf = item => escapeHtml(item && item.image || '');
+  const urlOf = item => escapeHtml(item && item.url || BASE);
+  const titleOf = item => escapeHtml(item && item.title || 'Te Equipamos');
+  const summaryOf = item => escapeHtml(item && item.summary || '');
+  const metaOf = item => escapeHtml(publicSection(asArray(item && item.sections)[0] || item && item.category || 'Te Equipamos'));
+  const imageMarkup = (item, className = '') => item && item.image
+    ? `<img class="${className}" src="${imageOf(item)}" alt="" loading="lazy" decoding="async">`
+    : `<span class="${className} te-rel-image-fallback" aria-hidden="true"></span>`;
+
   try {
-    const BASE = '/te-equipamos-arpenaz-27l/news/';
-    const response = await fetch(BASE + 'news-data.json');
+    const response = await fetch(BASE + 'news-data.json', { credentials: 'same-origin' });
     if (!response.ok) return;
     const items = await response.json();
-    if (!Array.isArray(items) || !items.length) return;
+    if (!Array.isArray(items) || items.length < 2) return;
 
-    const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    }[ch]));
-    const norm = value => String(value || '').replace(/\/$/, '').toLowerCase();
-    const here = norm(location.origin + location.pathname);
-    const current = items.find(x => norm(x.url) === here);
+    const here = normalizeUrl(location.origin + location.pathname);
+    const current = items.find(item => normalizeUrl(item.url) === here);
     const footer = document.querySelector('footer');
     const mount = node => footer ? footer.parentNode.insertBefore(node, footer) : document.body.appendChild(node);
-    const publicSection = section => section === 'Ventas' ? 'Productos' : (section || 'Te Equipamos');
-    const sectionUrl = section => BASE + '?section=' + encodeURIComponent(section);
-    const itemImage = item => esc(item && item.image || '');
-    const itemUrl = item => esc(item && item.url || BASE);
-    const itemTitle = item => esc(item && item.title || 'Te Equipamos');
-    const itemMeta = item => esc(publicSection((item && item.sections || [])[0] || item && item.category || 'Te Equipamos'));
 
     if (current) {
       const engage = document.createElement('section');
@@ -43,32 +63,23 @@ document.addEventListener('DOMContentLoaded', async function () {
         </div>`;
       mount(engage);
 
-      const title = String(current.title || document.title || 'Te Equipamos');
-      const url = String(current.url || location.href);
-      const text = 'Mira esto en Te Equipamos: ' + title;
+      const shareTitle = String(current.title || document.title || 'Te Equipamos');
+      const shareUrl = String(current.url || location.href);
+      const shareText = 'Mira esto en Te Equipamos: ' + shareTitle;
       engage.addEventListener('click', async event => {
         const button = event.target.closest('[data-social]');
         if (!button) return;
         const social = button.dataset.social;
-        if (social === 'whatsapp') {
-          window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + url), '_blank', 'noopener,noreferrer');
-          return;
-        }
-        if (social === 'facebook') {
-          window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank', 'noopener,noreferrer');
-          return;
-        }
-        if (social === 'telegram') {
-          window.open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text), '_blank', 'noopener,noreferrer');
-          return;
-        }
+        if (social === 'whatsapp') window.open('https://wa.me/?text=' + encodeURIComponent(shareText + '\n' + shareUrl), '_blank', 'noopener,noreferrer');
+        if (social === 'facebook') window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank', 'noopener,noreferrer');
+        if (social === 'telegram') window.open('https://t.me/share/url?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareText), '_blank', 'noopener,noreferrer');
         if (social === 'copy') {
           try {
-            if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(url);
-            else throw new Error('clipboard');
-          } catch (err) {
+            if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('clipboard-unavailable');
+            await navigator.clipboard.writeText(shareUrl);
+          } catch (error) {
             const area = document.createElement('textarea');
-            area.value = url;
+            area.value = shareUrl;
             area.style.position = 'fixed';
             area.style.opacity = '0';
             document.body.appendChild(area);
@@ -82,147 +93,84 @@ document.addEventListener('DOMContentLoaded', async function () {
       });
     }
 
-    if (items.length < 2) return;
-
-    const currentTags = new Set((current && current.tags || []).map(x => String(x).toLowerCase()));
-    const currentSections = current && current.sections || [];
-    const currentActivities = new Set((current && current.activities || []).map(x => String(x).toLowerCase()));
+    const currentTags = asSet(current && current.tags);
+    const currentActivities = asSet(current && current.activities);
+    const currentSections = asSet(current && current.sections);
+    const currentType = normalize(current && current.product_type);
+    const currentFamily = familyOf(current);
 
     const ranked = items
-      .filter(x => norm(x.url) !== here)
-      .map(x => {
-        const tags = (x.tags || []).map(t => String(t).toLowerCase());
-        const sharedTags = tags.filter(t => currentTags.has(t)).length;
-        const sharedSection = currentSections.some(s => (x.sections || []).includes(s)) ? 1 : 0;
-        const sharedActivities = (x.activities || []).filter(a => currentActivities.has(String(a).toLowerCase())).length;
-        return { x, score: sharedTags * 10 + sharedSection * 5 + sharedActivities * 4 + Number(x.score || 0) / 20 };
+      .filter(item => normalizeUrl(item.url) !== here)
+      .map(item => {
+        const itemTags = asSet(item.tags);
+        const sharedTags = intersects(itemTags, currentTags);
+        const sharedActivities = intersects(asSet(item.activities), currentActivities);
+        const sharedSections = intersects(asSet(item.sections), currentSections);
+        const itemType = normalize(item.product_type);
+        const exactTypeScore = currentType && itemType === currentType ? 60 : 0;
+        const familyScore = currentFamily !== 'general' && familyOf(item) === currentFamily && itemType !== currentType ? 30 : 0;
+        const activityScore = Math.min(sharedActivities.length, 2) * 8;
+        const specificTagScore = sharedTags.filter(tag => !GENERIC_TAGS.has(tag) && !BRAND_TAGS.has(tag)).length * 6;
+        const genericTagScore = sharedTags.filter(tag => GENERIC_TAGS.has(tag)).length * 2;
+        const brandScore = sharedTags.filter(tag => BRAND_TAGS.has(tag)).length * 2;
+        const sectionScore = sharedSections.length ? 3 : 0;
+        const editorialScore = Number(item.score || 0) / 100;
+        return { item, score: exactTypeScore + familyScore + activityScore + specificTagScore + genericTagScore + brandScore + sectionScore + editorialScore };
       })
-      .sort((a, b) => b.score - a.score);
+      .sort((left, right) => right.score - left.score || Number(right.item.score || 0) - Number(left.item.score || 0));
 
-    const related = ranked.slice(0, 8).map(row => row.x);
+    const related = ranked.slice(0, 8).map(entry => entry.item);
     if (!related.length) return;
+    const moduleHeader = (eyebrow, title) => `<div class="te-rel-module-head"><span>${escapeHtml(eyebrow)}</span><h3>${escapeHtml(title)}</h3></div>`;
 
-    const availableSections = ['Ventas', 'Reviews', 'Ofertas', 'Consejos', 'Novedades', 'Vídeos']
-      .filter(section => items.some(x => (x.sections || []).includes(section)));
-
-    function compact(rows) {
-      return `<section class="te-rel-module te-rel-compact">
-        <div class="te-rel-module-head"><span>SELECCIÓN EDITORIAL</span><h3>También te puede interesar</h3></div>
-        <div class="te-rel-list">${rows.slice(0, 4).map(x => `
-          <a class="te-rel-row" href="${itemUrl(x)}">
-            <img src="${itemImage(x)}" alt="">
-            <div><small>${itemMeta(x)}</small><strong>${itemTitle(x)}</strong><p>${esc(x.summary || '')}</p></div>
-            <b aria-hidden="true">›</b>
-          </a>`).join('')}</div>
-      </section>`;
+    function zigzag(rows) {
+      if (!rows.length) return '';
+      return `<section class="te-rel-module te-rel-zigzag">${moduleHeader('SELECCIÓN RELACIONADA', 'Más para descubrir')}<div class="te-rel-zigzag-list">${rows.slice(0, 4).map((item, index) => `<a class="te-rel-zigzag-row${index % 2 ? ' is-reverse' : ''}" href="${urlOf(item)}">${imageMarkup(item, 'te-rel-zigzag-image')}<div class="te-rel-zigzag-copy"><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
-    function continueReading(rows) {
-      return `<section class="te-rel-module te-rel-continue">
-        <div class="te-rel-module-head"><span>CONTINÚA</span><h3>Seguir leyendo</h3></div>
-        <div class="te-rel-textlist">${rows.slice(0, 4).map(x => `
-          <a href="${itemUrl(x)}"><div><strong>${itemTitle(x)}</strong><p>${esc(x.summary || '')}</p></div><b aria-hidden="true">›</b></a>`).join('')}</div>
-      </section>`;
+    function bordered(rows) {
+      if (!rows.length) return '';
+      return `<section class="te-rel-module te-rel-bordered">${moduleHeader('CONTENIDO ELEGIDO', 'También te puede interesar')}<div class="te-rel-bordered-grid">${rows.slice(0, 3).map(item => {
+        const sections = asSet(item.sections);
+        const isOffer = sections.has('ofertas') || normalize(item.category) === 'ofertas' || normalize(item.kind) === 'offer';
+        const label = isOffer ? 'OFERTA' : sections.has('reviews') ? 'REVIEW' : metaOf(item);
+        return `<a class="te-rel-bordered-card${isOffer ? ' is-offer' : ' is-review'}" href="${urlOf(item)}"><div><small>${label}</small><strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div>${imageMarkup(item, 'te-rel-bordered-image')}</a>`;
+      }).join('')}</div></section>`;
     }
 
-    function visual(rows) {
-      return `<section class="te-rel-module te-rel-visual">
-        <div class="te-rel-module-head"><span>DESCUBRE</span><h3>Más para explorar</h3></div>
-        <div class="te-rel-visual-grid">${rows.slice(0, 3).map(x => `
-          <a href="${itemUrl(x)}"><img src="${itemImage(x)}" alt=""><small>${itemMeta(x)}</small><strong>${itemTitle(x)}</strong></a>`).join('')}</div>
-      </section>`;
-    }
-
-    function featured(rows) {
-      const main = rows[0], rest = rows.slice(1, 4);
+    function bento(rows) {
+      const main = rows[0];
       if (!main) return '';
-      return `<section class="te-rel-module te-rel-featured">
-        <div class="te-rel-module-head"><span>SELECCIÓN DESTACADA</span><h3>Una recomendación para seguir</h3></div>
-        <a class="te-rel-feature-main" href="${itemUrl(main)}">
-          <img src="${itemImage(main)}" alt="">
-          <div><small>${itemMeta(main)}</small><strong>${itemTitle(main)}</strong><p>${esc(main.summary || '')}</p><span>Ver contenido →</span></div>
-        </a>
-        <div class="te-rel-feature-minis">${rest.map(x => `
-          <a href="${itemUrl(x)}"><img src="${itemImage(x)}" alt=""><strong>${itemTitle(x)}</strong></a>`).join('')}</div>
-      </section>`;
+      return `<section class="te-rel-module te-rel-bento">${moduleHeader('DESTACADO', 'Una lectura para continuar')}<a class="te-rel-bento-main" href="${urlOf(main)}">${imageMarkup(main, 'te-rel-bento-main-image')}<span class="te-rel-bento-shade" aria-hidden="true"></span><div><small>${metaOf(main)}</small><strong>${titleOf(main)}</strong><span>Ver contenido →</span></div></a><div class="te-rel-bento-compact">${rows.slice(1, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-bento-thumb')}<div><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
-    function topic(rows) {
-      const topic = publicSection(currentSections[0] || current && current.category || 'este tema');
-      return `<section class="te-rel-module te-rel-topic">
-        <div class="te-rel-module-head te-rel-inline-head"><div><span>MÁS SOBRE</span><h3>${esc(topic)}</h3></div><a href="${sectionUrl(currentSections[0] || '')}">Ver más →</a></div>
-        <div class="te-rel-topic-grid">${rows.slice(0, 4).map(x => `
-          <a href="${itemUrl(x)}"><img src="${itemImage(x)}" alt=""><strong>${itemTitle(x)}</strong><small>${itemMeta(x)}</small></a>`).join('')}</div>
-      </section>`;
+    function frameless(rows) {
+      if (!rows.length) return '';
+      return `<section class="te-rel-module te-rel-frameless">${moduleHeader('LECTURA EDITORIAL', 'Historias que amplían el tema')}<div class="te-rel-frameless-grid">${rows.slice(0, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-frameless-image')}<div><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p><b aria-hidden="true">→</b></div></a>`).join('')}</div></section>`;
     }
 
-    function intent() {
-      const sections = availableSections
-        .filter(s => !currentSections.includes(s))
-        .slice(0, 4);
-      if (sections.length < 2) return '';
-      const labels = {
-        Ventas: ['Productos relacionados', 'Explora el catálogo'],
-        Reviews: ['Leer más reviews', 'Compara antes de elegir'],
-        Ofertas: ['Ver ofertas activas', 'Oportunidades actuales'],
-        Consejos: ['Descubrir guías', 'Aprende a elegir mejor'],
-        Novedades: ['Ver novedades', 'Lo más reciente'],
-        Vídeos: ['Ver vídeos', 'Contenido para ver']
-      };
-      return `<section class="te-rel-module te-rel-intent">
-        <div class="te-rel-module-head"><span>SIGUE EXPLORANDO</span><h3>Elige cómo continuar</h3></div>
-        <div class="te-rel-intent-grid">${sections.map(s => `
-          <a href="${sectionUrl(s)}"><span>${esc(labels[s][0])}</span><small>${esc(labels[s][1])}</small><b aria-hidden="true">→</b></a>`).join('')}</div>
-      </section>`;
+    function ranking(rows) {
+      if (!rows.length) return '';
+      return `<section class="te-rel-module te-rel-ranking">${moduleHeader('SELECCIÓN TE EQUIPAMOS', 'Para seguir leyendo')}<div class="te-rel-ranking-list">${rows.slice(0, 3).map((item, index) => `<a href="${urlOf(item)}"><span>${String(index + 1).padStart(2, '0')}</span><div><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
-    function circleTopics(rows) {
-      const seen = new Map();
-      rows.concat(items.slice(0, 12)).forEach(item => {
-        const labels = (item.activities && item.activities.length ? item.activities : item.sections || []);
-        labels.forEach(label => {
-          const key = String(label || '').toLowerCase();
-          if (!key || seen.has(key) || !item.image || norm(item.url) === here) return;
-          seen.set(key, { label: publicSection(label), item });
-        });
-      });
-      const circles = [...seen.values()].slice(0, 6);
-      if (circles.length < 4) return '';
-      return `<section class="te-rel-module te-rel-circles">
-        <div class="te-rel-module-head"><span>EXPLORA</span><h3>Otros temas para descubrir</h3></div>
-        <div class="te-rel-circle-row">${circles.map(entry => `
-          <a href="${itemUrl(entry.item)}"><img src="${itemImage(entry.item)}" alt=""><strong>${esc(entry.label)}</strong></a>`).join('')}</div>
-      </section>`;
-    }
-
-    const primary = currentSections[0] || (current && current.category) || '';
-    let modules = [];
-    if (currentSections.includes('Reviews') || primary === 'Reviews') {
-      modules = [featured(related), intent()];
-    } else if (currentSections.includes('Ventas') || primary === 'Ventas') {
-      modules = [intent(), visual(related)];
-    } else if (currentSections.includes('Ofertas') || primary === 'Ofertas') {
-      modules = [intent(), compact(related)];
-    } else if (currentSections.includes('Consejos') || primary === 'Consejos') {
-      modules = [continueReading(related), circleTopics(related) || topic(related)];
-    } else if (currentSections.includes('Novedades') || primary === 'Novedades') {
-      modules = [visual(related), circleTopics(related) || compact(related)];
-    } else if (currentSections.includes('Vídeos') || primary === 'Vídeos') {
-      modules = [visual(related), continueReading(related)];
-    } else {
-      modules = [compact(related), circleTopics(related) || continueReading(related)];
-    }
-    modules = modules.filter(Boolean).slice(0, 2);
+    const primarySection = normalize(asArray(current && current.sections)[0] || current && current.category);
+    const primaryRows = related.slice(0, 4);
+    const secondaryRows = related.slice(4, 8).length ? related.slice(4, 8) : related.slice(0, 4);
+    let modules;
+    if (primarySection === 'reviews') modules = [bento(primaryRows), ranking(secondaryRows)];
+    else if (primarySection === 'ventas') modules = [zigzag(primaryRows), bordered(secondaryRows)];
+    else if (primarySection === 'ofertas') modules = [bordered(primaryRows), zigzag(secondaryRows)];
+    else if (primarySection === 'consejos') modules = [frameless(primaryRows), ranking(secondaryRows)];
+    else if (primarySection === 'novedades') modules = [frameless(primaryRows), zigzag(secondaryRows)];
+    else if (primarySection === 'vídeos' || primarySection === 'videos') modules = [bento(primaryRows), frameless(secondaryRows)];
+    else modules = [zigzag(primaryRows), ranking(secondaryRows)];
 
     const block = document.createElement('section');
     block.className = 'te-related';
-    block.innerHTML = `<div class="te-related-wrap">
-      <div class="te-related-title"><span>TE EQUIPAMOS</span><h2>Sigue descubriendo</h2><p>Contenido relacionado, presentado según lo que estás viendo.</p></div>
-      <div class="te-rel-modules">${modules.join('')}</div>
-      <a class="te-related-more" href="${BASE}">Ver todo en Te Equipamos →</a>
-    </div>`;
+    block.innerHTML = `<div class="te-related-wrap"><div class="te-related-title"><span>TE EQUIPAMOS</span><h2>Sigue explorando</h2><p>Contenido seleccionado según el producto o artículo que estás viendo.</p></div><div class="te-rel-modules">${modules.filter(Boolean).join('')}</div><a class="te-related-more" href="${BASE}">Ver todo en Te Equipamos →</a></div>`;
     mount(block);
-  } catch (e) {
-    console.warn('Te Equipamos related content:', e);
+  } catch (error) {
+    console.warn('Te Equipamos related content:', error);
   }
 });
