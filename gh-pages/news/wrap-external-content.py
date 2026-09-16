@@ -33,7 +33,7 @@ for item in items:
     source = html.escape(original, quote=True)
     page = f'''<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>{title} | Te Equipamos</title>
-<style>*{{box-sizing:border-box}}html,body{{margin:0;background:#fff}}.reader{{width:100%;border:0;display:block;min-height:100vh}}.reader-fallback{{display:none;padding:24px;font-family:Arial,sans-serif}}footer{{padding:20px;text-align:center;font:13px Arial,sans-serif;color:#777;border-top:1px solid #eee}}footer a{{color:#1a73e8;text-decoration:none;font-weight:700}}</style></head><body>
+<style>*{{box-sizing:border-box}}html,body{{margin:0;background:#fff}}.reader{{width:100%;height:100vh;border:0;display:block}}.reader-fallback{{display:none;padding:24px;font-family:Arial,sans-serif}}footer{{padding:20px;text-align:center;font:13px Arial,sans-serif;color:#777;border-top:1px solid #eee}}footer a{{color:#355345;text-decoration:none;font-weight:700}}</style></head><body>
 <iframe id="teFullContent" class="reader" src="{source}" title="{title}" loading="eager"></iframe>
 <div class="reader-fallback"><a href="{source}">Abrir contenido original →</a></div>
 <footer><a href="{home_url}">← Volver a Te Equipamos</a></footer>
@@ -45,7 +45,7 @@ for item in items:
    try{{
      const d=frame.contentDocument;if(!d)return;
      d.querySelectorAll('a').forEach(a=>{{
-       const label=(a.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+       const label=(a.textContent||'').replace(/\\s+/g,' ').trim().toLowerCase();
        if(label==='te equipamos'||label==='teequipamos'||(a.classList&&a.classList.contains('brand')&&label.includes('te equipamos'))){{
          a.href=HOME;
          a.target='_top';
@@ -54,9 +54,31 @@ for item in items:
      }});
    }}catch(e){{}}
  }}
- function fit(){{try{{const d=frame.contentDocument;if(!d)return;const h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);if(h>400)frame.style.height=h+'px';}}catch(e){{}}}}
- frame.addEventListener('load',function(){{wireBrand();fit();try{{const d=frame.contentDocument;new ResizeObserver(function(){{wireBrand();fit();}}).observe(d.documentElement);}}catch(e){{}}setTimeout(function(){{wireBrand();fit();}},500);setTimeout(function(){{wireBrand();fit();}},1500);}});
- window.addEventListener('resize',fit);
+ function freezeViewportMinimums(){{
+   try{{
+     const d=frame.contentDocument;if(!d)return;
+     d.querySelectorAll('body *').forEach(element=>{{
+       if(element.dataset.teReaderMinHeight)return;
+       const minHeight=getComputedStyle(element).minHeight;
+       const pixels=parseFloat(minHeight);
+       if(Number.isFinite(pixels)&&pixels>0){{element.style.minHeight=minHeight;element.dataset.teReaderMinHeight='1';}}
+     }});
+   }}catch(e){{}}
+ }}
+ function fit(){{
+   try{{
+     const d=frame.contentDocument;if(!d)return;
+     const h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);
+     if(h>400&&h<30000)frame.style.height=Math.ceil(h)+'px';
+   }}catch(e){{}}
+ }}
+ frame.addEventListener('load',function(){{
+   wireBrand();
+   freezeViewportMinimums();
+   fit();
+   setTimeout(function(){{wireBrand();fit();}},500);
+   setTimeout(function(){{wireBrand();fit();}},1800);
+ }});
 }})();
 </script></body></html>'''
     (wrapper_dir / 'index.html').write_text(page, encoding='utf-8')
