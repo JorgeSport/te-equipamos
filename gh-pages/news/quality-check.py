@@ -6,6 +6,7 @@ base = Path(__file__).resolve().parent
 index = base / 'index.html'
 data_file = base / 'news-data.json'
 restore_script = base / 'restore-desktop-card-images.py'
+legacy_repositories_file = base / 'seo-legacy-repositories.json'
 errors, warnings = [], []
 OFFICIAL_URL = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/'
 
@@ -21,6 +22,7 @@ else:
 
 html = index.read_text(encoding='utf-8')
 items = json.loads(data_file.read_text(encoding='utf-8'))
+legacy_repositories = set(json.loads(legacy_repositories_file.read_text(encoding='utf-8'))) if legacy_repositories_file.exists() else set()
 
 required_markers = {
     'Pulido de escritorio': '/* TE_DESKTOP_POLISH */',
@@ -109,6 +111,25 @@ for i, item in enumerate(items, start=1):
         errors.append(f'Contenido sin product_type: {title[:70]}')
     if item.get('activities_inferred'):
         warnings.append(f'Actividad inferida en lugar de declarada: {title[:70]}')
+    source_repo = str(item.get('source_repo') or '').strip()
+    schema_version = int(item.get('schema_version') or 1)
+    if source_repo and source_repo not in legacy_repositories and schema_version < 3:
+        errors.append(f'Repositorio nuevo sin schema_version 3: {source_repo}')
+    if schema_version >= 3:
+        card_title = str(item.get('card_title') or '').strip()
+        seo_title = str(item.get('seo_title') or '').strip()
+        seo_description = str(item.get('seo_description') or '').strip()
+        seo_keywords = item.get('seo_keywords') if isinstance(item.get('seo_keywords'), list) else []
+        if not item.get('seo_ready'):
+            errors.append(f'Contenido schema 3 incompleto para SEO: {source_repo or title[:70]}')
+        if not 35 <= len(card_title) <= 95:
+            errors.append(f'card_title fuera de longitud estratégica: {card_title[:70]}')
+        if not 35 <= len(seo_title) <= 75:
+            errors.append(f'seo_title fuera de longitud estratégica: {seo_title[:70]}')
+        if not 90 <= len(seo_description) <= 180:
+            errors.append(f'seo_description fuera de longitud estratégica: {seo_title[:70]}')
+        if not 3 <= len(seo_keywords) <= 8:
+            errors.append(f'seo_keywords debe contener entre 3 y 8 términos: {seo_title[:70]}')
 
 # ESCRITORIO: los cambios visuales específicos deben seguir aislados.
 block = re.search(r'/\* TE_DESKTOP_POLISH \*/(.*?)(?:</style>|$)', html, flags=re.S)
