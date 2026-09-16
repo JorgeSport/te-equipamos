@@ -199,7 +199,8 @@ def manifest_items(manifest) -> list[dict]:
     if isinstance(manifest, dict):
         items = manifest.get("items")
         if isinstance(items, list):
-            return [x for x in items if isinstance(x, dict)]
+            schema_version = int(manifest.get("schema_version") or 1)
+            return [{**x, "_schema_version": schema_version} for x in items if isinstance(x, dict)]
         if manifest.get("title"):
             return [manifest]
     return []
@@ -247,9 +248,26 @@ def normalize_item(raw: dict, repo_name: str) -> dict | None:
 
     product_type = slug(raw.get("product_type")) if clean(raw.get("product_type")) else infer_product_type(raw)
 
+    card_title = clean(raw.get("card_title")) or title
+    seo_title = clean(raw.get("seo_title")) or title
+    seo_description = clean(raw.get("seo_description")) or clean(raw.get("summary"))
+    seo_keywords = raw.get("seo_keywords") if isinstance(raw.get("seo_keywords"), list) else []
+    schema_version = int(raw.get("_schema_version") or 1)
+
     return {
         "id": int(raw.get("id")) if str(raw.get("id", "")).isdigit() else stable_id(url + "|" + title),
         "title": title,
+        "card_title": card_title,
+        "seo_title": seo_title,
+        "seo_description": seo_description,
+        "seo_keywords": [clean(value) for value in seo_keywords if clean(value)],
+        "schema_version": schema_version,
+        "seo_ready": bool(
+            clean(raw.get("card_title"))
+            and clean(raw.get("seo_title"))
+            and clean(raw.get("seo_description"))
+            and seo_keywords
+        ),
         "summary": clean(raw.get("summary")) or f"Contenido propio de Te Equipamos · {kind_label}.",
         "details": clean(raw.get("details")) or clean(raw.get("summary")) or "Contenido propio publicado por Te Equipamos.",
         "category": primary,
