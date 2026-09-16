@@ -10,6 +10,7 @@ PRODUCT_URL = BASE + PRODUCT_SLUG + "/"
 PRODUCT_REPOSITORY = "te-equipamos-arpenaz-100-27l"
 PRODUCT_TARGET = "https://jorgesport.github.io/te-equipamos-arpenaz-100-27l/"
 PUBLIC_ROOT = "/te-equipamos/"
+FOOTER_LOADER = '<script defer src="https://jorgesport.github.io/te-equipamos/universal-footer.js" data-te-universal-footer-loader></script>'
 
 root_index = ROOT / "index.html"
 news_index = NEWS / "index.html"
@@ -50,6 +51,14 @@ hub = hub.replace(f'href="{NEWS_BASE}"', f'href="{BASE}"')
 hub = hub.replace(f'content="{NEWS_BASE}"', f'content="{BASE}"')
 hub = hub.replace(f'"url":"{NEWS_BASE}"', f'"url":"{BASE}"')
 hub = hub.replace('href="./metodologia/"', f'href="{PUBLIC_ROOT}news/metodologia/"')
+
+# El footer oficial se carga desde un único componente central. Mantener el
+# loader aquí garantiza que cada despliegue del Hub conserve el footer aunque
+# news/index.html se regenere por completo.
+if 'data-te-universal-footer-loader' not in hub:
+    if '</body>' not in hub:
+        raise RuntimeError("El Hub no contiene </body> para instalar el footer universal")
+    hub = hub.replace('</body>', FOOTER_LOADER + '</body>', 1)
 
 root_index.write_text(hub, encoding="utf-8")
 
@@ -97,6 +106,7 @@ checks = {
     "producto_url_propia": PRODUCT_TARGET in product_check,
     "asset_css_presente": (NEWS / "editorial-experience.css").exists(),
     "asset_js_presente": (NEWS / "editorial-experience.js").exists(),
+    "footer_universal": 'data-te-universal-footer-loader' in root_html,
 }
 failed = [name for name, ok in checks.items() if not ok]
 if failed:
@@ -112,5 +122,5 @@ if sitemap.exists():
 
 print(
     "PORTADA OFICIAL ACTIVA · "
-    f"{BASE} · Hub promovido · /news/ redirige · producto independiente en {PRODUCT_TARGET} · sitemap sin duplicados"
+    f"{BASE} · Hub promovido · footer universal activo · /news/ redirige · producto independiente en {PRODUCT_TARGET} · sitemap sin duplicados"
 )
