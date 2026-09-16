@@ -148,7 +148,7 @@ product_check = product_index.read_text(encoding="utf-8")
 checks = {
     "hub_en_raiz": "tePremiumHeader" in root_html,
     "canonical_raiz": f'href="{BASE}"' in root_html,
-    "sin_canonical_news": f'href="{NEWS_BASE}"' not in root_html,
+    "sin_canonical_news": f'<link rel="canonical" href="{NEWS_BASE}">' not in root_html,
     "redirect_news_noindex": 'name="robots" content="noindex,follow"' in redirect_html,
     "producto_conservado": "Arpenaz 100 27 L" in product_check,
     "producto_url_propia": PRODUCT_TARGET in product_check,
