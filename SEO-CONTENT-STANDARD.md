@@ -4,6 +4,7 @@ Todo repositorio nuevo que quiera aparecer en Te Equipamos debe publicar un arch
 
 Cada elemento debe incluir:
 
+- `id`: número entero positivo, único e inmutable; debe conservarse aunque cambie el título.
 - `title`: título completo y descriptivo de la página.
 - `card_title`: titular breve, específico y orientado al clic.
 - `seo_title`: título preparado para buscadores.
