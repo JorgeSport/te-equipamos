@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const familyOf = item => PRODUCT_FAMILIES[normalize(item && item.product_type)] || normalize(item && item.product_type) || 'general';
   const imageOf = item => escapeHtml(item && item.image || '');
   const urlOf = item => escapeHtml(item && item.url || BASE);
-  const titleOf = item => escapeHtml(item && item.title || 'Te Equipamos');
+  const titleOf = item => escapeHtml(item && (item.card_title || item.title) || 'Te Equipamos');
   const summaryOf = item => escapeHtml(item && item.summary || '');
   const metaOf = item => escapeHtml(publicSection(asArray(item && item.sections)[0] || item && item.category || 'Te Equipamos'));
   const imageMarkup = (item, className = '') => item && item.image
