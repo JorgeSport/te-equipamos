@@ -2,6 +2,7 @@
   'use strict';
 
   const HOME='https://jorgesport.github.io/te-equipamos/';
+  const LOGO=HOME+'logo-te-equipamos.png';
   const LINKS=[
     ['Cómo trabajamos',HOME+'news/metodologia/'],
     ['Anúnciate',HOME+'news/anunciate/'],
@@ -9,6 +10,108 @@
     ['Privacidad',HOME+'news/privacidad/'],
     ['Cookies',HOME+'news/cookies/']
   ];
+
+  function isMainHub(){
+    const p=(location.pathname.replace(/\/+$/,'')||'/')+'/';
+    return p==='/te-equipamos/' || p.startsWith('/te-equipamos/news/');
+  }
+
+  function installBrandStyles(){
+    if(document.querySelector('style[data-te-universal-brand-style]'))return;
+    const style=document.createElement('style');
+    style.setAttribute('data-te-universal-brand-style','');
+    style.textContent=`
+      .te-universal-brand-link{display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;flex:0 0 auto!important;line-height:0!important;text-decoration:none!important;color:inherit!important;min-width:0!important}
+      .te-universal-brand-link:focus-visible{outline:2px solid #355345!important;outline-offset:4px!important;border-radius:3px!important}
+      .te-universal-brand-image{display:block!important;width:auto!important;height:32px!important;max-width:min(190px,44vw)!important;object-fit:contain!important;object-position:left center!important}
+      .te-universal-brand-link[data-te-brand-dark="true"] .te-universal-brand-image{filter:invert(1) brightness(1.08)}
+      @media(max-width:680px){.te-universal-brand-image{height:27px!important;max-width:42vw!important}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function parseBackground(value){
+    if(!value || value==='transparent')return null;
+    const m=value.match(/rgba?\(([^)]+)\)/i);
+    if(!m)return null;
+    const parts=m[1].split(',').map(v=>Number.parseFloat(v.trim()));
+    if(parts.length<3 || parts.some((n,i)=>i<3 && !Number.isFinite(n)))return null;
+    if(parts.length>3 && parts[3]<0.12)return null;
+    return parts.slice(0,3);
+  }
+
+  function isDarkAround(el){
+    let node=el;
+    while(node && node!==document.documentElement){
+      const rgb=parseBackground(getComputedStyle(node).backgroundColor);
+      if(rgb){
+        const [r,g,b]=rgb;
+        const luminance=(0.2126*r)+(0.7152*g)+(0.0722*b);
+        return luminance<118;
+      }
+      node=node.parentElement;
+    }
+    return false;
+  }
+
+  function findBrandTarget(){
+    const preferred=[
+      'header a.brand','nav a.brand','.site-header a.brand',
+      'header .brand','nav .brand','.site-header .brand',
+      'header a.logo','nav a.logo','.site-header a.logo',
+      'header .logo','nav .logo','.site-header .logo'
+    ];
+    for(const selector of preferred){
+      const el=document.querySelector(selector);
+      if(el)return el;
+    }
+    const img=document.querySelector('header img[alt*="Equipamos" i],nav img[alt*="Equipamos" i],.site-header img[alt*="Equipamos" i]');
+    if(img)return img.closest('a')||img;
+    const candidates=[...document.querySelectorAll('header a,header div,header span,nav a,nav div,nav span,.site-header a,.site-header div,.site-header span')];
+    return candidates.find(el=>el.children.length===0 && el.textContent.trim().toUpperCase()==='TE EQUIPAMOS')||null;
+  }
+
+  function installBrand(){
+    if(isMainHub() || document.documentElement.hasAttribute('data-te-brand-disabled'))return;
+    installBrandStyles();
+    const target=findBrandTarget();
+    if(!target)return;
+
+    let link;
+    if(target.tagName==='A'){
+      link=target;
+    }else if(target.tagName==='IMG' && target.closest('a')){
+      link=target.closest('a');
+    }else{
+      link=document.createElement('a');
+      while(target.firstChild)target.removeChild(target.firstChild);
+      target.appendChild(link);
+    }
+
+    link.href=HOME;
+    link.setAttribute('aria-label','Te Equipamos, ir al inicio');
+    link.classList.add('te-universal-brand-link');
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+
+    let img=link.querySelector('img');
+    if(!img){
+      img=document.createElement('img');
+      link.replaceChildren(img);
+    }
+    img.src=LOGO;
+    img.alt='Te Equipamos';
+    img.decoding='async';
+    img.classList.add('te-universal-brand-image');
+    img.addEventListener('error',()=>{
+      link.textContent='TE EQUIPAMOS';
+      link.style.lineHeight='1';
+      link.style.fontWeight='800';
+      link.style.letterSpacing='-.04em';
+    },{once:true});
+
+    link.dataset.teBrandDark=isDarkAround(link)?'true':'false';
+  }
 
   if(!customElements.get('te-equipamos-footer')){
     customElements.define('te-equipamos-footer',class extends HTMLElement{
@@ -52,7 +155,7 @@
     });
   }
 
-  function install(){
+  function installFooter(){
     if(document.querySelector('te-equipamos-footer'))return;
     const footers=[...document.querySelectorAll('footer')];
     const current=footers.length?footers[footers.length-1]:null;
@@ -60,6 +163,11 @@
     universal.setAttribute('data-te-universal-footer','');
     if(current)current.replaceWith(universal);
     else document.body.appendChild(universal);
+  }
+
+  function install(){
+    installBrand();
+    installFooter();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
