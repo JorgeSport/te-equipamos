@@ -1,5 +1,7 @@
 from pathlib import Path
+from html import escape
 import re
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 NEWS = ROOT / "news"
@@ -51,6 +53,52 @@ hub = hub.replace(f'href="{NEWS_BASE}"', f'href="{BASE}"')
 hub = hub.replace(f'content="{NEWS_BASE}"', f'content="{BASE}"')
 hub = hub.replace(f'"url":"{NEWS_BASE}"', f'"url":"{BASE}"')
 hub = hub.replace('href="./metodologia/"', f'href="{PUBLIC_ROOT}news/metodologia/"')
+
+# La interfaz enriquece estas zonas con JavaScript, pero los enlaces esenciales
+# también deben existir en el HTML inicial. Así los buscadores y los usuarios
+# sin JavaScript pueden descubrir las fichas sin alterar el diseño hidratado.
+if sitemap.exists():
+    sitemap_xml = sitemap.read_text(encoding="utf-8")
+    sitemap_urls = list(dict.fromkeys(re.findall(r"<loc>([^<]+)</loc>", sitemap_xml)))
+    excluded_prefixes = (
+        "news/", "read/", "studio/", "arpenaz-100-27l/",
+    )
+    cards = []
+    for url in sitemap_urls:
+        parsed = urlparse(url)
+        if parsed.netloc.lower() != "jorgesport.github.io":
+            continue
+        path = parsed.path
+        for public_prefix in ("/te-equipamos/", "/te-equipamos-arpenaz-27l/"):
+            if path.startswith(public_prefix):
+                path = path[len(public_prefix):]
+                break
+        relative = path.strip("/")
+        if not relative or relative.startswith(excluded_prefixes):
+            continue
+        page = ROOT / relative / "index.html"
+        if not page.exists():
+            continue
+        page_html = page.read_text(encoding="utf-8")
+        if re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex', page_html, re.I):
+            continue
+        title_match = re.search(r"<title>(.*?)</title>", page_html, re.I | re.S)
+        title = re.sub(r"\s+", " ", title_match.group(1)).strip() if title_match else relative.replace("-", " ").title()
+        title = re.sub(r"\s*[|·—-]\s*Te Equipamos.*$", "", title, flags=re.I).strip() or title
+        cards.append(
+            '<article class="card te-static-card"><div>'
+            '<div class="meta">Te Equipamos · Contenido propio</div>'
+            f'<a class="title" href="{escape(url, quote=True)}">{escape(title)}</a>'
+            '<p class="summary">Consulta la ficha completa, disponibilidad y detalles.</p>'
+            '</div></article>'
+        )
+
+    if cards:
+        empty_feed = '<div class="feed" id="feed"></div>'
+        static_feed = '<div class="feed" id="feed">' + "".join(cards) + '</div>'
+        if empty_feed not in hub:
+            raise RuntimeError("No se encontró el contenedor inicial del feed para prerenderizar enlaces")
+        hub = hub.replace(empty_feed, static_feed, 1)
 
 # El footer oficial se carga desde un único componente central. Mantener el
 # loader aquí garantiza que cada despliegue del Hub conserve el footer aunque
@@ -107,6 +155,7 @@ checks = {
     "asset_css_presente": (NEWS / "editorial-experience.css").exists(),
     "asset_js_presente": (NEWS / "editorial-experience.js").exists(),
     "footer_universal": 'data-te-universal-footer-loader' in root_html,
+    "enlaces_estaticos": 'class="title" href="' in root_html,
 }
 failed = [name for name, ok in checks.items() if not ok]
 if failed:
