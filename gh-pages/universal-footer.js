@@ -94,6 +94,13 @@
     link.removeAttribute('target');
     link.removeAttribute('rel');
 
+    // Blindaje contra estilos heredados de botones de cada landing.
+    // Algunas cabeceras antiguas aplican fondo, padding y radio a todos los enlaces del nav.
+    // El logo universal debe conservar siempre su aspecto limpio.
+    [['background','transparent'],['background-color','transparent'],['padding','0'],['border','0'],['border-radius','0'],['box-shadow','none'],['min-height','0']].forEach(([prop,value])=>{
+      link.style.setProperty(prop,value,'important');
+    });
+
     let img=link.querySelector('img');
     if(!img){
       img=document.createElement('img');
@@ -110,7 +117,9 @@
       link.style.letterSpacing='-.04em';
     },{once:true});
 
-    link.dataset.teBrandDark=isDarkAround(link)?'true':'false';
+    const dark=isDarkAround(link);
+    link.dataset.teBrandDark=dark?'true':'false';
+    img.style.setProperty('filter',dark?'invert(1) brightness(1.08)':'none','important');
   }
 
   if(!customElements.get('te-equipamos-footer')){
