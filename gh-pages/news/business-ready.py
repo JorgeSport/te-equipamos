@@ -115,6 +115,8 @@ hub_path.write_text(hub, encoding='utf-8')
 # ---------- Analítica preparada en páginas indexables ----------
 count_analytics = 0
 for p in ROOT.rglob('index.html'):
+    if p.relative_to(ROOT).parts[:1] == ('studio',):
+        continue
     txt = p.read_text(encoding='utf-8')
     low = txt.lower()
     if '<meta http-equiv="refresh"' in low or 'noindex' in low: continue
@@ -127,6 +129,8 @@ for p in ROOT.rglob('index.html'):
 # ---------- Sitemap y robots ----------
 urls = []
 for p in ROOT.rglob('index.html'):
+    if p.relative_to(ROOT).parts[:1] == ('studio',):
+        continue
     txt = p.read_text(encoding='utf-8')
     low = txt.lower()
     if 'noindex' in low or '<meta http-equiv="refresh"' in low: continue
