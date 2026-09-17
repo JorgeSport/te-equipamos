@@ -1,0 +1,42 @@
+{
+  "template_version": "1.0",
+  "brand": "Te Equipamos",
+  "market": "Perú",
+  "language": "es",
+  "home_url": "https://jorgesport.github.io/te-equipamos/",
+  "whatsapp": {
+    "e164": "51920807184",
+    "display": "+51 920 807 184"
+  },
+  "assets": {
+    "logo": "https://jorgesport.github.io/te-equipamos/logo-te-equipamos.png",
+    "shell_css": "https://jorgesport.github.io/te-equipamos/landing-shell.css",
+    "landing_core": "https://jorgesport.github.io/te-equipamos/landing-core.js",
+    "analytics_provider": "https://jorgesport.github.io/te-equipamos/te-analytics-provider.js",
+    "universal_brand_footer": "https://jorgesport.github.io/te-equipamos/universal-footer.js"
+  },
+  "repository_rule": "1 proyecto público = 1 repositorio independiente = 1 landing = 1 te-equipamos.json",
+  "fixed_system": [
+    "brand",
+    "brand_home_link",
+    "whatsapp",
+    "header_shell",
+    "universal_footer",
+    "analytics_with_consent",
+    "responsive_baseline",
+    "manifest",
+    "pages_workflow"
+  ],
+  "creative_zone": [
+    "hero",
+    "campaign_palette",
+    "campaign_typography",
+    "product_images",
+    "layout",
+    "gallery",
+    "storytelling",
+    "comparisons",
+    "technical_blocks",
+    "offer_presentation"
+  ]
+}
