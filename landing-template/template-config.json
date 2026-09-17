@@ -1,12 +1,35 @@
 {
-  "template_version": "1.0",
+  "template_version": "1.1",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
   "home_url": "https://jorgesport.github.io/te-equipamos/",
   "whatsapp": {
     "e164": "51920807184",
-    "display": "+51 920 807 184"
+    "display": "+51 920 807 184",
+    "personalized_message_required": true,
+    "message_required_fields": [
+      "product",
+      "price_when_available",
+      "selected_variant_when_applicable",
+      "availability_request",
+      "landing_url"
+    ],
+    "landing_url_label": "Enlace del producto:"
+  },
+  "sharing": {
+    "required": true,
+    "channels": [
+      "whatsapp",
+      "facebook",
+      "telegram",
+      "copy"
+    ],
+    "note": "Son canales para compartir la landing. No confundir con perfiles sociales oficiales."
+  },
+  "social_profiles": {
+    "status": "not_configured",
+    "rule": "No inventar perfiles. Solo añadir URLs oficiales verificadas."
   },
   "assets": {
     "logo": "https://jorgesport.github.io/te-equipamos/logo-te-equipamos.png",
@@ -20,6 +43,8 @@
     "brand",
     "brand_home_link",
     "whatsapp",
+    "whatsapp_personalized_message",
+    "social_sharing",
     "header_shell",
     "universal_footer",
     "analytics_with_consent",
