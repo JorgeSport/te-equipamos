@@ -84,7 +84,7 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
     $expectedUrl = "https://$($Owner.ToLower()).github.io/$ExpectedRepoName/"
 
     # Automatizaciones seguras que no alteran el copy creativo.
-    $idValue = 0
+    [uint32]$idValue = 0
     $hasNumericId = [uint32]::TryParse([string]$item.id, [ref]$idValue)
     if (-not $hasNumericId -or $idValue -eq 0) {
         $item.id = Get-StableId "$Owner/$ExpectedRepoName|$($item.title)"
