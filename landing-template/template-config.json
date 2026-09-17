@@ -1,5 +1,5 @@
 {
-  "template_version": "1.2",
+  "template_version": "1.3",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -27,6 +27,20 @@
       "copy"
     ],
     "default_rule": "No duplicar el bloque de compartir dentro de la landing independiente. El Hub Te Equipamos lo aporta en /read/.../. Añadirlo solo si el propietario lo pide expresamente."
+  },
+  "preview_workflow": {
+    "mode": "auto_html_first",
+    "generate_html_immediately_after_input": true,
+    "concept_approval_required_before_html": false,
+    "preview_required_before_repository": true,
+    "publish_only_after_explicit_approval": true,
+    "expected_first_deliverable": "openable_or_downloadable_html_preview",
+    "approval_examples": [
+      "APROBADO",
+      "PUBLICA",
+      "SUBE",
+      "CREA EL REPOSITORIO"
+    ]
   },
   "social_profiles": {
     "status": "not_configured",
