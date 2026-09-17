@@ -64,7 +64,7 @@ jobs:
 
           # Si alguien añade enlaces directos a WhatsApp, solo se permite el número oficial
           # o wa.me/?text= para compartir con otra persona.
-          direct_wa = re.findall(r'https://wa\.me/([^?"\'\s<]+)', html, flags=re.I)
+          direct_wa = re.findall(r"https://wa\.me/([^?\"'\s<]+)", html, flags=re.I)
           bad_wa = [value for value in direct_wa if value not in ('51920807184', '')]
           if bad_wa:
               raise SystemExit('Se detectó un número de WhatsApp distinto al oficial: ' + ', '.join(bad_wa))
