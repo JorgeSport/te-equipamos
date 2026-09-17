@@ -1,5 +1,5 @@
 {
-  "template_version": "1.3",
+  "template_version": "1.4",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -16,6 +16,19 @@
       "landing_url"
     ],
     "landing_url_label": "Enlace del producto:"
+  },
+  "hub_card": {
+    "required": true,
+    "strategic_title_required": true,
+    "strategic_subtitle_required": true,
+    "title_field": "card_title",
+    "subtitle_field": "summary",
+    "rule": "Cada landing publicada debe entrar al Hub con un título editorial estratégico y un subtítulo estratégico orientado a beneficio, curiosidad o contexto de uso. No usar como tarjeta un nombre de producto plano ni una repetición de la ficha técnica.",
+    "title_length": {
+      "min": 35,
+      "max": 95
+    },
+    "subtitle_guidance": "Debe complementar al título con beneficio real, contexto de uso o razón de interés, sin repetirlo literalmente y sin inventar datos."
   },
   "sharing": {
     "required_in_landing": false,
@@ -64,6 +77,8 @@
     "analytics_with_consent",
     "responsive_baseline",
     "manifest",
+    "hub_strategic_title",
+    "hub_strategic_subtitle",
     "pages_workflow"
   ],
   "creative_zone": [
