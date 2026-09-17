@@ -1,0 +1,80 @@
+name: Publicar landing Te Equipamos
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  validate-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validar estándar Te Equipamos
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          html_path = Path('index.html')
+          manifest_path = Path('te-equipamos.json')
+
+          if not html_path.exists():
+              raise SystemExit('Falta index.html')
+          if not manifest_path.exists():
+              raise SystemExit('Falta te-equipamos.json')
+
+          html = html_path.read_text(encoding='utf-8')
+          required = [
+              'class="te-header"',
+              'class="brand"',
+              'data-te-whatsapp',
+              'https://jorgesport.github.io/te-equipamos/landing-shell.css',
+              'https://jorgesport.github.io/te-equipamos/landing-core.js',
+              'https://jorgesport.github.io/te-equipamos/te-analytics-provider.js',
+              'data-te-universal-footer-loader'
+          ]
+          missing = [item for item in required if item not in html]
+          if missing:
+              raise SystemExit('Faltan elementos del sistema Te Equipamos: ' + ', '.join(missing))
+
+          if 'REEMPLAZAR_' in html:
+              raise SystemExit('Quedan marcadores REEMPLAZAR_ en index.html')
+
+          data = json.loads(manifest_path.read_text(encoding='utf-8'))
+          if data.get('brand') != 'Te Equipamos':
+              raise SystemExit('El manifiesto debe mantener brand = Te Equipamos')
+          items = data.get('items')
+          if not isinstance(items, list) or not items:
+              raise SystemExit('El manifiesto necesita al menos un item')
+          raw = json.dumps(data, ensure_ascii=False)
+          if 'REEMPLAZAR_' in raw:
+              raise SystemExit('Quedan marcadores REEMPLAZAR_ en te-equipamos.json')
+          item = items[0]
+          if not str(item.get('url','')).startswith('https://jorgesport.github.io/'):
+              raise SystemExit('La URL pública del manifiesto no es válida')
+          print('Estándar Te Equipamos: OK')
+          PY
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
