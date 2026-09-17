@@ -59,6 +59,35 @@
 .te-contact-btn:active{transform:none}
 .te-contact-btn:focus-visible{outline:2px solid var(--te-accent);outline-offset:3px}
 
+.te-share-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:18px;
+  font:700 12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+
+.te-share-label{color:var(--te-muted);margin-right:2px}
+
+.te-share-btn{
+  min-height:36px;
+  padding:0 12px;
+  border:1px solid var(--te-line);
+  border-radius:999px;
+  background:var(--te-surface);
+  color:var(--te-text);
+  font:800 12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  cursor:pointer;
+  transition:transform .15s ease,background .15s ease;
+}
+
+.te-share-btn:hover{transform:translateY(-1px);background:var(--te-accent-soft)}
+.te-share-btn:focus-visible{outline:2px solid var(--te-accent);outline-offset:3px}
+.te-share-btn[data-te-share="whatsapp"]{color:#138a43}
+.te-share-btn[data-te-share="facebook"]{color:#1877F2}
+.te-share-btn[data-te-share="telegram"]{color:#168ac1}
+
 .te-system-note{
   color:var(--te-muted);
   font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
@@ -68,4 +97,6 @@
   :root{--te-header-height:60px}
   .te-header__inner{width:min(100% - 24px,1180px);gap:12px}
   .te-contact-btn{min-height:38px;padding:0 14px;font-size:13px}
+  .te-share-row{gap:7px}
+  .te-share-btn{min-height:38px;padding:0 11px}
 }
