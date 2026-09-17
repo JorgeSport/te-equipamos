@@ -13,6 +13,7 @@ El repositorio `te-equipamos-arpenaz-27l` se mantiene como repositorio principal
 | Estado | Repositorio | Contenido |
 |---|---|---|
 | ✅ | `te-equipamos-arpenaz-27l` | Hub Te Equipamos + Arpenaz 100 27 L |
+| ✅ | `te-equipamos-roadr-100` | Gafas Roadr 100 categoría 3 · ciclismo y urbano |
 | ✅ | `te-equipamos-camiseta-mh100-mujer` | Camiseta MH100 mujer |
 | ✅ | `quechua-nh500-ninos-remate` | Quechua NH500 niños |
 | ✅ | `escape-journal` | Quechua Escape 500 Rolltop |
