@@ -5,6 +5,7 @@ Todo repositorio nuevo que quiera aparecer en Te Equipamos debe publicar un arch
 Cada elemento debe incluir:
 
 - `id`: número entero positivo, único e inmutable; debe conservarse aunque cambie el título.
+- `published_at`: fecha y hora ISO 8601 de la primera publicación; no debe cambiarse al actualizar el producto.
 - `title`: título completo y descriptivo de la página.
 - `card_title`: titular breve, específico y orientado al clic.
 - `seo_title`: título preparado para buscadores.
@@ -14,6 +15,8 @@ Cada elemento debe incluir:
 - `product_type`, `activities`, `sections`, `tags`, `image` y `url`.
 
 El despliegue comprueba automáticamente estos campos. Un repositorio nuevo que no cumpla el estándar no se publica en el Hub hasta que se corrija.
+
+Los productos muestran `RECIÉN PUBLICADO` durante sus primeros 7 días. La etiqueta desaparece automáticamente al cumplirse el plazo y una edición posterior no reinicia el contador.
 
 ## Criterios editoriales
 

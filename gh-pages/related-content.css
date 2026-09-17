@@ -10,6 +10,7 @@
 .te-related{background:var(--te-rel-bg);padding:48px 18px 62px;border-top:1px solid var(--te-rel-line)}
 .te-related a:focus-visible{outline:3px solid rgba(53,83,69,.28);outline-offset:4px}
 .te-related-title>span,.te-rel-module-head>span{display:block;margin-bottom:8px;color:var(--te-rel-accent);font-size:.72rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
+.te-rel-fresh{display:inline-flex;margin-left:7px;padding:3px 7px;border:1px solid var(--te-rel-line);border-radius:999px;background:#f1f1ee;color:var(--te-rel-muted);font-size:.58rem;font-weight:800;letter-spacing:.06em;line-height:1;text-transform:uppercase;vertical-align:middle}
 .te-related-title h2,.te-rel-module-head h3{font-family:Georgia,"Times New Roman",serif;color:var(--te-rel-text);font-weight:500}
 .te-related-title h2{margin:0;font-size:2.25rem;line-height:1.05;letter-spacing:-.035em}
 .te-related-title p{max-width:680px;margin:10px 0 30px;color:var(--te-rel-muted);font-size:.95rem;line-height:1.55}

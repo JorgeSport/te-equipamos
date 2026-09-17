@@ -286,7 +286,8 @@ def normalize_item(raw: dict, repo_name: str) -> dict | None:
         "kind": clean(raw.get("type")) or primary,
         "tags": [clean(x) for x in tags if clean(x)],
         "source_repo": f"{OWNER}/{repo_name}",
-        "published": clean(raw.get("published")),
+        "published_at": clean(raw.get("published_at")) or clean(raw.get("published")),
+        "published": clean(raw.get("published_at")) or clean(raw.get("published")),
     }
 
 

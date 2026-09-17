@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 import json
 import re
 
@@ -115,6 +116,12 @@ for i, item in enumerate(items, start=1):
     schema_version = int(item.get('schema_version') or 1)
     if source_repo and source_repo not in legacy_repositories and schema_version < 3:
         errors.append(f'Repositorio nuevo sin schema_version 3: {source_repo}')
+    if source_repo and source_repo not in legacy_repositories:
+        published_at = str(item.get('published_at') or '').strip()
+        try:
+            datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+        except (TypeError, ValueError):
+            errors.append(f'Repositorio nuevo sin published_at válido: {source_repo}')
     if schema_version >= 3:
         stable_id = item.get('id')
         card_title = str(item.get('card_title') or '').strip()

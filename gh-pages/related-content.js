@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', async function () {
   const titleOf = item => escapeHtml(item && (item.card_title || item.title) || 'Te Equipamos');
   const summaryOf = item => escapeHtml(item && item.summary || '');
   const metaOf = item => escapeHtml(publicSection(asArray(item && item.sections)[0] || item && item.category || 'Te Equipamos'));
+  const isRecent = item => {
+    const raw = String(item && item.published_at || '').trim();
+    if (!raw) return false;
+    const published = new Date(raw);
+    if (Number.isNaN(published.getTime())) return false;
+    const age = Date.now() - published.getTime();
+    return age >= 0 && age < 7 * 24 * 60 * 60 * 1000;
+  };
+  const freshBadge = item => isRecent(item) ? '<span class="te-rel-fresh">Recién publicado</span>' : '';
   const imageMarkup = (item, className = '') => item && item.image
     ? `<img class="${className}" src="${imageOf(item)}" alt="" loading="lazy" decoding="async">`
     : `<span class="${className} te-rel-image-fallback" aria-hidden="true"></span>`;
@@ -125,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function zigzag(rows) {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-zigzag">${moduleHeader('SELECCIÓN RELACIONADA', 'Más para descubrir')}<div class="te-rel-zigzag-list">${rows.slice(0, 4).map((item, index) => `<a class="te-rel-zigzag-row${index % 2 ? ' is-reverse' : ''}" href="${urlOf(item)}">${imageMarkup(item, 'te-rel-zigzag-image')}<div class="te-rel-zigzag-copy"><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-zigzag">${moduleHeader('SELECCIÓN RELACIONADA', 'Más para descubrir')}<div class="te-rel-zigzag-list">${rows.slice(0, 4).map((item, index) => `<a class="te-rel-zigzag-row${index % 2 ? ' is-reverse' : ''}" href="${urlOf(item)}">${imageMarkup(item, 'te-rel-zigzag-image')}<div class="te-rel-zigzag-copy"><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
     function bordered(rows) {
@@ -134,24 +143,24 @@ document.addEventListener('DOMContentLoaded', async function () {
         const sections = asSet(item.sections);
         const isOffer = sections.has('ofertas') || normalize(item.category) === 'ofertas' || normalize(item.kind) === 'offer';
         const label = isOffer ? 'OFERTA' : sections.has('reviews') ? 'REVIEW' : metaOf(item);
-        return `<a class="te-rel-bordered-card${isOffer ? ' is-offer' : ' is-review'}" href="${urlOf(item)}"><div><small>${label}</small><strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div>${imageMarkup(item, 'te-rel-bordered-image')}</a>`;
+        return `<a class="te-rel-bordered-card${isOffer ? ' is-offer' : ' is-review'}" href="${urlOf(item)}"><div><small>${label}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div>${imageMarkup(item, 'te-rel-bordered-image')}</a>`;
       }).join('')}</div></section>`;
     }
 
     function bento(rows) {
       const main = rows[0];
       if (!main) return '';
-      return `<section class="te-rel-module te-rel-bento">${moduleHeader('DESTACADO', 'Una lectura para continuar')}<a class="te-rel-bento-main" href="${urlOf(main)}">${imageMarkup(main, 'te-rel-bento-main-image')}<span class="te-rel-bento-shade" aria-hidden="true"></span><div><small>${metaOf(main)}</small><strong>${titleOf(main)}</strong><span>Ver contenido →</span></div></a><div class="te-rel-bento-compact">${rows.slice(1, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-bento-thumb')}<div><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-bento">${moduleHeader('DESTACADO', 'Una lectura para continuar')}<a class="te-rel-bento-main" href="${urlOf(main)}">${imageMarkup(main, 'te-rel-bento-main-image')}<span class="te-rel-bento-shade" aria-hidden="true"></span><div><small>${metaOf(main)}</small>${freshBadge(main)}<strong>${titleOf(main)}</strong><span>Ver contenido →</span></div></a><div class="te-rel-bento-compact">${rows.slice(1, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-bento-thumb')}<div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
     function frameless(rows) {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-frameless">${moduleHeader('LECTURA EDITORIAL', 'Historias que amplían el tema')}<div class="te-rel-frameless-grid">${rows.slice(0, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-frameless-image')}<div><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p><b aria-hidden="true">→</b></div></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-frameless">${moduleHeader('LECTURA EDITORIAL', 'Historias que amplían el tema')}<div class="te-rel-frameless-grid">${rows.slice(0, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-frameless-image')}<div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p><b aria-hidden="true">→</b></div></a>`).join('')}</div></section>`;
     }
 
     function ranking(rows) {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-ranking">${moduleHeader('SELECCIÓN TE EQUIPAMOS', 'Para seguir leyendo')}<div class="te-rel-ranking-list">${rows.slice(0, 3).map((item, index) => `<a href="${urlOf(item)}"><span>${String(index + 1).padStart(2, '0')}</span><div><small>${metaOf(item)}</small><strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-ranking">${moduleHeader('SELECCIÓN TE EQUIPAMOS', 'Para seguir leyendo')}<div class="te-rel-ranking-list">${rows.slice(0, 3).map((item, index) => `<a href="${urlOf(item)}"><span>${String(index + 1).padStart(2, '0')}</span><div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
     const primarySection = normalize(asArray(current && current.sections)[0] || current && current.category);
