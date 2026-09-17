@@ -34,9 +34,20 @@ function Resolve-GhPath {
     return $null
 }
 
+function Convert-PublisherToUtf8Bom {
+    $publisher = Join-Path $PSScriptRoot "PUBLICAR-TE-EQUIPAMOS.ps1"
+    if (Test-Path -LiteralPath $publisher) {
+        $text = [System.IO.File]::ReadAllText($publisher, [System.Text.Encoding]::UTF8)
+        $utf8Bom = New-Object System.Text.UTF8Encoding($true)
+        [System.IO.File]::WriteAllText($publisher, $text, $utf8Bom)
+    }
+}
+
 try {
     Write-Host "TE EQUIPAMOS | PREPARACION INICIAL" -ForegroundColor White
     Write-Host "Esto solo se hace una vez en este PC." -ForegroundColor DarkGray
+
+    Convert-PublisherToUtf8Bom
 
     if (-not (Test-Command "winget")) {
         throw "No encuentro winget. Actualiza Instalador de aplicaciones desde Microsoft Store y vuelve a intentarlo."
