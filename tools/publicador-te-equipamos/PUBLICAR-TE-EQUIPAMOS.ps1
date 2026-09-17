@@ -197,18 +197,24 @@ try {
         Stop-Publish "No existe la ruta: $SourcePath"
     }
 
-    Write-Step "Preparando la landing"
+    Write-Step "Preparando una copia temporal de la landing"
     $resolvedSource = (Resolve-Path -LiteralPath $SourcePath).Path
+    $tempRoot = Join-Path $env:TEMP ("te-equipamos-publish-" + [guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path $tempRoot | Out-Null
+
     if ([System.IO.Path]::GetExtension($resolvedSource).ToLowerInvariant() -eq ".zip") {
-        $tempRoot = Join-Path $env:TEMP ("te-equipamos-publish-" + [guid]::NewGuid().ToString("N"))
-        New-Item -ItemType Directory -Path $tempRoot | Out-Null
         Expand-Archive -LiteralPath $resolvedSource -DestinationPath $tempRoot -Force
         $projectRoot = Get-ProjectRoot $tempRoot
     }
     else {
-        $projectRoot = Get-ProjectRoot $resolvedSource
+        $copyRoot = Join-Path $tempRoot "project"
+        New-Item -ItemType Directory -Path $copyRoot | Out-Null
+        Get-ChildItem -LiteralPath $resolvedSource -Force | Where-Object { $_.Name -ne ".git" } | ForEach-Object {
+            Copy-Item -LiteralPath $_.FullName -Destination $copyRoot -Recurse -Force
+        }
+        $projectRoot = Get-ProjectRoot $copyRoot
     }
-    Write-Ok "Proyecto detectado: $projectRoot"
+    Write-Ok "Copia de trabajo preparada: $projectRoot"
 
     $manifestPath = Join-Path $projectRoot "te-equipamos.json"
 
@@ -258,10 +264,6 @@ try {
 
     Write-Step "Creando el repositorio público $fullRepo"
     Set-Location $projectRoot
-
-    if (Test-Path -LiteralPath (Join-Path $projectRoot ".git")) {
-        Remove-Item -LiteralPath (Join-Path $projectRoot ".git") -Recurse -Force
-    }
 
     & git init -b main *> $null
     if ($LASTEXITCODE -ne 0) {
