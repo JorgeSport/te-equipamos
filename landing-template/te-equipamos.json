@@ -1,0 +1,37 @@
+{
+  "brand": "Te Equipamos",
+  "schema_version": 2,
+  "items": [
+    {
+      "active": true,
+      "type": "sale",
+      "sections": [
+        "Ventas",
+        "Novedades"
+      ],
+      "activities": [
+        "REEMPLAZAR_ACTIVIDAD"
+      ],
+      "product_type": "REEMPLAZAR_TIPO_PRODUCTO",
+      "title": "REEMPLAZAR_TITULO_PUBLICO",
+      "card_title": "REEMPLAZAR_TITULO_TARJETA",
+      "seo_title": "REEMPLAZAR_TITULO_SEO",
+      "seo_description": "REEMPLAZAR_DESCRIPCION_SEO",
+      "seo_keywords": [
+        "REEMPLAZAR_KEYWORD_1",
+        "REEMPLAZAR_KEYWORD_2"
+      ],
+      "summary": "REEMPLAZAR_RESUMEN",
+      "details": "REEMPLAZAR_DETALLE",
+      "url": "https://jorgesport.github.io/REEMPLAZAR_REPOSITORIO/",
+      "image": "REEMPLAZAR_IMAGEN_SOCIAL",
+      "time": "Producto · Consultar disponibilidad",
+      "featured": false,
+      "direct": true,
+      "tags": [
+        "REEMPLAZAR_TAG_1",
+        "REEMPLAZAR_TAG_2"
+      ]
+    }
+  ]
+}
