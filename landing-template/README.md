@@ -22,7 +22,6 @@ En una landing nueva se mantienen:
 - Precio incluido en el mensaje cuando esté definido.
 - Si hay selector de color, talla, variante o cantidad, el mensaje debe incluir la selección actual.
 - Cabecera base de Te Equipamos.
-- Bloque para compartir por WhatsApp, Facebook, Telegram y copiar enlace.
 - Footer universal.
 - Analítica con consentimiento usando la configuración central de Te Equipamos.
 - Responsive móvil.
@@ -50,18 +49,18 @@ Ejemplo de mensaje esperado:
 
 `Hola Te Equipamos, deseo consultar por Mochila X. Color: Verde. Talla: M. Precio: S/199.00. Quisiera confirmar disponibilidad.\n\nEnlace del producto: https://...`
 
-## Compartir en redes: comportamiento obligatorio
+## Compartir: responsabilidad del Hub Te Equipamos
 
-Toda landing nueva debe conservar los controles de compartir mediante:
+Los controles para compartir por WhatsApp, Facebook, Telegram y copiar enlace **no son obligatorios dentro de la landing independiente**.
 
-- WhatsApp, para compartir el producto con otra persona.
-- Facebook.
-- Telegram.
-- Copiar enlace.
+El Hub de Te Equipamos los añade en la experiencia `/read/.../` junto con categoría, etiquetas y otros elementos editoriales. Por tanto, una landing nueva no debe duplicar ese bloque salvo que el propietario lo pida expresamente para una campaña concreta.
 
-Estos botones usan `data-te-share` y el núcleo central construye las URLs de compartir.
+Regla por defecto:
 
-Importante: esto se refiere a **compartir la landing en redes**. No hay perfiles oficiales de Instagram, TikTok, Facebook u otras redes definidos en esta plantilla mientras no exista una URL oficial verificada y añadida expresamente a `template-config.json`. Nunca inventar perfiles sociales.
+- Landing independiente: WhatsApp comercial personalizado.
+- Hub `/read/.../`: compartir por WhatsApp, Facebook, Telegram y copiar enlace.
+
+No inventar perfiles oficiales de Instagram, TikTok, Facebook u otras redes. Solo añadir perfiles si sus URLs oficiales están verificadas y configuradas expresamente.
 
 ## LIBRE: aquí sí cambia el diseño
 
@@ -102,7 +101,7 @@ Los recursos centrales se sirven desde el Hub:
 4. Diseñar únicamente la zona `TE DESIGN ZONE` del `index.html`.
 5. Mantener intactos los bloques marcados `TE SYSTEM` salvo que se actualice oficialmente el sistema.
 6. Si hay variantes, conectar color/talla/cantidad con el mensaje personalizado de WhatsApp.
-7. Revisar los cuatro controles de compartir.
+7. No duplicar por defecto el bloque social que ya aporta el Hub `/read/.../`.
 8. Revisar móvil y escritorio.
 9. Publicar con GitHub Pages.
 10. Confirmar que la URL pública coincide con la del manifiesto.
@@ -110,7 +109,7 @@ Los recursos centrales se sirven desde el Hub:
 
 ## Prompt corto para un chat nuevo
 
-`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing, y los controles para compartir por WhatsApp, Facebook, Telegram y copiar enlace. Diseña solo la TE DESIGN ZONE. Antes de tocar código, muéstrame la idea visual y espera mi aprobación.`
+`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing. No añadas dentro de la landing el bloque de compartir por WhatsApp, Facebook, Telegram y copiar enlace, porque lo aporta el Hub Te Equipamos en /read/.../, salvo que yo lo pida expresamente. Diseña solo la TE DESIGN ZONE. Antes de tocar código, muéstrame la idea visual y espera mi aprobación.`
 
 ## Reglas de contenido
 
