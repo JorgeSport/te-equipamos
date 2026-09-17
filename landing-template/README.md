@@ -93,23 +93,41 @@ Los recursos centrales se sirven desde el Hub:
 - `universal-footer.js`
 - `te-analytics-provider.js`
 
-## Flujo para una nueva landing
+## Flujo rápido obligatorio
 
-1. Crear un repositorio nuevo con nombre `te-equipamos-<producto-slug>`.
-2. Copiar el contenido de esta carpeta a la raíz del repositorio nuevo.
-3. Sustituir los marcadores `REEMPLAZAR_*` del `index.html` y del `te-equipamos.json`.
-4. Diseñar únicamente la zona `TE DESIGN ZONE` del `index.html`.
-5. Mantener intactos los bloques marcados `TE SYSTEM` salvo que se actualice oficialmente el sistema.
-6. Si hay variantes, conectar color/talla/cantidad con el mensaje personalizado de WhatsApp.
-7. No duplicar por defecto el bloque social que ya aporta el Hub `/read/.../`.
-8. Revisar móvil y escritorio.
-9. Publicar con GitHub Pages.
-10. Confirmar que la URL pública coincide con la del manifiesto.
-11. El Hub podrá detectar el `te-equipamos.json` del repositorio público y clasificarlo.
+El objetivo es ahorrar tiempo. Cuando el propietario entregue el enlace del producto, precio, imágenes, referencias y demás datos, **no se debe parar en una explicación conceptual antes de generar la vista previa**.
+
+1. Leer `README.md` y `template-config.json`.
+2. Revisar la fuente del producto y usar solo datos reales y verificables.
+3. Analizar la referencia visual aportada, si existe.
+4. Crear directamente una primera versión funcional en HTML siguiendo la plantilla oficial.
+5. Entregar un **HTML descargable/abrible como vista previa** para que el propietario vea el diseño real en móvil y escritorio.
+6. No crear todavía el repositorio definitivo ni publicar en GitHub Pages.
+7. Si el propietario pide cambios, modificar la vista previa HTML hasta que quede aprobada.
+8. Solo después de una aprobación explícita como `APROBADO`, `PUBLICA`, `SUBE`, `CREA EL REPOSITORIO` o equivalente, preparar el repositorio independiente.
+9. Crear/copiar `te-equipamos.json` y el workflow oficial.
+10. Publicar en GitHub Pages.
+11. Confirmar la URL pública, WhatsApp, responsive, SEO e integración con el Hub.
+
+### Regla de vista previa
+
+La primera entrega después de recibir los datos del producto debe ser **la landing real en HTML**, no solo una descripción del concepto. Se puede resumir brevemente la idea visual, pero no se debe pedir una aprobación previa para empezar el HTML.
+
+La vista previa debe incluir ya:
+
+- diseño real,
+- imágenes disponibles,
+- precio,
+- CTA de WhatsApp,
+- comportamiento responsive,
+- SEO básico,
+- elementos TE SYSTEM aplicables.
+
+El repositorio definitivo se crea únicamente después de que el propietario haya visto y aprobado esa vista previa.
 
 ## Prompt corto para un chat nuevo
 
-`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing. No añadas dentro de la landing el bloque de compartir por WhatsApp, Facebook, Telegram y copiar enlace, porque lo aporta el Hub Te Equipamos en /read/.../, salvo que yo lo pida expresamente. Diseña solo la TE DESIGN ZONE. Antes de tocar código, muéstrame la idea visual y espera mi aprobación.`
+`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Cuando te entregue el enlace del producto, precio, imágenes, referencia visual y demás datos, analiza las fuentes y genera directamente una primera versión funcional en HTML para que pueda abrirla y revisar el diseño. No te detengas antes a pedirme aprobación del concepto. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing. No añadas dentro de la landing el bloque de compartir por WhatsApp, Facebook, Telegram y copiar enlace, porque lo aporta el Hub Te Equipamos en /read/.../, salvo que yo lo pida expresamente. No crees ni publiques todavía el repositorio definitivo. Primero entrégame el HTML de vista previa. Cuando yo lo apruebe, entonces prepara el repositorio independiente, te-equipamos.json, GitHub Pages e integración con el Hub.`
 
 ## Reglas de contenido
 
