@@ -13,20 +13,30 @@ function Install-WingetPackage([string]$Id, [string]$Label) {
     }
 }
 
-function Convert-ScriptsToUtf8Bom {
-    $folder = Split-Path -Parent $MyInvocation.MyCommand.Path
-    $encoding = New-Object System.Text.UTF8Encoding($true)
-    Get-ChildItem -LiteralPath $folder -Filter "*.ps1" -File | ForEach-Object {
-        $text = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
-        [System.IO.File]::WriteAllText($_.FullName, $text, $encoding)
+function Resolve-GhPath {
+    $command = Get-Command gh -ErrorAction SilentlyContinue
+    if ($command -and -not [string]::IsNullOrWhiteSpace([string]$command.Source)) {
+        return [string]$command.Source
     }
+
+    $candidates = @(
+        "C:\Program Files\GitHub CLI\gh.exe",
+        "C:\Program Files (x86)\GitHub CLI\gh.exe",
+        (Join-Path $env:LOCALAPPDATA "Programs\GitHub CLI\gh.exe")
+    )
+
+    foreach ($candidate in $candidates) {
+        if (-not [string]::IsNullOrWhiteSpace($candidate) -and (Test-Path -LiteralPath $candidate)) {
+            return $candidate
+        }
+    }
+
+    return $null
 }
 
 try {
     Write-Host "TE EQUIPAMOS | PREPARACION INICIAL" -ForegroundColor White
     Write-Host "Esto solo se hace una vez en este PC." -ForegroundColor DarkGray
-
-    Convert-ScriptsToUtf8Bom
 
     if (-not (Test-Command "winget")) {
         throw "No encuentro winget. Actualiza Instalador de aplicaciones desde Microsoft Store y vuelve a intentarlo."
@@ -40,27 +50,24 @@ try {
     }
 
     if (-not (Test-Command "gh")) {
-        Install-WingetPackage "GitHub.cli" "GitHub CLI"
+        $existingGh = Resolve-GhPath
+        if (-not $existingGh) {
+            Install-WingetPackage "GitHub.cli" "GitHub CLI"
+        }
+        else {
+            Write-Host "[OK] GitHub CLI ya esta instalado" -ForegroundColor Green
+        }
     }
     else {
         Write-Host "[OK] GitHub CLI ya esta instalado" -ForegroundColor Green
     }
 
-    $gh = Get-Command gh -ErrorAction SilentlyContinue
-    if (-not $gh) {
-        $commonGh = "C:\Program Files\GitHub CLI\gh.exe"
-        if (Test-Path $commonGh) {
-            $ghPath = $commonGh
-        }
-        else {
-            Write-Host ""
-            Write-Host "GitHub CLI se instalo, pero Windows todavia no actualizo el PATH de esta ventana." -ForegroundColor Yellow
-            Write-Host "Cierra esta ventana, vuelve a ejecutar INSTALAR-UNA-VEZ.bat y continua con el inicio de sesion." -ForegroundColor Yellow
-            exit 0
-        }
-    }
-    else {
-        $ghPath = $gh.Source
+    $ghPath = Resolve-GhPath
+    if ([string]::IsNullOrWhiteSpace($ghPath)) {
+        Write-Host ""
+        Write-Host "GitHub CLI se instalo, pero Windows todavia no actualizo sus rutas." -ForegroundColor Yellow
+        Write-Host "Cierra esta ventana y vuelve a ejecutar INSTALAR-UNA-VEZ.bat." -ForegroundColor Yellow
+        exit 0
     }
 
     & $ghPath auth status *> $null
