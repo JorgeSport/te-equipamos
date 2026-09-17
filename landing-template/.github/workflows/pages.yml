@@ -29,6 +29,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import json
+          import re
 
           html_path = Path('index.html')
           manifest_path = Path('te-equipamos.json')
@@ -43,6 +44,12 @@ jobs:
               'class="te-header"',
               'class="brand"',
               'data-te-whatsapp',
+              'name="te:product"',
+              'name="te:price"',
+              'data-te-share="whatsapp"',
+              'data-te-share="facebook"',
+              'data-te-share="telegram"',
+              'data-te-share="copy"',
               'https://jorgesport.github.io/te-equipamos/landing-shell.css',
               'https://jorgesport.github.io/te-equipamos/landing-core.js',
               'https://jorgesport.github.io/te-equipamos/te-analytics-provider.js',
@@ -54,6 +61,13 @@ jobs:
 
           if 'REEMPLAZAR_' in html:
               raise SystemExit('Quedan marcadores REEMPLAZAR_ en index.html')
+
+          # Si alguien añade enlaces directos a WhatsApp, solo se permite el número oficial
+          # o wa.me/?text= para compartir con otra persona.
+          direct_wa = re.findall(r'https://wa\.me/([^?"\'\s<]+)', html, flags=re.I)
+          bad_wa = [value for value in direct_wa if value not in ('51920807184', '')]
+          if bad_wa:
+              raise SystemExit('Se detectó un número de WhatsApp distinto al oficial: ' + ', '.join(bad_wa))
 
           data = json.loads(manifest_path.read_text(encoding='utf-8'))
           if data.get('brand') != 'Te Equipamos':
