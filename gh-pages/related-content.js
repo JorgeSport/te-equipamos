@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const urlOf = item => escapeHtml(item && item.url || BASE);
   const titleOf = item => escapeHtml(item && (item.card_title || item.title) || 'Te Equipamos');
   const summaryOf = item => escapeHtml(item && item.summary || '');
-  const metaOf = item => escapeHtml(publicSection(asArray(item && item.sections)[0] || item && item.category || 'Te Equipamos'));
+  const metaOf = item => escapeHtml(item && item.content_label || publicSection(asArray(item && item.sections)[0] || item && item.category || 'Te Equipamos'));
   const isRecent = item => {
     const raw = String(item && item.published_at || '').trim();
     if (!raw) return false;

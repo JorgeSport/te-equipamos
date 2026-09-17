@@ -271,6 +271,7 @@ def normalize_item(raw: dict, repo_name: str) -> dict | None:
         "summary": clean(raw.get("summary")) or f"Contenido propio de Te Equipamos · {kind_label}.",
         "details": clean(raw.get("details")) or clean(raw.get("summary")) or "Contenido propio publicado por Te Equipamos.",
         "category": primary,
+        "content_label": clean(raw.get("content_label")),
         "sections": sections,
         "activities": activities,
         "activities_inferred": inferred,
