@@ -57,13 +57,18 @@ try {
         Write-Host ""
         Write-Host "Ahora GitHub abrirá el navegador para autorizar este PC." -ForegroundColor Cyan
         Write-Host "Inicia sesión con tu cuenta JorgeSport y acepta la autorización." -ForegroundColor White
-        & $ghPath auth login --hostname github.com --git-protocol https --web
+        & $ghPath auth login --hostname github.com --git-protocol https --web --scopes "repo,workflow"
         if ($LASTEXITCODE -ne 0) {
             throw "No se completó el inicio de sesión de GitHub CLI."
         }
     }
     else {
         Write-Host "[OK] GitHub CLI ya tiene sesión iniciada" -ForegroundColor Green
+        Write-Host "Comprobando permisos para repositorios y workflows..." -ForegroundColor Cyan
+        & $ghPath auth refresh --hostname github.com --scopes "repo,workflow"
+        if ($LASTEXITCODE -ne 0) {
+            throw "No se pudieron confirmar los permisos repo y workflow de GitHub CLI."
+        }
     }
 
     Write-Host ""
