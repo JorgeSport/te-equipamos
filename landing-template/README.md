@@ -26,7 +26,31 @@ En una landing nueva se mantienen:
 - Analítica con consentimiento usando la configuración central de Te Equipamos.
 - Responsive móvil.
 - Manifiesto `te-equipamos.json` para que el Hub descubra y clasifique la landing.
+- Título estratégico y subtítulo estratégico para la tarjeta del Hub.
 - GitHub Pages mediante Actions.
+
+## Título y subtítulo estratégicos para el Hub
+
+Toda landing que se publique e integre en Te Equipamos debe entrar al Hub con una presentación editorial propia. No basta con copiar el nombre del producto y una ficha técnica.
+
+Reglas obligatorias:
+
+- `card_title` = **título estratégico visible en la tarjeta del Hub**. Debe generar interés con un beneficio real, un dato diferenciador, una tensión útil o un contexto de uso. No debe ser simplemente `Marca + modelo + categoría`.
+- `summary` = **subtítulo estratégico visible bajo el título**. Debe complementar al título explicando el beneficio, el uso o la razón por la que ese producto merece atención, sin repetir literalmente el título.
+- `title` también debe tener enfoque editorial y puede ser algo más amplio que `card_title`.
+- No inventar datos para hacer el copy más atractivo. La estrategia se construye únicamente con información real del producto.
+- El título estratégico debe tener entre 35 y 95 caracteres para mantener una buena jerarquía en escritorio y móvil.
+- Antes de publicar, comprobar cómo se verá el conjunto `card_title + summary` dentro de Te Equipamos.
+
+Ejemplo correcto:
+
+`card_title`: `24 g, categoría 3 y visión envolvente: unas gafas pensadas para moverse`
+
+`summary`: `Protección 100 % anti-UV, lente oscura y diseño envolvente para ciclismo, ciudad y viajes cuando el sol aprieta.`
+
+Ejemplo a evitar:
+
+`card_title`: `Gafas Roadr 100 Categoría 3 · ciclismo y urbano`
 
 ## WhatsApp: comportamiento obligatorio
 
@@ -105,9 +129,9 @@ El objetivo es ahorrar tiempo. Cuando el propietario entregue el enlace del prod
 6. No crear todavía el repositorio definitivo ni publicar en GitHub Pages.
 7. Si el propietario pide cambios, modificar la vista previa HTML hasta que quede aprobada.
 8. Solo después de una aprobación explícita como `APROBADO`, `PUBLICA`, `SUBE`, `CREA EL REPOSITORIO` o equivalente, preparar el repositorio independiente.
-9. Crear/copiar `te-equipamos.json` y el workflow oficial.
+9. Crear/copiar `te-equipamos.json` y el workflow oficial, incluyendo título estratégico y subtítulo estratégico del Hub.
 10. Publicar en GitHub Pages.
-11. Confirmar la URL pública, WhatsApp, responsive, SEO e integración con el Hub.
+11. Confirmar la URL pública, WhatsApp, responsive, SEO e integración con el Hub, comprobando visualmente `card_title + summary`.
 
 ### Regla de vista previa
 
@@ -127,7 +151,7 @@ El repositorio definitivo se crea únicamente después de que el propietario hay
 
 ## Prompt corto para un chat nuevo
 
-`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Cuando te entregue el enlace del producto, precio, imágenes, referencia visual y demás datos, analiza las fuentes y genera directamente una primera versión funcional en HTML para que pueda abrirla y revisar el diseño. No te detengas antes a pedirme aprobación del concepto. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing. No añadas dentro de la landing el bloque de compartir por WhatsApp, Facebook, Telegram y copiar enlace, porque lo aporta el Hub Te Equipamos en /read/.../, salvo que yo lo pida expresamente. No crees ni publiques todavía el repositorio definitivo. Primero entrégame el HTML de vista previa. Cuando yo lo apruebe, entonces prepara el repositorio independiente, te-equipamos.json, GitHub Pages e integración con el Hub.`
+`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Cuando te entregue el enlace del producto, precio, imágenes, referencia visual y demás datos, analiza las fuentes y genera directamente una primera versión funcional en HTML para que pueda abrirla y revisar el diseño. No te detengas antes a pedirme aprobación del concepto. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing. Al preparar te-equipamos.json crea siempre un título estratégico para el Hub en card_title y un subtítulo estratégico en summary; no uses como tarjeta un nombre de producto plano ni una ficha técnica genérica. No añadas dentro de la landing el bloque de compartir por WhatsApp, Facebook, Telegram y copiar enlace, porque lo aporta el Hub Te Equipamos en /read/.../, salvo que yo lo pida expresamente. No crees ni publiques todavía el repositorio definitivo. Primero entrégame el HTML de vista previa. Cuando yo lo apruebe, entonces prepara el repositorio independiente, te-equipamos.json, GitHub Pages e integración con el Hub.`
 
 ## Reglas de contenido
 
