@@ -1,8 +1,9 @@
 {
   "brand": "Te Equipamos",
-  "schema_version": 2,
+  "schema_version": 3,
   "items": [
     {
+      "id": "REEMPLAZAR_ID_ESTABLE",
       "active": true,
       "type": "sale",
       "sections": [
@@ -13,15 +14,16 @@
         "REEMPLAZAR_ACTIVIDAD"
       ],
       "product_type": "REEMPLAZAR_TIPO_PRODUCTO",
-      "title": "REEMPLAZAR_TITULO_PUBLICO",
-      "card_title": "REEMPLAZAR_TITULO_TARJETA",
+      "title": "REEMPLAZAR_TITULO_PUBLICO_ESTRATEGICO",
+      "card_title": "REEMPLAZAR_TITULO_ESTRATEGICO_HUB",
       "seo_title": "REEMPLAZAR_TITULO_SEO",
       "seo_description": "REEMPLAZAR_DESCRIPCION_SEO",
       "seo_keywords": [
         "REEMPLAZAR_KEYWORD_1",
-        "REEMPLAZAR_KEYWORD_2"
+        "REEMPLAZAR_KEYWORD_2",
+        "REEMPLAZAR_KEYWORD_3"
       ],
-      "summary": "REEMPLAZAR_RESUMEN",
+      "summary": "REEMPLAZAR_SUBTITULO_ESTRATEGICO_HUB",
       "details": "REEMPLAZAR_DETALLE",
       "url": "https://jorgesport.github.io/REEMPLAZAR_REPOSITORIO/",
       "image": "REEMPLAZAR_IMAGEN_SOCIAL",
@@ -31,7 +33,8 @@
       "tags": [
         "REEMPLAZAR_TAG_1",
         "REEMPLAZAR_TAG_2"
-      ]
+      ],
+      "published_at": "REEMPLAZAR_FECHA_YYYY-MM-DD"
     }
   ]
 }
