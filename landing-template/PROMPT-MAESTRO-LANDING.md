@@ -85,6 +85,7 @@ HUB TE EQUIPAMOS
 
 Debe incluir correctamente los campos necesarios para el Hub, especialmente:
 
+- `id`
 - `title`
 - `card_title`
 - `summary`
