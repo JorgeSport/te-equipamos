@@ -59,7 +59,7 @@ function Get-ProjectRoot([string]$Path) {
         return $matches[0].FullName
     }
 
-    Stop-Publish "No encuentro una raíz única de landing con index.html y te-equipamos.json."
+    Stop-Publish "No encuentro una raiz unica de landing con index.html y te-equipamos.json."
 }
 
 function Get-StableId([string]$Value) {
@@ -82,7 +82,7 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
         $manifest = $raw | ConvertFrom-Json
     }
     catch {
-        Stop-Publish "te-equipamos.json no es JSON válido."
+        Stop-Publish "te-equipamos.json no es JSON valido."
     }
 
     if (-not $manifest.brand -or $manifest.brand -ne "Te Equipamos") {
@@ -94,7 +94,7 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
     }
 
     if (-not $manifest.items -or @($manifest.items).Count -lt 1) {
-        Stop-Publish "te-equipamos.json no contiene ningún producto."
+        Stop-Publish "te-equipamos.json no contiene ningun producto."
     }
 
     $item = @($manifest.items)[0]
@@ -122,13 +122,13 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
     $keywords = @($item.seo_keywords)
 
     if ([string]::IsNullOrWhiteSpace($cardTitle) -or $cardTitle -match 'REEMPLAZAR_') {
-        Stop-Publish "Falta el título estratégico del Hub (card_title). Créalo antes de publicar."
+        Stop-Publish "Falta el titulo estrategico del Hub (card_title). Crealo antes de publicar."
     }
     if ($cardTitle.Length -lt 35 -or $cardTitle.Length -gt 95) {
         Stop-Publish "card_title debe tener entre 35 y 95 caracteres. Actual: $($cardTitle.Length)."
     }
     if ([string]::IsNullOrWhiteSpace($summary) -or $summary -match 'REEMPLAZAR_') {
-        Stop-Publish "Falta el subtítulo estratégico del Hub (summary). Créalo antes de publicar."
+        Stop-Publish "Falta el subtitulo estrategico del Hub (summary). Crealo antes de publicar."
     }
     if ([string]::IsNullOrWhiteSpace($seoTitle) -or $seoTitle -match 'REEMPLAZAR_') {
         Stop-Publish "Falta seo_title."
@@ -143,12 +143,12 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
         Stop-Publish "seo_description debe tener entre 90 y 180 caracteres. Actual: $($seoDescription.Length)."
     }
     if ($keywords.Count -lt 3 -or $keywords.Count -gt 8) {
-        Stop-Publish "seo_keywords debe contener entre 3 y 8 términos."
+        Stop-Publish "seo_keywords debe contener entre 3 y 8 terminos."
     }
 
     $normalized = $manifest | ConvertTo-Json -Depth 20
     if ($normalized -match 'REEMPLAZAR_') {
-        Stop-Publish "El manifiesto todavía contiene campos REEMPLAZAR_. Completa la landing antes de publicar."
+        Stop-Publish "El manifiesto todavia contiene campos REEMPLAZAR_. Completa la landing antes de publicar."
     }
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -160,13 +160,13 @@ function Wait-ForWorkflow([string]$Repository, [string]$Workflow, [string]$Event
     Start-Sleep -Seconds 3
     $runId = & gh run list --repo $Repository --workflow $Workflow --event $Event --limit 1 --json databaseId --jq '.[0].databaseId'
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($runId)) {
-        Stop-Publish "No pude localizar la ejecución de $Workflow en $Repository."
+        Stop-Publish "No pude localizar la ejecucion de $Workflow en $Repository."
     }
 
     Write-Host "Esperando GitHub Actions (run $runId)..."
     & gh run watch $runId --repo $Repository --exit-status
     if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "GitHub Actions falló en $Repository. Revisa la pestaña Acciones."
+        Stop-Publish "GitHub Actions fallo en $Repository. Revisa la pestana Acciones."
     }
 }
 
@@ -190,7 +190,7 @@ $tempRoot = $null
 $originalLocation = Get-Location
 
 try {
-    Write-Host "TE EQUIPAMOS | PUBLICADOR AUTOMÁTICO" -ForegroundColor White
+    Write-Host "TE EQUIPAMOS | PUBLICADOR AUTOMATICO" -ForegroundColor White
     Write-Host "Repositorio + Pages + Hub, en un solo proceso" -ForegroundColor DarkGray
 
     Write-Step "Comprobando herramientas"
@@ -203,7 +203,7 @@ try {
 
     $authExit = Invoke-QuietExitCode { & gh auth status }
     if ($authExit -ne 0) {
-        Stop-Publish "GitHub CLI no está autenticado. Ejecuta INSTALAR-UNA-VEZ.bat o 'gh auth login --web'."
+        Stop-Publish "GitHub CLI no esta autenticado. Ejecuta INSTALAR-UNA-VEZ.bat o 'gh auth login --web'."
     }
     Write-Ok "Git y GitHub CLI listos"
 
@@ -256,7 +256,7 @@ try {
     $RepoName = $RepoName.Trim()
 
     if ($RepoName -notmatch '^[A-Za-z0-9._-]+$') {
-        Stop-Publish "El nombre del repositorio contiene caracteres no válidos."
+        Stop-Publish "El nombre del repositorio contiene caracteres no validos."
     }
 
     $requiredFiles = @(
@@ -270,18 +270,18 @@ try {
         }
     }
 
-    Write-Step "Validando título, subtítulo, SEO y esquema del Hub"
+    Write-Step "Validando titulo, subtitulo, SEO y esquema del Hub"
     $siteUrl = Test-StrategicManifest $manifestPath $RepoName
     Write-Ok "Manifiesto schema 3 correcto"
 
     $fullRepo = "$Owner/$RepoName"
     $repoExists = Invoke-QuietExitCode { & gh repo view $fullRepo --json nameWithOwner }
     if ($repoExists -eq 0) {
-        Stop-Publish "El repositorio $fullRepo ya existe. Por seguridad, este publicador automático solo crea landings nuevas."
+        Stop-Publish "El repositorio $fullRepo ya existe. Por seguridad, este publicador automatico solo crea landings nuevas."
     }
     Write-Ok "Nombre de repositorio disponible"
 
-    Write-Step "Creando el repositorio público $fullRepo"
+    Write-Step "Creando el repositorio publico $fullRepo"
     Set-Location $projectRoot
 
     $gitInitExit = Invoke-QuietExitCode { & git init -b main }
@@ -312,7 +312,7 @@ try {
     if ($LASTEXITCODE -ne 0) {
         Stop-Publish "No pude crear o subir el repositorio $fullRepo."
     }
-    Write-Ok "Repositorio público creado y código subido"
+    Write-Ok "Repositorio publico creado y codigo subido"
 
     Write-Step "Activando GitHub Pages con Acciones de GitHub"
     Enable-Pages $fullRepo
@@ -330,23 +330,27 @@ try {
     Start-Sleep -Seconds 4
     & gh workflow run pages.yml --repo $HubRepo
     if ($LASTEXITCODE -ne 0) {
-        Stop-Publish "La landing ya está publicada, pero no pude lanzar la actualización del Hub $HubRepo."
+        Stop-Publish "La landing ya esta publicada, pero no pude lanzar la actualizacion del Hub $HubRepo."
     }
     Wait-ForWorkflow $HubRepo "pages.yml"
     Write-Ok "Hub actualizado"
 
     Write-Host ""
-    Write-Host "PUBLICACIÓN COMPLETADA" -ForegroundColor Green
+    Write-Host "PUBLICACION COMPLETADA" -ForegroundColor Green
     Write-Host "Landing: $siteUrl" -ForegroundColor White
     Write-Host "Hub: https://jorgesport.github.io/te-equipamos/" -ForegroundColor White
     Write-Host "Repositorio: https://github.com/$fullRepo" -ForegroundColor White
 
-    try { Start-Process $siteUrl } catch { }
+    # No abrir el navegador automaticamente. El lanzador deja las URLs visibles.
 }
 catch {
     Write-Host ""
-    Write-Host "PUBLICACIÓN DETENIDA" -ForegroundColor Red
-    Write-Host $_.Exception.Message -ForegroundColor Yellow
+    Write-Host "PUBLICACION DETENIDA" -ForegroundColor Red
+    $errorMessage = "Error desconocido."
+    if ($Error.Count -gt 0 -and $null -ne $Error[0].Exception) {
+        $errorMessage = $Error[0].Exception.Message
+    }
+    Write-Host $errorMessage -ForegroundColor Yellow
     Write-Host ""
     Write-Host "No se ha continuado para evitar publicar una landing incompleta." -ForegroundColor DarkGray
     exit 1
