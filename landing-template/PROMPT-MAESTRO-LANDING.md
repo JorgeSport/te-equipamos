@@ -104,6 +104,16 @@ Debe incluir correctamente los campos necesarios para el Hub, especialmente:
 
 `summary` debe funcionar como subtítulo estratégico y explicar brevemente por qué merece atención el producto.
 
+Límites obligatorios que debe respetar antes de crear el ZIP:
+
+- `card_title`: entre 35 y 95 caracteres.
+- `seo_title`: entre 35 y 75 caracteres.
+- `seo_description`: entre 90 y 180 caracteres.
+- `seo_keywords`: entre 3 y 8 términos.
+- `summary`: obligatorio, no vacío y sin marcadores pendientes.
+
+Si algún campo no cumple estos límites, corrígelo antes de entregar el HTML y el ZIP.
+
 Evita títulos genéricos como “Descubre este producto”, “La mejor opción”, “Producto ideal”, “Calidad y diseño” o “Todo lo que necesitas”.
 
 No inventes información para hacerlos más atractivos.
