@@ -65,7 +65,7 @@ jobs:
           if bad_wa:
               raise SystemExit('Se detectó un número de WhatsApp distinto al oficial: ' + ', '.join(bad_wa))
 
-          data = json.loads(manifest_path.read_text(encoding='utf-8'))
+          data = json.loads(manifest_path.read_text(encoding='utf-8-sig'))
           if data.get('brand') != 'Te Equipamos':
               raise SystemExit('El manifiesto debe mantener brand = Te Equipamos')
           items = data.get('items')
