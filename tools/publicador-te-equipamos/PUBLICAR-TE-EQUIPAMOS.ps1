@@ -9,7 +9,7 @@ param(
     [string]$HubRepo = "JorgeSport/te-equipamos"
 )
 
-$PublisherVersion = "2026.09.20.1"
+$PublisherVersion = "2026.09.20.2"
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -188,6 +188,55 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
     return $expectedUrl
 }
 
+function Normalize-PriceSystem([string]$HtmlPath) {
+    $html = Get-Content -LiteralPath $HtmlPath -Raw -Encoding UTF8
+
+    $priceMatch = [regex]::Match(
+        $html,
+        '<meta\s+name=["'']te:price["''][^>]*content=["'']([^"'']*)["''][^>]*>',
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+
+    if (-not $priceMatch.Success) {
+        return
+    }
+
+    $priceValue = $priceMatch.Groups[1].Value.Trim()
+    if ([string]::IsNullOrWhiteSpace($priceValue) -or $priceValue -match 'REEMPLAZAR_') {
+        return
+    }
+
+    if ($html -notmatch 'landing-core\.js') {
+        Stop-Publish "La landing tiene precio, pero falta el nucleo central landing-core.js."
+    }
+
+    if ($html -notmatch 'data-te-price') {
+        Stop-Publish "La landing tiene precio, pero falta data-te-price en el bloque visual del precio."
+    }
+
+    $today = Get-Date -Format "yyyy-MM-dd"
+    $updatedMetaPattern = '<meta\s+name=["'']te:price-updated["''][^>]*>'
+    $updatedMeta = '<meta name="te:price-updated" content="' + $today + '">'
+
+    if ([regex]::IsMatch($html, $updatedMetaPattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) {
+        $html = [regex]::Replace(
+            $html,
+            $updatedMetaPattern,
+            $updatedMeta,
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+    }
+    elseif ($html -match '</head>') {
+        $html = $html -replace '</head>', ("  " + $updatedMeta + [Environment]::NewLine + "</head>")
+    }
+    else {
+        Stop-Publish "No pude registrar la fecha de actualizacion del precio porque falta </head>."
+    }
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($HtmlPath, $html, $utf8NoBom)
+}
+
 function Wait-ForWorkflow([string]$Repository, [string]$Workflow, [string]$Event = "workflow_dispatch") {
     Start-Sleep -Seconds 3
     $runId = & gh run list --repo $Repository --workflow $Workflow --event $Event --limit 1 --json databaseId --jq '.[0].databaseId'
@@ -302,6 +351,10 @@ try {
             Stop-Publish "Falta el archivo obligatorio: $file"
         }
     }
+
+    Write-Step "Normalizando aviso y fecha del precio"
+    Normalize-PriceSystem (Join-Path $projectRoot "index.html")
+    Write-Ok "Sistema de precio correcto"
 
     Write-Step "Validando titulo, subtitulo, SEO y esquema del Hub"
     $siteUrl = Test-StrategicManifest $manifestPath $RepoName
