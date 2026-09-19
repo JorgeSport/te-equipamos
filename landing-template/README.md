@@ -117,27 +117,33 @@ Los recursos centrales se sirven desde el Hub:
 - `universal-footer.js`
 - `te-analytics-provider.js`
 
-## Flujo rápido obligatorio
+## Prompt maestro oficial y flujo de trabajo
 
-El objetivo es ahorrar tiempo. Cuando el propietario entregue el enlace del producto, precio, imágenes, referencias y demás datos, **no se debe parar en una explicación conceptual antes de generar la vista previa**.
+El archivo oficial para iniciar nuevas landings es:
 
-1. Leer `README.md` y `template-config.json`.
-2. Revisar la fuente del producto y usar solo datos reales y verificables.
-3. Analizar la referencia visual aportada, si existe.
-4. Crear directamente una primera versión funcional en HTML siguiendo la plantilla oficial.
-5. Entregar un **HTML descargable/abrible como vista previa** para que el propietario vea el diseño real en móvil y escritorio.
-6. No crear todavía el repositorio definitivo ni publicar en GitHub Pages.
-7. Si el propietario pide cambios, modificar la vista previa HTML hasta que quede aprobada.
-8. Solo después de una aprobación explícita como `APROBADO`, `PUBLICA`, `SUBE`, `CREA EL REPOSITORIO` o equivalente, preparar el repositorio independiente.
-9. Crear/copiar `te-equipamos.json` y el workflow oficial, incluyendo título estratégico y subtítulo estratégico del Hub.
-10. Publicar en GitHub Pages.
-11. Confirmar la URL pública, WhatsApp, responsive, SEO e integración con el Hub, comprobando visualmente `card_title + summary`.
+`landing-template/PROMPT-MAESTRO-LANDING.md`
 
-### Regla de vista previa
+Ese archivo define el flujo obligatorio y debe leerse junto con este README, `template-config.json`, `index.html` y `.github/workflows/pages.yml`.
 
-La primera entrega después de recibir los datos del producto debe ser **la landing real en HTML**, no solo una descripción del concepto. Se puede resumir brevemente la idea visual, pero no se debe pedir una aprobación previa para empezar el HTML.
+El flujo oficial es:
 
-La vista previa debe incluir ya:
+**CONCEPTO → APLICA → REVISIÓN → PUBLICA**
+
+1. **CONCEPTO**: analizar el producto, su público, argumento de venta, dirección de arte, hero, estructura, colores, tipografía, móvil y estrategia de conversión. No escribir código todavía.
+2. **APLICA**: crear la landing completa respetando TE SYSTEM, generar `index.html`, `te-equipamos.json` con `schema_version: 3`, workflow de Pages, SEO, WhatsApp personalizado, responsive y todos los recursos necesarios.
+3. Después de **APLICA**, entregar obligatoriamente:
+   - un `index.html` descargable para revisión visual;
+   - un ZIP completo compatible con `PUBLICAR-TE-EQUIPAMOS`.
+4. **APLICA no publica**. El propietario revisa la versión entregada y puede pedir cambios.
+5. **PUBLICA**: solo después de una aprobación explícita. Debe utilizarse la versión exacta aprobada y el flujo oficial del Publicador Te Equipamos.
+6. Nunca sobrescribir repositorios existentes.
+7. Regla permanente: **1 producto = 1 repositorio independiente = 1 landing = 1 `te-equipamos.json`.**
+
+### Regla de revisión
+
+La landing debe poder revisarse localmente antes de publicarse.
+
+El HTML de revisión debe permitir comprobar:
 
 - diseño real,
 - imágenes disponibles,
@@ -147,11 +153,11 @@ La vista previa debe incluir ya:
 - SEO básico,
 - elementos TE SYSTEM aplicables.
 
-El repositorio definitivo se crea únicamente después de que el propietario haya visto y aprobado esa vista previa.
+La publicación en GitHub se realiza únicamente después de la aprobación final.
 
 ## Prompt corto para un chat nuevo
 
-`Crea una nueva landing Te Equipamos usando como fuente de verdad la carpeta landing-template del repositorio JorgeSport/te-equipamos. Lee primero README.md y template-config.json. Cuando te entregue el enlace del producto, precio, imágenes, referencia visual y demás datos, analiza las fuentes y genera directamente una primera versión funcional en HTML para que pueda abrirla y revisar el diseño. No te detengas antes a pedirme aprobación del concepto. Mantén intactos los bloques TE SYSTEM, incluido WhatsApp personalizado con producto, precio, variantes y enlace de la landing. Al preparar te-equipamos.json crea siempre un título estratégico para el Hub en card_title y un subtítulo estratégico en summary; no uses como tarjeta un nombre de producto plano ni una ficha técnica genérica. No añadas dentro de la landing el bloque de compartir por WhatsApp, Facebook, Telegram y copiar enlace, porque lo aporta el Hub Te Equipamos en /read/.../, salvo que yo lo pida expresamente. No crees ni publiques todavía el repositorio definitivo. Primero entrégame el HTML de vista previa. Cuando yo lo apruebe, entonces prepara el repositorio independiente, te-equipamos.json, GitHub Pages e integración con el Hub.`
+`Quiero crear una nueva landing de Te Equipamos. Usa como fuente de verdad obligatoria JorgeSport/te-equipamos/landing-template/ y sigue landing-template/PROMPT-MAESTRO-LANDING.md. Lee también README.md, template-config.json, index.html y .github/workflows/pages.yml. Primero presenta únicamente el concepto visual y comercial y espera mi aprobación. Cuando diga APLICA, crea la landing completa y entrégame un HTML descargable de revisión y un ZIP compatible con PUBLICAR-TE-EQUIPAMOS. APLICA no significa publicar. Solo cuando diga PUBLICA debe pasar al flujo oficial de publicación.`
 
 ## Reglas de contenido
 
