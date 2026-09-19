@@ -62,6 +62,27 @@ function Get-ProjectRoot([string]$Path) {
     Stop-Publish "No encuentro una raiz unica de landing con index.html y te-equipamos.json."
 }
 
+function Get-JsonPropertyValue($Object, [string]$Name) {
+    if ($null -eq $Object) { return $null }
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) { return $null }
+    return $property.Value
+}
+
+function Set-JsonPropertyValue($Object, [string]$Name, $Value) {
+    if ($null -eq $Object) {
+        Stop-Publish "No se puede escribir '$Name' porque el objeto JSON no existe."
+    }
+
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        $Object | Add-Member -MemberType NoteProperty -Name $Name -Value $Value
+    }
+    else {
+        $property.Value = $Value
+    }
+}
+
 function Get-StableId([string]$Value) {
     $sha = [System.Security.Cryptography.SHA256]::Create()
     try {
@@ -85,41 +106,50 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
         Stop-Publish "te-equipamos.json no es JSON valido."
     }
 
-    if (-not $manifest.brand -or $manifest.brand -ne "Te Equipamos") {
+    $brand = [string](Get-JsonPropertyValue $manifest "brand")
+    if ([string]::IsNullOrWhiteSpace($brand) -or $brand -ne "Te Equipamos") {
         Stop-Publish "te-equipamos.json debe declarar brand = Te Equipamos."
     }
 
-    if (-not $manifest.schema_version -or [int]$manifest.schema_version -lt 3) {
+    $schemaVersion = Get-JsonPropertyValue $manifest "schema_version"
+    if ($null -eq $schemaVersion -or [int]$schemaVersion -lt 3) {
         Stop-Publish "La landing usa un esquema antiguo. Debe tener schema_version 3."
     }
 
-    if (-not $manifest.items -or @($manifest.items).Count -lt 1) {
+    $itemsValue = Get-JsonPropertyValue $manifest "items"
+    if ($null -eq $itemsValue -or @($itemsValue).Count -lt 1) {
         Stop-Publish "te-equipamos.json no contiene ningun producto."
     }
 
-    $item = @($manifest.items)[0]
+    $item = @($itemsValue)[0]
     $expectedUrl = "https://$($Owner.ToLower()).github.io/$ExpectedRepoName/"
 
     # Automatizaciones seguras que no alteran el copy creativo.
+    # id, url y published_at pueden faltar: el publicador los normaliza.
     [uint32]$idValue = 0
-    $hasNumericId = [uint32]::TryParse([string]$item.id, [ref]$idValue)
+    $currentId = Get-JsonPropertyValue $item "id"
+    $hasNumericId = [uint32]::TryParse([string]$currentId, [ref]$idValue)
     if (-not $hasNumericId -or $idValue -eq 0) {
-        $item.id = Get-StableId "$Owner/$ExpectedRepoName|$($item.title)"
+        $titleForId = [string](Get-JsonPropertyValue $item "title")
+        $generatedId = Get-StableId "$Owner/$ExpectedRepoName|$titleForId"
+        Set-JsonPropertyValue $item "id" $generatedId
     }
 
-    $item.url = $expectedUrl
+    Set-JsonPropertyValue $item "url" $expectedUrl
 
+    $publishedAt = Get-JsonPropertyValue $item "published_at"
     $dateValue = [datetime]::MinValue
-    $validDate = [datetime]::TryParse([string]$item.published_at, [ref]$dateValue)
-    if (-not $validDate -or [string]$item.published_at -match '^REEMPLAZAR_') {
-        $item.published_at = Get-Date -Format "yyyy-MM-dd"
+    $validDate = [datetime]::TryParse([string]$publishedAt, [ref]$dateValue)
+    if (-not $validDate -or [string]$publishedAt -match '^REEMPLAZAR_') {
+        Set-JsonPropertyValue $item "published_at" (Get-Date -Format "yyyy-MM-dd")
     }
 
-    $cardTitle = [string]$item.card_title
-    $summary = [string]$item.summary
-    $seoTitle = [string]$item.seo_title
-    $seoDescription = [string]$item.seo_description
-    $keywords = @($item.seo_keywords)
+    $cardTitle = [string](Get-JsonPropertyValue $item "card_title")
+    $summary = [string](Get-JsonPropertyValue $item "summary")
+    $seoTitle = [string](Get-JsonPropertyValue $item "seo_title")
+    $seoDescription = [string](Get-JsonPropertyValue $item "seo_description")
+    $keywordsValue = Get-JsonPropertyValue $item "seo_keywords"
+    $keywords = @($keywordsValue)
 
     if ([string]::IsNullOrWhiteSpace($cardTitle) -or $cardTitle -match 'REEMPLAZAR_') {
         Stop-Publish "Falta el titulo estrategico del Hub (card_title). Crealo antes de publicar."
@@ -142,7 +172,7 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
     if ($seoDescription.Length -lt 90 -or $seoDescription.Length -gt 180) {
         Stop-Publish "seo_description debe tener entre 90 y 180 caracteres. Actual: $($seoDescription.Length)."
     }
-    if ($keywords.Count -lt 3 -or $keywords.Count -gt 8) {
+    if ($null -eq $keywordsValue -or $keywords.Count -lt 3 -or $keywords.Count -gt 8) {
         Stop-Publish "seo_keywords debe contener entre 3 y 8 terminos."
     }
 
