@@ -167,3 +167,14 @@ La publicación en GitHub se realiza únicamente después de la aprobación fina
 - Nunca sustituir el número oficial por otro número.
 - Nunca dejar un mensaje genérico si existen datos del producto disponibles.
 - Nunca inventar perfiles sociales.
+
+
+## Aviso automático de precio
+
+Cuando una landing muestre un precio, el bloque visual principal debe usar `data-te-price` y el documento debe incluir los metadatos `te:price` y `te:price-updated`.
+
+El núcleo compartido `landing-core.js` añade automáticamente debajo del precio:
+
+**Precio referencial sujeto a cambios y disponibilidad. Confirma el precio final antes de realizar tu compra.**
+
+También muestra la fecha de actualización del precio cuando está disponible. El publicador normaliza esa fecha al día de publicación y detiene la publicación si una landing con precio no está integrada correctamente con este sistema.
