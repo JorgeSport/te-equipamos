@@ -16,6 +16,34 @@
     return location.href;
   }
 
+  function priceUpdatedDate(){
+    const value=(document.querySelector('meta[name="te:price-updated"]')?.content||'').trim();
+    if(!value||/REEMPLAZAR_/i.test(value))return '';
+    const match=value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return match?`${match[3]}/${match[2]}/${match[1]}`:value;
+  }
+
+  function installPriceReference(root=document){
+    const price=productPrice();
+    if(!price||/REEMPLAZAR_/i.test(price))return;
+
+    let targets=[...root.querySelectorAll('[data-te-price]')];
+    if(!targets.length)targets=[...root.querySelectorAll('.price')];
+
+    const updated=priceUpdatedDate();
+    targets.forEach(target=>{
+      if(target.dataset.tePriceReferenceBound==='true')return;
+      target.dataset.tePriceReferenceBound='true';
+
+      const note=document.createElement('div');
+      note.className='te-price-reference';
+      note.setAttribute('role','note');
+      note.innerHTML='<span>Precio referencial sujeto a cambios y disponibilidad. Confirma el precio final antes de realizar tu compra.</span>'+
+        (updated?`<small>Precio actualizado: ${updated}</small>`:'');
+      target.insertAdjacentElement('afterend',note);
+    });
+  }
+
   function track(event,props={}){
     const payload={event,...props,ts:Date.now()};
     window.teDataLayer=window.teDataLayer||[];
@@ -105,6 +133,7 @@
   function install(){
     refreshWhatsApp();
     bindShare();
+    installPriceReference();
     track('page_view',{
       product:productName(),
       page_title:document.title,
@@ -119,6 +148,8 @@
     track,
     productName,
     productPrice,
+    priceUpdatedDate,
+    installPriceReference,
     buildWhatsAppUrl,
     refreshWhatsApp,
     share
