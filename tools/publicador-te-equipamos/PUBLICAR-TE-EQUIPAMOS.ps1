@@ -29,6 +29,23 @@ function Test-Command([string]$Name) {
     return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
 }
 
+# Ejecuta comandos externos que pueden fallar como parte normal de una comprobacion.
+# Evita que PowerShell convierta el stderr esperado de GitHub CLI en una excepcion.
+function Invoke-QuietExitCode([scriptblock]$Command) {
+    $previousPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & $Command *> $null
+        return $LASTEXITCODE
+    }
+    catch {
+        return 1
+    }
+    finally {
+        $ErrorActionPreference = $previousPreference
+    }
+}
+
 function Get-ProjectRoot([string]$Path) {
     if ((Test-Path (Join-Path $Path "index.html")) -and (Test-Path (Join-Path $Path "te-equipamos.json"))) {
         return (Resolve-Path $Path).Path
@@ -153,16 +170,16 @@ function Wait-ForWorkflow([string]$Repository, [string]$Workflow, [string]$Event
 }
 
 function Enable-Pages([string]$Repository) {
-    & gh api "repos/$Repository/pages" *> $null
-    if ($LASTEXITCODE -eq 0) {
-        & gh api --method PUT "repos/$Repository/pages" -f build_type=workflow *> $null
-        if ($LASTEXITCODE -ne 0) {
+    $pagesExists = Invoke-QuietExitCode { & gh api "repos/$Repository/pages" }
+    if ($pagesExists -eq 0) {
+        $configurePages = Invoke-QuietExitCode { & gh api --method PUT "repos/$Repository/pages" -f build_type=workflow }
+        if ($configurePages -ne 0) {
             Stop-Publish "No pude configurar GitHub Pages para usar Actions en $Repository."
         }
     }
     else {
-        & gh api --method POST "repos/$Repository/pages" -f build_type=workflow *> $null
-        if ($LASTEXITCODE -ne 0) {
+        $createPages = Invoke-QuietExitCode { & gh api --method POST "repos/$Repository/pages" -f build_type=workflow }
+        if ($createPages -ne 0) {
             Stop-Publish "No pude activar GitHub Pages en $Repository."
         }
     }
@@ -183,8 +200,8 @@ try {
         Stop-Publish "Falta GitHub CLI. Ejecuta primero INSTALAR-UNA-VEZ.bat."
     }
 
-    & gh auth status *> $null
-    if ($LASTEXITCODE -ne 0) {
+    $authExit = Invoke-QuietExitCode { & gh auth status }
+    if ($authExit -ne 0) {
         Stop-Publish "GitHub CLI no está autenticado. Ejecuta INSTALAR-UNA-VEZ.bat o 'gh auth login --web'."
     }
     Write-Ok "Git y GitHub CLI listos"
@@ -257,17 +274,21 @@ try {
     Write-Ok "Manifiesto schema 3 correcto"
 
     $fullRepo = "$Owner/$RepoName"
-    & gh repo view $fullRepo --json nameWithOwner *> $null
-    if ($LASTEXITCODE -eq 0) {
+    $repoExists = Invoke-QuietExitCode { & gh repo view $fullRepo --json nameWithOwner }
+    if ($repoExists -eq 0) {
         Stop-Publish "El repositorio $fullRepo ya existe. Por seguridad, este publicador automático solo crea landings nuevas."
     }
+    Write-Ok "Nombre de repositorio disponible"
 
     Write-Step "Creando el repositorio público $fullRepo"
     Set-Location $projectRoot
 
-    & git init -b main *> $null
-    if ($LASTEXITCODE -ne 0) {
-        & git init *> $null
+    $gitInitExit = Invoke-QuietExitCode { & git init -b main }
+    if ($gitInitExit -ne 0) {
+        $gitInitFallback = Invoke-QuietExitCode { & git init }
+        if ($gitInitFallback -ne 0) {
+            Stop-Publish "No pude inicializar Git en la copia temporal."
+        }
         & git branch -M main *> $null
     }
 
