@@ -9,7 +9,7 @@ param(
     [string]$HubRepo = "JorgeSport/te-equipamos"
 )
 
-$PublisherVersion = "2026.09.19.2"
+$PublisherVersion = "2026.09.20.1"
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -367,6 +367,25 @@ try {
     }
     Wait-ForWorkflow $HubRepo "pages.yml"
     Write-Ok "Hub actualizado"
+
+    Write-Step "Sincronizando la Fabrica y el Centro de Control"
+    $privateControlRepo = "JorgeSport/te-equipamos-prompts"
+
+    $factorySyncExit = Invoke-QuietExitCode { & gh workflow run fabrica-sync.yml --repo $privateControlRepo }
+    if ($factorySyncExit -eq 0) {
+        Write-Ok "Sincronizacion de la Fabrica solicitada"
+    }
+    else {
+        Write-Host "[AVISO] La landing esta publicada, pero no pude lanzar la sincronizacion de la Fabrica." -ForegroundColor Yellow
+    }
+
+    $controlSyncExit = Invoke-QuietExitCode { & gh workflow run control-te-equipamos.yml --repo $privateControlRepo }
+    if ($controlSyncExit -eq 0) {
+        Write-Ok "Revision del Centro de Control solicitada"
+    }
+    else {
+        Write-Host "[AVISO] La landing esta publicada, pero no pude lanzar el Centro de Control." -ForegroundColor Yellow
+    }
 
     Write-Host ""
     Write-Host "PUBLICACION COMPLETADA" -ForegroundColor Green
