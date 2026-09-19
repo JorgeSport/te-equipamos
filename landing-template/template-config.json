@@ -1,5 +1,5 @@
 {
-  "template_version": "1.5",
+  "template_version": "1.6",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -85,7 +85,8 @@
     "manifest",
     "hub_strategic_title",
     "hub_strategic_subtitle",
-    "pages_workflow"
+    "pages_workflow",
+    "pricing_notice"
   ],
   "creative_zone": [
     "hero",
@@ -98,5 +99,14 @@
     "comparisons",
     "technical_blocks",
     "offer_presentation"
-  ]
+  ],
+  "pricing_notice": {
+    "required_when_price_present": true,
+    "marker_attribute": "data-te-price",
+    "text": "Precio referencial sujeto a cambios y disponibilidad. Confirma el precio final antes de realizar tu compra.",
+    "updated_date_meta": "te:price-updated",
+    "updated_date_format": "YYYY-MM-DD",
+    "auto_rendered_by": "https://jorgesport.github.io/te-equipamos/landing-core.js",
+    "display_rule": "Mostrar de forma discreta inmediatamente debajo de cada bloque de precio."
+  }
 }
