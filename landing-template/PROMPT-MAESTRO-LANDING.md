@@ -1,42 +1,48 @@
 # PROMPT MAESTRO OFICIAL · LANDINGS TE EQUIPAMOS
 
-Este es el prompt maestro oficial para iniciar una nueva landing de Te Equipamos.
+Este es el prompt maestro oficial para crear nuevas landings de Te Equipamos.
 
-## Cómo usarlo
+## Flujo oficial
 
-En un chat nuevo, copia este prompt y completa únicamente los datos reales del producto al final.
+**CREAR → REVISAR → CORREGIR → PUBLICA**
 
-El flujo oficial es:
+- **CREAR**: al recibir los datos del producto, crear directamente la landing real.
+- **REVISAR**: entregar un `index.html` descargable y un ZIP completo para que el propietario vea la landing.
+- **CORREGIR**: si el propietario pide cambios, modificar los archivos reales y volver a entregar HTML + ZIP actualizados.
+- **PUBLICA**: solo después de la aprobación final, usar la versión exacta aprobada con `PUBLICAR-TE-EQUIPAMOS`.
 
-**CONCEPTO → APLICA → REVISIÓN → PUBLICA**
-
-- **CONCEPTO**: primero se analiza el producto y se propone la dirección visual y comercial. No se programa todavía.
-- **APLICA**: se crea la landing completa y se entregan un HTML de revisión y un ZIP final compatible con PUBLICAR-TE-EQUIPAMOS. No se publica.
-- **REVISIÓN**: el propietario revisa la landing y solicita cambios si hacen falta.
-- **PUBLICA**: solo después de la aprobación final se usa la versión exacta aprobada para el flujo oficial de publicación.
+No existe una fase obligatoria de concepto previa.
+No hace falta decir APLICA.
+El propio envío de este prompt junto con los datos del producto significa: **crear la primera versión funcional ahora**.
 
 ---
 
 Quiero crear una nueva landing de TE EQUIPAMOS.
 
+========================================
 FUENTE DE VERDAD OBLIGATORIA
+========================================
 
 Usa como única fuente estructural oficial el repositorio:
 
-JorgeSport/te-equipamos
+`JorgeSport/te-equipamos`
 
 Carpeta:
 
-landing-template/
+`landing-template/`
 
-Antes de diseñar, proponer concepto o escribir código:
+Antes de crear archivos:
 
-1. Lee landing-template/README.md
-2. Lee landing-template/template-config.json
-3. Lee landing-template/index.html
-4. Lee landing-template/.github/workflows/pages.yml
-5. Identifica y respeta todos los bloques marcados como TE SYSTEM.
+1. Lee `landing-template/README.md`.
+2. Lee `landing-template/template-config.json`.
+3. Lee `landing-template/index.html`.
+4. Lee `landing-template/.github/workflows/pages.yml`.
+5. Identifica y respeta todos los bloques marcados como **TE SYSTEM**.
 6. No sustituyas, elimines ni reinventes elementos TE SYSTEM.
+
+Haz el análisis creativo y comercial internamente.
+No me entregues primero una explicación larga del concepto.
+No esperes una aprobación previa para empezar a construir.
 
 ========================================
 ELEMENTOS FIJOS DE TE EQUIPAMOS
@@ -47,7 +53,7 @@ Debes mantener:
 - Logo oficial de Te Equipamos.
 - Logo enlazado a la portada oficial de Te Equipamos.
 - Cabecera base oficial.
-- WhatsApp oficial +51 920 807 184.
+- WhatsApp oficial `+51 920 807 184`.
 - CTA comercial de WhatsApp.
 - Mensaje de WhatsApp personalizado para el producto.
 - Footer universal.
@@ -55,7 +61,7 @@ Debes mantener:
 - Responsive móvil y escritorio.
 - SEO técnico.
 - Metadatos Open Graph y sociales.
-- te-equipamos.json.
+- `te-equipamos.json`.
 - Integración con el Hub Te Equipamos.
 - Compatibilidad con GitHub Pages.
 - Estructura preparada para repositorio independiente.
@@ -67,57 +73,37 @@ El mensaje de WhatsApp debe incluir:
 - disponibilidad,
 - URL pública de la propia landing.
 
-Si existen opciones seleccionables como:
+Si existen opciones seleccionables como talla, color, variante o cantidad, el mensaje de WhatsApp debe reflejar la selección actual del usuario.
 
-- talla,
-- color,
-- variante,
-- cantidad,
-
-el mensaje de WhatsApp debe reflejar la selección actual del usuario.
-
-Si no existe información real de stock, no inventes disponibilidad.
-Usa una formulación neutra como “consultar disponibilidad”.
+Si no existe información real de stock, no inventes disponibilidad. Usa una formulación neutra como `consultar disponibilidad`.
 
 ========================================
 HUB TE EQUIPAMOS
 ========================================
 
-te-equipamos.json debe usar:
+`te-equipamos.json` debe usar `schema_version: 3`.
 
-schema_version: 3
+Debe incluir correctamente los campos necesarios para el Hub, especialmente:
 
-Debe incluir correctamente los campos necesarios para el Hub.
+- `title`
+- `card_title`
+- `summary`
+- `seo_title`
+- `seo_description`
+- `seo_keywords`
+- `url`
+- `image`
+- `published_at`
+- `activities`
+- `sections`
+- `product_type`
+- `active`
 
-Especialmente:
+`card_title` debe ser un título estratégico creado específicamente para la tarjeta del Hub y no limitarse a copiar el nombre del producto.
 
-- title
-- card_title
-- summary
-- seo_title
-- seo_description
-- seo_keywords
-- url
-- image
-- published_at
-- activities
-- sections
-- product_type
-- active
+`summary` debe funcionar como subtítulo estratégico y explicar brevemente por qué merece atención el producto.
 
-card_title debe ser un título estratégico creado específicamente para la tarjeta del Hub.
-
-No debe limitarse a copiar el nombre del producto.
-
-summary debe funcionar como subtítulo estratégico y explicar de forma breve por qué merece atención el producto.
-
-Evita títulos genéricos como:
-
-- “Descubre este producto”
-- “La mejor opción”
-- “Producto ideal”
-- “Calidad y diseño”
-- “Todo lo que necesitas”
+Evita títulos genéricos como “Descubre este producto”, “La mejor opción”, “Producto ideal”, “Calidad y diseño” o “Todo lo que necesitas”.
 
 No inventes información para hacerlos más atractivos.
 
@@ -125,14 +111,9 @@ No inventes información para hacerlos más atractivos.
 BOTONES DE COMPARTIR
 ========================================
 
-NO añadas por defecto dentro de la landing botones para:
+NO añadas por defecto dentro de la landing botones para WhatsApp, Facebook, Telegram o copiar enlace.
 
-- WhatsApp
-- Facebook
-- Telegram
-- copiar enlace
-
-El Hub Te Equipamos ya proporciona estos controles en la vista /read/.../
+El Hub Te Equipamos ya proporciona estos controles en la vista `/read/.../`.
 
 Solo deben aparecer dentro de la landing si yo lo solicito expresamente.
 
@@ -170,32 +151,15 @@ Si un dato no está disponible o no puede verificarse, no lo completes por intui
 
 No conviertas una inferencia en un dato técnico.
 
+Si se proporciona una URL del producto, revisa la fuente y usa únicamente información real y verificable.
+
 ========================================
 PARTE CREATIVA
 ========================================
 
-La zona TE DESIGN ZONE puede ser completamente diferente en cada producto.
+La zona **TE DESIGN ZONE** puede ser completamente diferente en cada producto.
 
-Puedes cambiar libremente:
-
-- hero,
-- dirección de arte,
-- composición,
-- retícula,
-- estilo visual,
-- colores de campaña,
-- tipografía,
-- fotografía,
-- galerías,
-- storytelling,
-- secciones editoriales,
-- comparativas,
-- bloques técnicos,
-- presentación del precio,
-- navegación interna,
-- ritmo visual,
-- animaciones razonables,
-- estructura de venta.
+Puedes cambiar libremente hero, dirección de arte, composición, retícula, estilo visual, colores de campaña, tipografía, fotografía, galerías, storytelling, secciones editoriales, comparativas, bloques técnicos, presentación del precio, navegación interna, ritmo visual, animaciones razonables y estructura de venta.
 
 Quiero variedad visual profesional.
 
@@ -204,101 +168,89 @@ NO quiero que todas las landings parezcan una misma plantilla cambiando solament
 La identidad TE SYSTEM debe mantenerse, pero la experiencia visual del producto debe tener personalidad propia.
 
 ========================================
-PRIMERA FASE: CONCEPTO
+CREACIÓN INMEDIATA OBLIGATORIA
 ========================================
 
-NO escribas ni modifiques código todavía.
+Cuando te entregue este prompt y los datos del producto:
 
-Primero:
+- NO presentes primero un concepto.
+- NO me entregues una explicación extensa.
+- NO describas cómo podría ser la landing.
+- NO esperes a que yo diga APLICA.
+- NO pegues todo el código en el chat salvo que yo lo pida expresamente.
+- NO me pidas que cree un repositorio de GitHub.
+- NO crees ni publiques todavía un repositorio definitivo.
 
-1. Analiza el producto.
-2. Analiza para quién está pensado.
-3. Identifica su principal argumento de venta.
-4. Define el concepto creativo.
-5. Presenta la dirección de arte.
-6. Explica el hero.
-7. Explica la estructura completa de la página.
-8. Define colores y tipografía.
-9. Explica la jerarquía visual.
-10. Explica la experiencia móvil.
-11. Explica la estrategia de conversión.
-12. Explica cómo se presentarán características, beneficios y limitaciones.
-13. Explica qué imágenes o recursos visuales utilizarías.
+Analiza internamente el producto, toma las decisiones creativas necesarias y empieza inmediatamente a construir la landing real.
 
-No programes todavía.
+Debes crear físicamente los archivos necesarios.
 
-Espera mi aprobación.
+La primera entrega debe contener obligatoriamente:
 
-========================================
-CUANDO YO DIGA “APLICA”
-========================================
+1. Un archivo `index.html` descargable para abrirlo y revisar visualmente la landing en mi PC.
+2. Un ZIP completo descargable compatible con `PUBLICAR-TE-EQUIPAMOS`.
 
-Solo cuando yo diga:
+El ZIP debe incluir como mínimo:
 
-APLICA
+- `index.html`
+- `te-equipamos.json`
+- `.github/workflows/pages.yml`
+- todos los archivos y recursos locales necesarios.
 
-debes crear la landing.
+Antes de entregarlos comprueba:
 
-En ese momento:
+- TE SYSTEM intacto,
+- responsive móvil,
+- responsive escritorio,
+- WhatsApp personalizado,
+- SEO,
+- metadatos sociales,
+- `schema_version: 3`,
+- `card_title`,
+- `summary`,
+- ausencia de marcadores `REEMPLAZAR_`,
+- ausencia de datos inventados,
+- compatibilidad con GitHub Pages.
 
-- usa la plantilla oficial,
-- conserva todos los elementos TE SYSTEM,
-- desarrolla completamente TE DESIGN ZONE,
-- crea index.html,
-- crea te-equipamos.json,
-- usa schema_version 3,
-- crea card_title estratégico,
-- crea summary estratégico,
-- comprueba el mensaje personalizado de WhatsApp,
-- comprueba responsive,
-- comprueba móvil,
-- comprueba escritorio,
-- comprueba SEO,
-- comprueba metadatos sociales,
-- comprueba que no quedan marcadores REEMPLAZAR_,
-- comprueba que no se ha inventado información,
-- comprueba compatibilidad con GitHub Pages,
-- incluye .github/workflows/pages.yml,
-- deja la landing preparada para un repositorio independiente,
-- prepara un ZIP final compatible con PUBLICAR-TE-EQUIPAMOS.
+La landing debe mostrarse mediante **archivos reales**, no mediante una descripción textual de cómo podría quedar.
 
-APLICA NO significa publicar.
-
-Después de APLICA, la landing debe quedar preparada para revisión final.
+La respuesta de entrega debe ser breve y centrarse en los enlaces de descarga y, como máximo, un resumen corto de lo creado.
 
 ========================================
-ENTREGA OBLIGATORIA DESPUÉS DE APLICA
+REVISIÓN Y CORRECCIONES
 ========================================
 
-Al finalizar la creación debes entregarme:
+Después de recibir el HTML y el ZIP, yo revisaré la landing.
 
-1. Un archivo index.html descargable para poder abrir y revisar visualmente la landing directamente en mi PC.
+Si pido cambios:
 
-2. Un ZIP completo descargable con toda la landing:
-   - index.html
-   - te-equipamos.json
-   - .github/workflows/pages.yml
-   - todos los archivos y recursos necesarios.
+- modifica la landing real,
+- conserva intacto todo lo que no haya pedido cambiar,
+- vuelve a comprobar TE SYSTEM,
+- vuelve a generar el `index.html` descargable actualizado,
+- vuelve a generar el ZIP completo actualizado.
 
-El ZIP debe quedar listo para utilizarse directamente con PUBLICAR-TE-EQUIPAMOS.
+Cada ronda de cambios debe terminar nuevamente con **HTML + ZIP actualizados**.
 
-No publiques todavía.
-
-Primero debo revisar y aprobar la landing.
+No publiques durante las revisiones.
 
 ========================================
 CUANDO YO DIGA “PUBLICA”
 ========================================
 
-PUBLICA significa que la landing ya está aprobada.
+`PUBLICA` significa que la versión actual está aprobada.
 
-En ese momento debe utilizarse el flujo oficial del Publicador Te Equipamos.
+En ese momento debe utilizarse la versión exacta del ZIP aprobada con el flujo oficial de `PUBLICAR-TE-EQUIPAMOS`.
 
-Debe publicarse la versión exacta del ZIP aprobada por el propietario.
+El Publicador Te Equipamos es el encargado de validar la landing, crear el repositorio independiente, subir los archivos, configurar/publicar GitHub Pages y actualizar el Hub Te Equipamos.
 
-No sobrescribas repositorios existentes.
+NO me pidas crear previamente el repositorio.
+NO sobrescribas repositorios existentes.
+NO cambies la landing aprobada antes de publicarla.
 
-1 producto = 1 repositorio independiente = 1 landing = 1 te-equipamos.json.
+Regla permanente:
+
+**1 producto = 1 repositorio independiente = 1 landing = 1 `te-equipamos.json`.**
 
 ========================================
 DATOS DEL PRODUCTO
