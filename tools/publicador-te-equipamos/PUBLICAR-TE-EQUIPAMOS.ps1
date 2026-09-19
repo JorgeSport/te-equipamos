@@ -9,6 +9,8 @@ param(
     [string]$HubRepo = "JorgeSport/te-equipamos"
 )
 
+$PublisherVersion = "2026.09.19.2"
+
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
@@ -222,6 +224,7 @@ $originalLocation = Get-Location
 try {
     Write-Host "TE EQUIPAMOS | PUBLICADOR AUTOMATICO" -ForegroundColor White
     Write-Host "Repositorio + Pages + Hub, en un solo proceso" -ForegroundColor DarkGray
+    Write-Host "Motor: $PublisherVersion" -ForegroundColor DarkGray
 
     Write-Step "Comprobando herramientas"
     if (-not (Test-Command "git")) {
