@@ -74,7 +74,7 @@ PRODUCT_TYPES = [
 def get_json(url: str):
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=15) as response:
-        return json.loads(response.read().decode("utf-8"))
+        return json.loads(response.read().decode("utf-8-sig"))
 
 
 def get_text(url: str) -> str:
@@ -335,7 +335,7 @@ def main() -> None:
     local_manifest = ROOT / MANIFEST
     if local_manifest.exists():
         try:
-            manifest = json.loads(local_manifest.read_text(encoding="utf-8"))
+            manifest = json.loads(local_manifest.read_text(encoding="utf-8-sig"))
             for raw in manifest_items(manifest):
                 item = normalize_item(raw, "te-equipamos")
                 if item:
