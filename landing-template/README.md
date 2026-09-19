@@ -119,45 +119,43 @@ Los recursos centrales se sirven desde el Hub:
 
 ## Prompt maestro oficial y flujo de trabajo
 
-El archivo oficial para iniciar nuevas landings es:
+El archivo oficial es:
 
 `landing-template/PROMPT-MAESTRO-LANDING.md`
 
-Ese archivo define el flujo obligatorio y debe leerse junto con este README, `template-config.json`, `index.html` y `.github/workflows/pages.yml`.
+Debe leerse junto con este README, `template-config.json`, `index.html` y `.github/workflows/pages.yml`.
 
 El flujo oficial es:
 
-**CONCEPTO → APLICA → REVISIÓN → PUBLICA**
+**CREAR → REVISAR → CORREGIR → PUBLICA**
 
-1. **CONCEPTO**: analizar el producto, su público, argumento de venta, dirección de arte, hero, estructura, colores, tipografía, móvil y estrategia de conversión. No escribir código todavía.
-2. **APLICA**: crear la landing completa respetando TE SYSTEM, generar `index.html`, `te-equipamos.json` con `schema_version: 3`, workflow de Pages, SEO, WhatsApp personalizado, responsive y todos los recursos necesarios.
-3. Después de **APLICA**, entregar obligatoriamente:
-   - un `index.html` descargable para revisión visual;
-   - un ZIP completo compatible con `PUBLICAR-TE-EQUIPAMOS`.
-4. **APLICA no publica**. El propietario revisa la versión entregada y puede pedir cambios.
-5. **PUBLICA**: solo después de una aprobación explícita. Debe utilizarse la versión exacta aprobada y el flujo oficial del Publicador Te Equipamos.
+1. **CREAR**: al recibir el prompt y los datos del producto, crear inmediatamente la primera versión funcional. No presentar primero un concepto ni esperar `APLICA`.
+2. **REVISAR**: entregar obligatoriamente un `index.html` descargable y un ZIP completo compatible con `PUBLICAR-TE-EQUIPAMOS`.
+3. **CORREGIR**: si el propietario pide cambios, modificar los archivos reales y volver a entregar HTML + ZIP actualizados.
+4. **PUBLICA**: solo después de la aprobación final. Utilizar la versión exacta aprobada con el Publicador Te Equipamos.
+5. No pedir al propietario que cree previamente un repositorio. `PUBLICAR-TE-EQUIPAMOS` crea el repositorio independiente.
 6. Nunca sobrescribir repositorios existentes.
 7. Regla permanente: **1 producto = 1 repositorio independiente = 1 landing = 1 `te-equipamos.json`.**
 
-### Regla de revisión
+### Regla de entrega
 
-La landing debe poder revisarse localmente antes de publicarse.
+La primera respuesta útil debe materializar la landing en archivos.
 
-El HTML de revisión debe permitir comprobar:
+No sustituir la entrega por una explicación larga del concepto.
 
-- diseño real,
-- imágenes disponibles,
-- precio,
-- CTA de WhatsApp,
-- comportamiento responsive,
-- SEO básico,
-- elementos TE SYSTEM aplicables.
+La entrega debe contener:
+
+- `index.html` descargable para revisión,
+- ZIP completo descargable,
+- una respuesta breve con los enlaces y, como máximo, un resumen corto.
+
+Cada corrección debe volver a terminar con HTML + ZIP actualizados.
 
 La publicación en GitHub se realiza únicamente después de la aprobación final.
 
 ## Prompt corto para un chat nuevo
 
-`Quiero crear una nueva landing de Te Equipamos. Usa como fuente de verdad obligatoria JorgeSport/te-equipamos/landing-template/ y sigue landing-template/PROMPT-MAESTRO-LANDING.md. Lee también README.md, template-config.json, index.html y .github/workflows/pages.yml. Primero presenta únicamente el concepto visual y comercial y espera mi aprobación. Cuando diga APLICA, crea la landing completa y entrégame un HTML descargable de revisión y un ZIP compatible con PUBLICAR-TE-EQUIPAMOS. APLICA no significa publicar. Solo cuando diga PUBLICA debe pasar al flujo oficial de publicación.`
+`Quiero crear una nueva landing de Te Equipamos. Abre y lee JorgeSport/te-equipamos-prompts/LANDINGS/PROMPT-MAESTRO-LANDING.md y úsalo como instrucciones obligatorias. Lee también los archivos oficiales de JorgeSport/te-equipamos/landing-template/. Crea directamente la primera versión real y entrégame index.html descargable + ZIP compatible con PUBLICAR-TE-EQUIPAMOS. No me presentes primero un concepto, no esperes APLICA, no publiques todavía y no me pidas crear un repositorio.`
 
 ## Reglas de contenido
 
