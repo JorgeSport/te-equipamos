@@ -1,5 +1,5 @@
 {
-  "template_version": "1.4",
+  "template_version": "1.5",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -42,17 +42,23 @@
     "default_rule": "No duplicar el bloque de compartir dentro de la landing independiente. El Hub Te Equipamos lo aporta en /read/.../. Añadirlo solo si el propietario lo pide expresamente."
   },
   "preview_workflow": {
-    "mode": "auto_html_first",
-    "generate_html_immediately_after_input": true,
-    "concept_approval_required_before_html": false,
+    "mode": "auto_files_first",
+    "generate_files_immediately_after_input": true,
+    "concept_approval_required_before_files": false,
+    "apply_keyword_required": false,
     "preview_required_before_repository": true,
     "publish_only_after_explicit_approval": true,
-    "expected_first_deliverable": "openable_or_downloadable_html_preview",
+    "expected_first_deliverables": [
+      "downloadable_index_html",
+      "publisher_compatible_zip"
+    ],
+    "correction_rule": "Cada modificación debe terminar con un index.html descargable actualizado y un ZIP completo actualizado.",
+    "response_rule": "No sustituir los archivos por una explicación larga. La respuesta de entrega debe ser breve y centrarse en los enlaces de descarga.",
+    "repository_creation_rule": "No pedir al propietario crear previamente el repositorio. PUBLICAR-TE-EQUIPAMOS crea el repositorio independiente al publicar.",
     "approval_examples": [
-      "APROBADO",
       "PUBLICA",
       "SUBE",
-      "CREA EL REPOSITORIO"
+      "APROBADO Y PUBLICA"
     ]
   },
   "social_profiles": {
