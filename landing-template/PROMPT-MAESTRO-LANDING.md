@@ -296,3 +296,21 @@ Objetivo comercial:
 
 Mercado:
 PERÚ
+
+
+## PRECIOS · REGLA GLOBAL TE SYSTEM
+
+Siempre que la landing muestre un precio real:
+
+- cada bloque visual de precio debe llevar el atributo `data-te-price`;
+- debe existir `<meta name="te:price" ...>` con el precio mostrado;
+- debe existir `<meta name="te:price-updated" content="YYYY-MM-DD">` con la fecha real de actualización del precio;
+- el núcleo central `landing-core.js` añadirá automáticamente, inmediatamente debajo del precio y con estilo discreto, este aviso exacto:
+
+`Precio referencial sujeto a cambios y disponibilidad. Confirma el precio final antes de realizar tu compra.`
+
+- debajo del aviso se mostrará automáticamente `Precio actualizado: DD/MM/YYYY` cuando exista `te:price-updated`;
+- no dupliques manualmente este aviso dentro de la zona creativa;
+- si hay varios bloques de precio visibles, marca cada bloque principal con `data-te-price`;
+- no inventes precios ni fechas. Usa únicamente el precio proporcionado y la fecha real de creación/actualización.
+
