@@ -151,7 +151,8 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
         Stop-Publish "El manifiesto todavía contiene campos REEMPLAZAR_. Completa la landing antes de publicar."
     }
 
-    $normalized | Set-Content -LiteralPath $ManifestPath -Encoding UTF8
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($ManifestPath, $normalized, $utf8NoBom)
     return $expectedUrl
 }
 
