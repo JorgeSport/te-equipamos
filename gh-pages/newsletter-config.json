@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "enabled": false,
+  "provider": "brevo",
+  "form_url": "",
+  "privacy_url": "https://jorgesport.github.io/te-equipamos/privacidad/",
+  "double_opt_in_required": true,
+  "placements": [
+    "hub_home",
+    "editorial"
+  ],
+  "excluded_sections": [
+    "Ventas"
+  ],
+  "interests": [
+    "Senderismo y trekking",
+    "Running",
+    "Ofertas y remates",
+    "Reviews y comparativas",
+    "Novedades generales"
+  ],
+  "copy": {
+    "eyebrow": "TE EQUIPAMOS",
+    "title": "Recibe las novedades que sí te interesan",
+    "text": "Nuevos productos, reviews, ofertas y consejos de Te Equipamos directamente en tu correo.",
+    "cta": "Quiero suscribirme"
+  }
+}
