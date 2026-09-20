@@ -1,5 +1,5 @@
 {
-  "template_version": "1.6",
+  "template_version": "1.7",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -108,5 +108,24 @@
     "updated_date_format": "YYYY-MM-DD",
     "auto_rendered_by": "https://jorgesport.github.io/te-equipamos/landing-core.js",
     "display_rule": "Mostrar de forma discreta inmediatamente debajo de cada bloque de precio."
+  },
+  "social_strategy": {
+    "title_source": "card_title",
+    "fallback_title_source": "title",
+    "description_source": "summary",
+    "fallback_description_source": "seo_description",
+    "image_source": "image",
+    "url_source": "url",
+    "automatic_metadata": [
+      "og:title",
+      "og:description",
+      "og:image",
+      "og:url",
+      "twitter:card",
+      "twitter:title",
+      "twitter:description",
+      "twitter:image"
+    ],
+    "rule": "Usar el enfoque estratégico y de curiosidad del Hub también al compartir la landing en redes sociales, sin clickbait ni datos inventados."
   }
 }
