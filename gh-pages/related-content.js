@@ -5,9 +5,27 @@ document.addEventListener('DOMContentLoaded', async function () {
   const PRODUCT_FAMILIES = {
     mochila: 'carga', bolso: 'carga', riñonera: 'carga',
     zapatillas: 'calzado', sandalias: 'calzado', botas: 'calzado',
-    chaqueta: 'ropa', camiseta: 'ropa', pantalon: 'ropa', short: 'ropa', legging: 'ropa',
+    chaqueta: 'ropa', camiseta: 'ropa', pantalon: 'ropa', pantalón: 'ropa', short: 'ropa', legging: 'ropa',
     sombrero: 'accesorios', gorra: 'accesorios', guantes: 'accesorios',
-    'editorial-running': 'calzado'
+    gafas: 'accesorios'
+  };
+  const PRODUCT_LABELS = {
+    mochila: 'mochilas',
+    bolso: 'bolsos',
+    riñonera: 'riñoneras',
+    zapatillas: 'zapatillas',
+    sandalias: 'sandalias',
+    botas: 'botas',
+    chaqueta: 'chaquetas',
+    camiseta: 'camisetas',
+    pantalon: 'pantalones',
+    pantalón: 'pantalones',
+    short: 'shorts',
+    legging: 'leggings',
+    sombrero: 'sombreros',
+    gorra: 'gorras',
+    guantes: 'guantes',
+    gafas: 'gafas'
   };
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -20,7 +38,20 @@ document.addEventListener('DOMContentLoaded', async function () {
   const intersects = (left, right) => [...left].filter(value => right.has(value));
   const publicSection = section => section === 'Ventas' ? 'Productos' : (section || 'Te Equipamos');
   const sectionUrl = section => BASE + '?section=' + encodeURIComponent(section || '');
-  const familyOf = item => PRODUCT_FAMILIES[normalize(item && item.product_type)] || normalize(item && item.product_type) || 'general';
+  const productTypeOf = item => normalize(item && item.product_type);
+  const typeKeyOf = item => {
+    const type = productTypeOf(item);
+    if (!type) return '';
+    const exact = Object.keys(PRODUCT_FAMILIES).find(key => type === key);
+    if (exact) return exact;
+    const partial = Object.keys(PRODUCT_FAMILIES).find(key => type.includes(key));
+    return partial || type;
+  };
+  const familyOf = item => {
+    const key = typeKeyOf(item);
+    return PRODUCT_FAMILIES[key] || key || 'general';
+  };
+  const productLabelOf = item => PRODUCT_LABELS[typeKeyOf(item)] || productTypeOf(item) || 'este tema';
   const imageOf = item => escapeHtml(item && item.image || '');
   const urlOf = item => escapeHtml(item && item.url || BASE);
   const titleOf = item => escapeHtml(item && (item.card_title || item.title) || 'Te Equipamos');
@@ -105,7 +136,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const currentTags = asSet(current && current.tags);
     const currentActivities = asSet(current && current.activities);
     const currentSections = asSet(current && current.sections);
-    const currentType = normalize(current && current.product_type);
+    const currentType = productTypeOf(current);
+    const currentTypeKey = typeKeyOf(current);
     const currentFamily = familyOf(current);
 
     const ranked = items
@@ -115,31 +147,51 @@ document.addEventListener('DOMContentLoaded', async function () {
         const sharedTags = intersects(itemTags, currentTags);
         const sharedActivities = intersects(asSet(item.activities), currentActivities);
         const sharedSections = intersects(asSet(item.sections), currentSections);
-        const itemType = normalize(item.product_type);
-        const exactTypeScore = currentType && itemType === currentType ? 60 : 0;
-        const familyScore = currentFamily !== 'general' && familyOf(item) === currentFamily && itemType !== currentType ? 30 : 0;
+        const itemType = productTypeOf(item);
+        const itemTypeKey = typeKeyOf(item);
+        const exactType = Boolean(currentTypeKey && itemTypeKey && itemTypeKey === currentTypeKey);
+        const sameFamily = Boolean(!exactType && currentFamily !== 'general' && familyOf(item) === currentFamily);
+        const specificTags = sharedTags.filter(tag => !GENERIC_TAGS.has(tag) && !BRAND_TAGS.has(tag));
+        const contextual = Boolean(sharedActivities.length || specificTags.length);
         const activityScore = Math.min(sharedActivities.length, 2) * 8;
-        const specificTagScore = sharedTags.filter(tag => !GENERIC_TAGS.has(tag) && !BRAND_TAGS.has(tag)).length * 6;
+        const specificTagScore = specificTags.length * 6;
         const genericTagScore = sharedTags.filter(tag => GENERIC_TAGS.has(tag)).length * 2;
         const brandScore = sharedTags.filter(tag => BRAND_TAGS.has(tag)).length * 2;
         const sectionScore = sharedSections.length ? 3 : 0;
         const editorialScore = Number(item.score || 0) / 100;
-        return { item, score: exactTypeScore + familyScore + activityScore + specificTagScore + genericTagScore + brandScore + sectionScore + editorialScore };
+        const score = (exactType ? 60 : 0) + (sameFamily ? 30 : 0) + activityScore + specificTagScore + genericTagScore + brandScore + sectionScore + editorialScore;
+        const tier = exactType ? 1 : sameFamily ? 2 : contextual ? 3 : 4;
+        return { item, score, tier, itemType };
       })
-      .sort((left, right) => right.score - left.score || Number(right.item.score || 0) - Number(left.item.score || 0));
+      .sort((left, right) => left.tier - right.tier || right.score - left.score || Number(right.item.score || 0) - Number(left.item.score || 0));
 
-    const related = ranked.slice(0, 8).map(entry => entry.item);
-    if (!related.length) return;
+    const exactRows = ranked.filter(entry => entry.tier === 1).map(entry => entry.item);
+    const familyRows = ranked.filter(entry => entry.tier === 2).map(entry => entry.item);
+    const contextRows = ranked.filter(entry => entry.tier === 3).map(entry => entry.item);
+    const discoveryRows = ranked.filter(entry => entry.tier === 4).map(entry => entry.item);
+
+    const primaryRows = exactRows.length
+      ? exactRows.slice(0, 4)
+      : familyRows.length
+        ? familyRows.slice(0, 4)
+        : contextRows.slice(0, 4);
+
+    const primaryUrls = new Set(primaryRows.map(item => normalizeUrl(item.url)));
+    const secondaryRows = [...exactRows, ...familyRows, ...contextRows, ...discoveryRows]
+      .filter(item => !primaryUrls.has(normalizeUrl(item.url)))
+      .slice(0, 4);
+
+    if (!primaryRows.length && !secondaryRows.length) return;
     const moduleHeader = (eyebrow, title) => `<div class="te-rel-module-head"><span>${escapeHtml(eyebrow)}</span><h3>${escapeHtml(title)}</h3></div>`;
 
-    function zigzag(rows) {
+    function zigzag(rows, eyebrow = 'SELECCIÓN RELACIONADA', title = 'Más para descubrir') {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-zigzag">${moduleHeader('SELECCIÓN RELACIONADA', 'Más para descubrir')}<div class="te-rel-zigzag-list">${rows.slice(0, 4).map((item, index) => `<a class="te-rel-zigzag-row${index % 2 ? ' is-reverse' : ''}" href="${urlOf(item)}">${imageMarkup(item, 'te-rel-zigzag-image')}<div class="te-rel-zigzag-copy"><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-zigzag">${moduleHeader(eyebrow, title)}<div class="te-rel-zigzag-list">${rows.slice(0, 4).map((item, index) => `<a class="te-rel-zigzag-row${index % 2 ? ' is-reverse' : ''}" href="${urlOf(item)}">${imageMarkup(item, 'te-rel-zigzag-image')}<div class="te-rel-zigzag-copy"><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
-    function bordered(rows) {
+    function bordered(rows, eyebrow = 'CONTENIDO ELEGIDO', title = 'También te puede interesar') {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-bordered">${moduleHeader('CONTENIDO ELEGIDO', 'También te puede interesar')}<div class="te-rel-bordered-grid">${rows.slice(0, 3).map(item => {
+      return `<section class="te-rel-module te-rel-bordered">${moduleHeader(eyebrow, title)}<div class="te-rel-bordered-grid">${rows.slice(0, 3).map(item => {
         const sections = asSet(item.sections);
         const isOffer = sections.has('ofertas') || normalize(item.category) === 'ofertas' || normalize(item.kind) === 'offer';
         const label = isOffer ? 'OFERTA' : sections.has('reviews') ? 'REVIEW' : metaOf(item);
@@ -147,33 +199,58 @@ document.addEventListener('DOMContentLoaded', async function () {
       }).join('')}</div></section>`;
     }
 
-    function bento(rows) {
+    function bento(rows, eyebrow = 'DESTACADO', title = 'Una lectura para continuar') {
       const main = rows[0];
       if (!main) return '';
-      return `<section class="te-rel-module te-rel-bento">${moduleHeader('DESTACADO', 'Una lectura para continuar')}<a class="te-rel-bento-main" href="${urlOf(main)}">${imageMarkup(main, 'te-rel-bento-main-image')}<span class="te-rel-bento-shade" aria-hidden="true"></span><div><small>${metaOf(main)}</small>${freshBadge(main)}<strong>${titleOf(main)}</strong><span>Ver contenido →</span></div></a><div class="te-rel-bento-compact">${rows.slice(1, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-bento-thumb')}<div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-bento">${moduleHeader(eyebrow, title)}<a class="te-rel-bento-main" href="${urlOf(main)}">${imageMarkup(main, 'te-rel-bento-main-image')}<span class="te-rel-bento-shade" aria-hidden="true"></span><div><small>${metaOf(main)}</small>${freshBadge(main)}<strong>${titleOf(main)}</strong><span>Ver contenido →</span></div></a><div class="te-rel-bento-compact">${rows.slice(1, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-bento-thumb')}<div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
-    function frameless(rows) {
+    function frameless(rows, eyebrow = 'LECTURA EDITORIAL', title = 'Historias que amplían el tema') {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-frameless">${moduleHeader('LECTURA EDITORIAL', 'Historias que amplían el tema')}<div class="te-rel-frameless-grid">${rows.slice(0, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-frameless-image')}<div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p><b aria-hidden="true">→</b></div></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-frameless">${moduleHeader(eyebrow, title)}<div class="te-rel-frameless-grid">${rows.slice(0, 3).map(item => `<a href="${urlOf(item)}">${imageMarkup(item, 'te-rel-frameless-image')}<div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong><p>${summaryOf(item)}</p><b aria-hidden="true">→</b></div></a>`).join('')}</div></section>`;
     }
 
-    function ranking(rows) {
+    function ranking(rows, eyebrow = 'SELECCIÓN TE EQUIPAMOS', title = 'Para seguir leyendo') {
       if (!rows.length) return '';
-      return `<section class="te-rel-module te-rel-ranking">${moduleHeader('SELECCIÓN TE EQUIPAMOS', 'Para seguir leyendo')}<div class="te-rel-ranking-list">${rows.slice(0, 3).map((item, index) => `<a href="${urlOf(item)}"><span>${String(index + 1).padStart(2, '0')}</span><div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
+      return `<section class="te-rel-module te-rel-ranking">${moduleHeader(eyebrow, title)}<div class="te-rel-ranking-list">${rows.slice(0, 3).map((item, index) => `<a href="${urlOf(item)}"><span>${String(index + 1).padStart(2, '0')}</span><div><small>${metaOf(item)}</small>${freshBadge(item)}<strong>${titleOf(item)}</strong></div><b aria-hidden="true">→</b></a>`).join('')}</div></section>`;
     }
 
     const primarySection = normalize(asArray(current && current.sections)[0] || current && current.category);
-    const primaryRows = related.slice(0, 4);
-    const secondaryRows = related.slice(4, 8).length ? related.slice(4, 8) : related.slice(0, 4);
+    const label = productLabelOf(current);
+    const primaryEyebrow = exactRows.length ? 'MISMA CATEGORÍA' : familyRows.length ? 'MISMA FAMILIA' : 'RELACIONADO CON ESTE TEMA';
+    const primaryTitle = exactRows.length ? `Más sobre ${label}` : familyRows.length ? 'Productos de la misma familia' : 'Contenido relacionado';
+    const secondaryEyebrow = 'TAMBIÉN TE PUEDE INTERESAR';
+    const secondaryTitle = 'Más opciones para seguir explorando';
+
     let modules;
-    if (primarySection === 'reviews') modules = [bento(primaryRows), ranking(secondaryRows)];
-    else if (primarySection === 'ventas') modules = [zigzag(primaryRows), bordered(secondaryRows)];
-    else if (primarySection === 'ofertas') modules = [bordered(primaryRows), zigzag(secondaryRows)];
-    else if (primarySection === 'consejos') modules = [frameless(primaryRows), ranking(secondaryRows)];
-    else if (primarySection === 'novedades') modules = [frameless(primaryRows), zigzag(secondaryRows)];
-    else if (primarySection === 'vídeos' || primarySection === 'videos') modules = [bento(primaryRows), frameless(secondaryRows)];
-    else modules = [zigzag(primaryRows), ranking(secondaryRows)];
+    if (primarySection === 'reviews') modules = [
+      bento(primaryRows, primaryEyebrow, primaryTitle),
+      ranking(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
+    else if (primarySection === 'ventas') modules = [
+      zigzag(primaryRows, primaryEyebrow, primaryTitle),
+      bordered(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
+    else if (primarySection === 'ofertas') modules = [
+      bordered(primaryRows, primaryEyebrow, primaryTitle),
+      zigzag(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
+    else if (primarySection === 'consejos') modules = [
+      frameless(primaryRows, primaryEyebrow, primaryTitle),
+      ranking(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
+    else if (primarySection === 'novedades') modules = [
+      frameless(primaryRows, primaryEyebrow, primaryTitle),
+      zigzag(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
+    else if (primarySection === 'vídeos' || primarySection === 'videos') modules = [
+      bento(primaryRows, primaryEyebrow, primaryTitle),
+      frameless(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
+    else modules = [
+      zigzag(primaryRows, primaryEyebrow, primaryTitle),
+      ranking(secondaryRows, secondaryEyebrow, secondaryTitle)
+    ];
 
     const block = document.createElement('section');
     block.className = 'te-related';
