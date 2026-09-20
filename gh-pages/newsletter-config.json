@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "enabled": false,
+  "enabled": true,
   "provider": "brevo",
   "form_url": "https://2660a6b8.sibforms.com/serve/MUIFAKk1vxIQ-Zp87WZ5sPA9PrSQ4A1sE8OZL2z3uGrY0EZzDGwjVYVfoQZtJtpPtO3gvPH7jIfwzFbsTcWFyWkqyKvlcbCjrEVtRkUnscnK15NzWhYTw9ziz_qYkmgyxBMzhFfu5WJCWUfuvkGHyJqR_m_2h4QGiq56c7Bxw5dwmCvQJ9cuEstieR1g4i9T_3MlFTzOMdriDd9ElA==",
   "privacy_url": "https://jorgesport.github.io/te-equipamos/privacidad/",
@@ -25,6 +25,7 @@
     "text": "Nuevos productos, reviews, ofertas y consejos de Te Equipamos directamente en tu correo.",
     "cta": "Quiero suscribirme"
   },
-  "status": "configured_pending_antispam",
-  "updated_at": "2026-09-20"
+  "status": "active",
+  "updated_at": "2026-09-20",
+  "activated_at": "2026-09-20"
 }
