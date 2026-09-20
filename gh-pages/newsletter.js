@@ -44,15 +44,26 @@
     const section=document.createElement('section');
     section.className='te-newsletter';
     section.dataset.teNewsletter='true';
+    const chips=Array.isArray(copy.chips)?copy.chips.slice(0,4):['Ofertas','Reviews','Consejos'];
     section.innerHTML=`
       <div class="te-newsletter__card">
-        <div>
+        <div class="te-newsletter__content">
           <span class="te-newsletter__eyebrow">${escapeHtml(copy.eyebrow||'TE EQUIPAMOS')}</span>
-          <h2>${escapeHtml(copy.title||'Recibe las novedades de Te Equipamos')}</h2>
-          <p>${escapeHtml(copy.text||'Nuevos productos, reviews, ofertas y consejos directamente en tu correo.')}</p>
-          <small class="te-newsletter__legal">Suscripción con confirmación por email. Puedes darte de baja cuando quieras. <a href="${escapeHtml(config.privacy_url||'#')}">Privacidad</a>.</small>
+          <h2>${escapeHtml(copy.title||'Lo nuevo de Te Equipamos, directo a tu correo')}</h2>
+          <p>${escapeHtml(copy.text||'Nuevos productos, reviews, ofertas y consejos seleccionados para seguir disfrutando del outdoor.')}</p>
+          <div class="te-newsletter__chips" aria-label="Contenido de la suscripción">
+            ${chips.map(chip=>`<span class="te-newsletter__chip">${escapeHtml(chip)}</span>`).join('')}
+          </div>
+          <small class="te-newsletter__legal">Suscripción con doble confirmación. Puedes darte de baja cuando quieras. <a href="${escapeHtml(config.privacy_url||'#')}">Privacidad</a>.</small>
         </div>
-        <a class="te-newsletter__cta" href="${escapeHtml(config.form_url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHtml(copy.cta||'Quiero suscribirme')}</a>
+        <div class="te-newsletter__action">
+          <span class="te-newsletter__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 6.5h16v11H4z"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>
+          </span>
+          <strong>${escapeHtml(copy.action_title||'Recibe solo lo que merece la pena abrir.')}</strong>
+          <a class="te-newsletter__cta" href="${escapeHtml(config.form_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.cta||'Quiero suscribirme')}</a>
+          <span class="te-newsletter__trust">Doble confirmación · reCAPTCHA · Baja cuando quieras</span>
+        </div>
       </div>`;
 
     const footer=document.querySelector('footer');
