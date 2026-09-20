@@ -298,6 +298,21 @@ Mercado:
 PERÚ
 
 
+## REGLA SOCIAL ESTRATÉGICA
+
+Cuando la landing se comparta en redes sociales, el título de la vista previa no debe limitarse al nombre del producto ni al `seo_title`.
+
+Usa automáticamente:
+
+- `card_title` como `og:title` y `twitter:title`;
+- `summary` como `og:description` y `twitter:description`;
+- `image` como `og:image` y `twitter:image`;
+- `url` como `og:url`.
+
+El objetivo es que el enlace compartido conserve el mismo enfoque estratégico del Hub: curiosidad, beneficio, contraste, pregunta útil o dato concreto que invite a abrir la landing, sin clickbait ni afirmaciones inventadas.
+
+El Publicador Te Equipamos normaliza estos metadatos antes de publicar. No crees un segundo título social independiente si `card_title` ya cumple esta función.
+
 ## PRECIOS · REGLA GLOBAL TE SYSTEM
 
 Siempre que la landing muestre un precio real:
