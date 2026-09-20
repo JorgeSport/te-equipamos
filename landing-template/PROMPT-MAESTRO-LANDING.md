@@ -298,6 +298,28 @@ Mercado:
 PERÚ
 
 
+## REGLA DE CONTENIDO RELACIONADO
+
+El campo `product_type` es obligatorio y debe describir **el producto o categoría principal sobre la que trata el contenido**, no el formato editorial.
+
+Ejemplos correctos:
+
+- editorial sobre sandalias → `"product_type": "sandalias"`
+- review de una mochila → `"product_type": "mochila"`
+- oferta de zapatillas → `"product_type": "zapatillas"`
+- artículo sobre chaquetas → `"product_type": "chaqueta"`
+
+No uses valores como `editorial-running`, `review-producto` o `noticia-outdoor` cuando el contenido trate claramente de una categoría de producto. El formato del contenido ya se expresa mediante `type` y `sections`.
+
+El Hub usa `product_type` para ordenar automáticamente los contenidos relacionados con esta prioridad:
+
+1. misma categoría de producto;
+2. misma familia de producto;
+3. mismas actividades o etiquetas específicas;
+4. otros contenidos de descubrimiento.
+
+Así, un contenido sobre sandalias debe mostrar primero otros contenidos de sandalias; una mochila debe priorizar mochilas; una chaqueta debe priorizar chaquetas. Después se completan las recomendaciones con productos y contenidos relacionados por uso o actividad.
+
 ## REGLA SOCIAL ESTRATÉGICA
 
 Cuando la landing se comparta en redes sociales, el título de la vista previa no debe limitarse al nombre del producto ni al `seo_title`.
