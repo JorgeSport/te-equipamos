@@ -1,5 +1,5 @@
 {
-  "template_version": "1.7",
+  "template_version": "1.8",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -127,5 +127,26 @@
       "twitter:image"
     ],
     "rule": "Usar el enfoque estratégico y de curiosidad del Hub también al compartir la landing en redes sociales, sin clickbait ni datos inventados."
+  },
+  "related_content_strategy": {
+    "product_type_required": true,
+    "product_type_semantics": "Debe describir la categoría principal del producto tratado por el contenido, no el formato editorial.",
+    "content_format_fields": [
+      "type",
+      "sections"
+    ],
+    "priority": [
+      "same_product_type",
+      "same_product_family",
+      "shared_activities_or_specific_tags",
+      "discovery_content"
+    ],
+    "examples": {
+      "editorial sobre sandalias": "sandalias",
+      "review de mochila": "mochila",
+      "oferta de zapatillas": "zapatillas",
+      "artículo sobre chaquetas": "chaqueta"
+    },
+    "renderer": "https://jorgesport.github.io/te-equipamos/related-content.js"
   }
 }
