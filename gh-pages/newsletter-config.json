@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "enabled": true,
   "provider": "brevo",
   "form_url": "https://2660a6b8.sibforms.com/serve/MUIFAKk1vxIQ-Zp87WZ5sPA9PrSQ4A1sE8OZL2z3uGrY0EZzDGwjVYVfoQZtJtpPtO3gvPH7jIfwzFbsTcWFyWkqyKvlcbCjrEVtRkUnscnK15NzWhYTw9ziz_qYkmgyxBMzhFfu5WJCWUfuvkGHyJqR_m_2h4QGiq56c7Bxw5dwmCvQJ9cuEstieR1g4i9T_3MlFTzOMdriDd9ElA==",
-  "privacy_url": "https://jorgesport.github.io/te-equipamos/privacidad/",
+  "privacy_url": "https://jorgesport.github.io/te-equipamos/news/privacidad/",
   "double_opt_in_required": true,
   "placements": [
     "hub_home",
@@ -20,9 +20,16 @@
     "Novedades generales"
   ],
   "copy": {
-    "eyebrow": "TE EQUIPAMOS",
-    "title": "Recibe las novedades que sí te interesan",
-    "text": "Nuevos productos, reviews, ofertas y consejos de Te Equipamos directamente en tu correo.",
+    "eyebrow": "NOVEDADES TE EQUIPAMOS",
+    "title": "Lo nuevo de Te Equipamos, directo a tu correo",
+    "text": "Nuevos productos, reviews, ofertas y consejos seleccionados para seguir disfrutando del outdoor.",
+    "chips": [
+      "Ofertas",
+      "Reviews",
+      "Consejos",
+      "Nuevos productos"
+    ],
+    "action_title": "Recibe solo lo que merece la pena abrir.",
     "cta": "Quiero suscribirme"
   },
   "status": "active",
