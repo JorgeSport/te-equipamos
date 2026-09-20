@@ -184,6 +184,35 @@ jobs:
       - name: Convertir el Hub en la portada oficial de Te Equipamos
         run: python gh-pages/news/promote-hub-to-root.py
 
+      - name: Instalar newsletter Te Equipamos
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path('gh-pages')
+          css = '<link rel="stylesheet" href="/te-equipamos/newsletter.css" data-te-newsletter-style>'
+          js = '<script defer src="/te-equipamos/newsletter.js" data-te-newsletter-loader></script>'
+          count = 0
+
+          for page in root.rglob('*.html'):
+              html = page.read_text(encoding='utf-8')
+              changed = False
+
+              if 'data-te-newsletter-style' not in html and '</head>' in html:
+                  html = html.replace('</head>', css + '\n</head>', 1)
+                  changed = True
+
+              if 'data-te-newsletter-loader' not in html and '</body>' in html:
+                  html = html.replace('</body>', js + '\n</body>', 1)
+                  changed = True
+
+              if changed:
+                  page.write_text(html, encoding='utf-8')
+                  count += 1
+
+          print(f'Newsletter preparado en {count} páginas. Visible solo cuando newsletter-config.json esté activado.')
+          PY
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
