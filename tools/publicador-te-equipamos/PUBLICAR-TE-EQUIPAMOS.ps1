@@ -9,7 +9,7 @@ param(
     [string]$HubRepo = "JorgeSport/te-equipamos"
 )
 
-$PublisherVersion = "2026.09.20.2"
+$PublisherVersion = "2026.09.20.3"
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -188,6 +188,87 @@ function Test-StrategicManifest([string]$ManifestPath, [string]$ExpectedRepoName
     return $expectedUrl
 }
 
+function Normalize-SocialStrategy([string]$HtmlPath, [string]$ManifestPath) {
+    $html = Get-Content -LiteralPath $HtmlPath -Raw -Encoding UTF8
+    $manifestRaw = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8
+
+    try {
+        $manifest = $manifestRaw | ConvertFrom-Json
+    }
+    catch {
+        Stop-Publish "No pude leer te-equipamos.json para preparar los metadatos sociales."
+    }
+
+    $item = @((Get-JsonPropertyValue $manifest "items"))[0]
+    if ($null -eq $item) {
+        Stop-Publish "No hay un item valido para preparar los metadatos sociales."
+    }
+
+    $cardTitle = [string](Get-JsonPropertyValue $item "card_title")
+    $fallbackTitle = [string](Get-JsonPropertyValue $item "title")
+    $summary = [string](Get-JsonPropertyValue $item "summary")
+    $image = [string](Get-JsonPropertyValue $item "image")
+    $url = [string](Get-JsonPropertyValue $item "url")
+
+    $socialTitle = $cardTitle.Trim()
+    if ([string]::IsNullOrWhiteSpace($socialTitle)) {
+        $socialTitle = $fallbackTitle.Trim()
+    }
+    if ([string]::IsNullOrWhiteSpace($socialTitle)) {
+        Stop-Publish "No existe un titulo estrategico para redes sociales."
+    }
+
+    $socialDescription = $summary.Trim()
+    if ([string]::IsNullOrWhiteSpace($socialDescription)) {
+        $socialDescription = [string](Get-JsonPropertyValue $item "seo_description")
+        $socialDescription = $socialDescription.Trim()
+    }
+
+    $encodedTitle = [System.Net.WebUtility]::HtmlEncode($socialTitle)
+    $encodedDescription = [System.Net.WebUtility]::HtmlEncode($socialDescription)
+    $encodedImage = [System.Net.WebUtility]::HtmlEncode($image.Trim())
+    $encodedUrl = [System.Net.WebUtility]::HtmlEncode($url.Trim())
+
+    function Set-MetaProperty([string]$Source, [string]$Property, [string]$Value) {
+        if ([string]::IsNullOrWhiteSpace($Value)) { return $Source }
+        $pattern = '<meta\s+property=["'']' + [regex]::Escape($Property) + '["''][^>]*>'
+        $replacement = '<meta property="' + $Property + '" content="' + $Value + '">'
+        if ([regex]::IsMatch($Source, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) {
+            return [regex]::Replace($Source, $pattern, $replacement, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+        }
+        return $Source -replace '</head>', ("  " + $replacement + [Environment]::NewLine + "</head>")
+    }
+
+    function Set-MetaName([string]$Source, [string]$Name, [string]$Value) {
+        if ([string]::IsNullOrWhiteSpace($Value)) { return $Source }
+        $pattern = '<meta\s+name=["'']' + [regex]::Escape($Name) + '["''][^>]*>'
+        $replacement = '<meta name="' + $Name + '" content="' + $Value + '">'
+        if ([regex]::IsMatch($Source, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)) {
+            return [regex]::Replace($Source, $pattern, $replacement, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+        }
+        return $Source -replace '</head>', ("  " + $replacement + [Environment]::NewLine + "</head>")
+    }
+
+    $html = Set-MetaProperty $html "og:title" $encodedTitle
+    $html = Set-MetaProperty $html "og:description" $encodedDescription
+    if (-not [string]::IsNullOrWhiteSpace($encodedImage)) {
+        $html = Set-MetaProperty $html "og:image" $encodedImage
+    }
+    if (-not [string]::IsNullOrWhiteSpace($encodedUrl)) {
+        $html = Set-MetaProperty $html "og:url" $encodedUrl
+    }
+
+    $html = Set-MetaName $html "twitter:card" "summary_large_image"
+    $html = Set-MetaName $html "twitter:title" $encodedTitle
+    $html = Set-MetaName $html "twitter:description" $encodedDescription
+    if (-not [string]::IsNullOrWhiteSpace($encodedImage)) {
+        $html = Set-MetaName $html "twitter:image" $encodedImage
+    }
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($HtmlPath, $html, $utf8NoBom)
+}
+
 function Normalize-PriceSystem([string]$HtmlPath) {
     $html = Get-Content -LiteralPath $HtmlPath -Raw -Encoding UTF8
 
@@ -359,6 +440,10 @@ try {
     Write-Step "Validando titulo, subtitulo, SEO y esquema del Hub"
     $siteUrl = Test-StrategicManifest $manifestPath $RepoName
     Write-Ok "Manifiesto schema 3 correcto"
+
+    Write-Step "Preparando titulo estrategico para redes sociales"
+    Normalize-SocialStrategy (Join-Path $projectRoot "index.html") $manifestPath
+    Write-Ok "Open Graph y Twitter usan el titulo estrategico del Hub"
 
     $fullRepo = "$Owner/$RepoName"
     $repoExists = Invoke-QuietExitCode { & gh repo view $fullRepo --json nameWithOwner }
