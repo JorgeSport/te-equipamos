@@ -178,3 +178,19 @@ El núcleo compartido `landing-core.js` añade automáticamente debajo del preci
 **Precio referencial sujeto a cambios y disponibilidad. Confirma el precio final antes de realizar tu compra.**
 
 También muestra la fecha de actualización del precio cuando está disponible. El publicador normaliza esa fecha al día de publicación y detiene la publicación si una landing con precio no está integrada correctamente con este sistema.
+
+
+## Contenido relacionado por producto
+
+El Hub prioriza automáticamente los contenidos relacionados usando `product_type`.
+
+Orden de prioridad:
+
+1. misma categoría de producto;
+2. misma familia de producto;
+3. actividades o etiquetas específicas compartidas;
+4. otros contenidos de descubrimiento.
+
+Por eso, `product_type` debe describir el producto del que trata el contenido, no el formato editorial. Ejemplo: un editorial sobre sandalias usa `"product_type": "sandalias"`; el hecho de que sea editorial se expresa mediante `type` y `sections`.
+
+El publicador valida esta regla antes de crear una nueva landing.
