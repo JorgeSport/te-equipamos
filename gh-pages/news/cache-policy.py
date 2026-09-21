@@ -16,10 +16,14 @@ html = html.replace('<meta property="og:image:type" content="image/png">', '<met
 html = html.replace('<meta property="og:image:width" content="1200">', '<meta property="og:image:width" content="600">')
 html = html.replace('<meta property="og:image:height" content="630">', '<meta property="og:image:height" content="315">')
 
-if f'<meta property="og:image" content="{social_image}">' not in html:
-    raise RuntimeError('La nueva imagen social oficial no quedó conectada a og:image')
-if f'<meta name="twitter:image" content="{social_image}">' not in html:
-    raise RuntimeError('La nueva imagen social oficial no quedó conectada a twitter:image')
+if '<meta property="og:image"' in html:
+    html = re.sub(r'<meta property="og:image" content="[^"]*">', f'<meta property="og:image" content="{social_image}">', html, count=1)
+else:
+    html = html.replace('</head>', f'<meta property="og:image" content="{social_image}"></head>', 1)
+if '<meta name="twitter:image"' in html:
+    html = re.sub(r'<meta name="twitter:image" content="[^"]*">', f'<meta name="twitter:image" content="{social_image}">', html, count=1)
+else:
+    html = html.replace('</head>', f'<meta name="twitter:image" content="{social_image}"></head>', 1)
 
 # "Sigue explorando" se gestiona exclusivamente desde add-section-journeys.py.
 # Si existe una capa antigua de override responsive de despliegues anteriores,
