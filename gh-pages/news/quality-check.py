@@ -10,6 +10,7 @@ restore_script = base / 'restore-desktop-card-images.py'
 legacy_repositories_file = base / 'seo-legacy-repositories.json'
 errors, warnings = [], []
 OFFICIAL_URL = 'https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/'
+PUBLIC_HUB_URL = 'https://jorgesport.github.io/te-equipamos/'
 
 if not index.exists(): errors.append('Falta gh-pages/news/index.html')
 if not data_file.exists(): errors.append('Falta gh-pages/news/news-data.json')
@@ -63,8 +64,9 @@ if 'Te Equipamos News' in html:
     errors.append('Sigue apareciendo la identidad antigua Te Equipamos News')
 if '<small>Noticias</small>' in html or '← Volver a noticias' in html:
     errors.append('Sigue apareciendo Noticias en la identidad o navegación principal')
+if f'href="{PUBLIC_HUB_URL}" class="brand"' not in html and f'href="{OFFICIAL_URL}" class="brand"' not in html:
+    errors.append('La marca principal no enlaza a un Hub válido de Te Equipamos')
 for marker in [
-    f'href="{OFFICIAL_URL}" class="brand"',
     f'<link rel="canonical" href="{OFFICIAL_URL}">',
     '<meta property="og:type" content="website">',
     '<meta property="og:site_name" content="Te Equipamos">',
