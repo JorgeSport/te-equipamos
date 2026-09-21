@@ -34,10 +34,8 @@ product_index.write_text(f'''<!doctype html>
 <meta name="robots" content="noindex,follow">
 <link rel="canonical" href="{PRODUCT_TARGET}">
 <title>Arpenaz 100 27 L · Te Equipamos</title></head>
-<body><p>Comprobando la nueva dirección… <a href="{PRODUCT_TARGET}">Abrir producto</a>.</p>
-<script>fetch('https://api.github.com/repos/JorgeSport/{PRODUCT_REPOSITORY}',{{cache:'no-store'}})
-.then(r=>location.replace(r.status===404?'{BASE}':'{PRODUCT_TARGET}'+location.search+location.hash))
-.catch(()=>location.replace('{PRODUCT_TARGET}'+location.search+location.hash));</script>
+<body><p>Te estamos llevando al producto… <a href="{PRODUCT_TARGET}">Abrir producto</a>.</p>
+<script>location.replace('{PRODUCT_TARGET}'+location.search+location.hash);</script>
 </body></html>''', encoding="utf-8")
 
 # 2) Promueve el Hub generado a la raíz sin mover sus assets. Los CSS/JS
@@ -80,7 +78,7 @@ if sitemap.exists():
         if parsed.netloc.lower() != "jorgesport.github.io":
             continue
         path = parsed.path
-        for public_prefix in ("/te-equipamos/", "/te-equipamos-arpenaz-27l/"):
+        for public_prefix in ("/te-equipamos/",):
             if path.startswith(public_prefix):
                 path = path[len(public_prefix):]
                 break

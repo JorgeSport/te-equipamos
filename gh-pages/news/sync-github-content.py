@@ -18,7 +18,7 @@ OWNER = "JorgeSport"
 MANIFEST = "te-equipamos.json"
 
 HEADERS = {
-    "User-Agent": "TeEquipamosHub/3.0 (+https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/)"
+    "User-Agent": "TeEquipamosHub/4.0 (+https://jorgesport.github.io/te-equipamos/)"
 }
 
 TYPE_TO_SECTION = {
@@ -292,6 +292,67 @@ def normalize_item(raw: dict, repo_name: str) -> dict | None:
     }
 
 
+
+def discover_local_published_pages() -> list[dict]:
+    """Descubre landings ya publicadas dentro de gh-pages como respaldo local.
+
+    Esto evita que el Hub quede vacío si GitHub limita temporalmente la API o
+    si un repositorio externo todavía no expone su manifiesto.
+    """
+    published_root = BASE.parent
+    ignored = {"news", "read", "studio", "kalenji", "arpenaz-100-27l"}
+    items = []
+    for page in sorted(published_root.glob("*/index.html")):
+        folder = page.parent.name
+        if folder in ignored:
+            continue
+        try:
+            html = page.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+
+        title_match = re.search(r"<title>(.*?)</title>", html, flags=re.I | re.S)
+        title = clean(re.sub(r"<[^>]+>", " ", title_match.group(1))) if title_match else folder.replace("-", " ").title()
+        title = re.sub(r"\s*[|·—-]\s*Te Equipamos.*$", "", title, flags=re.I).strip() or title
+
+        desc_match = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']*)', html, flags=re.I)
+        if not desc_match:
+            desc_match = re.search(r'<meta[^>]+content=["\']([^"\']*)["\'][^>]+name=["\']description["\']', html, flags=re.I)
+        summary = unescape(desc_match.group(1)).strip() if desc_match else f"Contenido propio de Te Equipamos sobre {title}."
+
+        image = ""
+        for pattern in [
+            r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)',
+            r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']',
+        ]:
+            match = re.search(pattern, html, flags=re.I)
+            if match:
+                image = unescape(match.group(1)).strip()
+                break
+
+        inferred_type = "review" if "review" in plain(title + " " + folder) else "sale"
+        raw = {
+            "title": title,
+            "summary": summary,
+            "details": summary,
+            "url": f"https://jorgesport.github.io/te-equipamos/{folder}/",
+            "image": image,
+            "type": inferred_type,
+            "activities": infer_activities({"title": title, "summary": summary, "tags": []}),
+            "product_type": infer_product_type({"title": title, "summary": summary, "tags": []}),
+            "source": "Te Equipamos",
+            "direct": True,
+            "active": True,
+            "score": 82,
+        }
+        if not raw["activities"]:
+            raw["activities"] = ["senderismo"]
+        item = normalize_item(raw, "te-equipamos")
+        if item:
+            items.append(item)
+    return items
+
+
 def deduplicate(items: list[dict]) -> list[dict]:
     by_url: dict[str, dict] = {}
     for item in items:
@@ -342,6 +403,9 @@ def main() -> None:
                     collected.append(item)
         except Exception as exc:
             errors.append(f"Manifiesto local: {exc}")
+
+    # Respaldo local: las landings ya presentes en gh-pages siempre alimentan el Hub.
+    collected.extend(discover_local_published_pages())
 
     for repo in repos:
         name = repo.get("name", "")

@@ -1,5 +1,184 @@
 {
   "brand": "Te Equipamos",
   "schema_version": 2,
-  "items": []
+  "items": [
+    {
+      "id": 1001,
+      "title": "Quechua Arpenaz 100 20L: review, colores y precio",
+      "summary": "Descubre la Quechua Arpenaz 100 20L: 440 g, 5 bolsillos, espacio para portátil de 15 pulgadas, cinco colores y precio Te Equipamos.",
+      "details": "Descubre la Quechua Arpenaz 100 20L: 440 g, 5 bolsillos, espacio para portátil de 15 pulgadas, cinco colores y precio Te Equipamos.",
+      "url": "https://jorgesport.github.io/te-equipamos/arpenaz-100-20l-marron/",
+      "image": "https://contents.mediadecathlon.com/p3079427/k$932e8f52b1a88c465fd76e18dbcc36b5/picture.jpg?f=1600x0&format=auto",
+      "type": "review",
+      "activities": [
+        "senderismo",
+        "travel"
+      ],
+      "product_type": "mochila",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 95
+    },
+    {
+      "id": 1002,
+      "title": "Quechua Arpenaz 500: review, opinión y oferta",
+      "summary": "Review experto de las Quechua Arpenaz 500: comodidad EVA, piel, tacos de 4 mm, agarre para senderos y una oferta que merece la pena conocer.",
+      "details": "Review experto de las Quechua Arpenaz 500: comodidad EVA, piel, tacos de 4 mm, agarre para senderos y una oferta que merece la pena conocer.",
+      "url": "https://jorgesport.github.io/te-equipamos/arpenaz-500-review/",
+      "image": "https://contents.mediadecathlon.com/p3017101/k$93805943e2c99c1d35e764c266909253/picture.jpg?f=2000x0&format=auto",
+      "type": "review",
+      "activities": [
+        "senderismo"
+      ],
+      "product_type": "zapatillas",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 94
+    },
+    {
+      "id": 1003,
+      "title": "Mochila Quechua Escape 500 Rolltop 16+4 L",
+      "summary": "Quechua Escape 500 Rolltop: mochila versátil para ciudad y senderismo, ampliable de 16 a 20 L, cómoda, organizada y disponible en 5 colores.",
+      "details": "Quechua Escape 500 Rolltop: mochila versátil para ciudad y senderismo, ampliable de 16 a 20 L, cómoda, organizada y disponible en 5 colores.",
+      "url": "https://jorgesport.github.io/te-equipamos/escape-500-rolltop/",
+      "image": "https://contents.mediadecathlon.com/p2837420/k$9430319d89fd80437197189b51ea37bc/picture.jpg?f=1800x0&format=auto",
+      "type": "sale",
+      "activities": [
+        "senderismo",
+        "urbano",
+        "travel"
+      ],
+      "product_type": "mochila",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 93
+    },
+    {
+      "id": 1004,
+      "title": "Mochila plegable Forclaz Compact 10L",
+      "summary": "Forclaz Compact 10L: mochila auxiliar plegable de 45 g para viajes y trekking. 10 L, ultraligera y compacta.",
+      "details": "Forclaz Compact 10L: mochila auxiliar plegable de 45 g para viajes y trekking. 10 L, ultraligera y compacta.",
+      "url": "https://jorgesport.github.io/te-equipamos/forclaz-compact-10l/",
+      "image": "https://contents.mediadecathlon.com/p2621812/k$8586c9180d332fcb8d272fd305194274/picture.jpg?f=1800x0&format=auto",
+      "type": "sale",
+      "activities": [
+        "trekking",
+        "travel"
+      ],
+      "product_type": "mochila",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 92
+    },
+    {
+      "id": 1005,
+      "title": "Sombrero Forclaz MT100 UPF50+: review y opinión",
+      "summary": "Analizamos el Forclaz MT100: UPF50+, ala de 7 cm, ventilación, algodón y ajuste para trekking.",
+      "details": "Analizamos el Forclaz MT100: UPF50+, ala de 7 cm, ventilación, algodón y ajuste para trekking.",
+      "url": "https://jorgesport.github.io/te-equipamos/forclaz-mt100-sombrero/",
+      "image": "https://contents.mediadecathlon.com/p2439774/k$61ef4aa1e100846e29c0ddb91ee1a5f9/picture.jpg?f=1600x0&format=auto",
+      "type": "review",
+      "activities": [
+        "trekking",
+        "senderismo"
+      ],
+      "product_type": "sombrero",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 91
+    },
+    {
+      "id": 1006,
+      "title": "Quechua NH100 para hombre",
+      "summary": "Quechua NH100 para hombre: confort, agarre y ajuste para senderos naturales. Tallas 39 a 48. Consultas y ventas por WhatsApp.",
+      "details": "Quechua NH100 para hombre: confort, agarre y ajuste para senderos naturales. Tallas 39 a 48. Consultas y ventas por WhatsApp.",
+      "url": "https://jorgesport.github.io/te-equipamos/nh100-sandalias/",
+      "image": "https://contents.mediadecathlon.com/p2406037/k$b3c196aa3b82fb78ca9da8e9d79ba4b2/picture.jpg?f=1800x0&format=auto",
+      "type": "sale",
+      "activities": [
+        "senderismo"
+      ],
+      "product_type": "sandalias",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 90
+    },
+    {
+      "id": 1007,
+      "title": "PLAYER T MESH mujer",
+      "summary": "PLAYER T MESH mujer. Estilo clásico, mesh ventilable y comodidad ligera.",
+      "details": "PLAYER T MESH mujer. Estilo clásico, mesh ventilable y comodidad ligera.",
+      "url": "https://jorgesport.github.io/te-equipamos/player-t-mesh/",
+      "image": "https://contents.mediadecathlon.com/p3031261/k$fbc2b2d701990c8100416d234336dc80/picture.jpg?f=1800x0&format=auto",
+      "type": "sale",
+      "activities": [
+        "running",
+        "fitness"
+      ],
+      "product_type": "camiseta",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 89
+    },
+    {
+      "id": 1008,
+      "title": "Quechua X-Light 2 mujer XS: review y oferta",
+      "summary": "Review de la Quechua X-Light 2 de mujer: plumón 75/25, 540 CUIN, compactable y con oferta en talla XS poco usada.",
+      "details": "Review de la Quechua X-Light 2 de mujer: plumón 75/25, 540 CUIN, compactable y con oferta en talla XS poco usada.",
+      "url": "https://jorgesport.github.io/te-equipamos/plumon-quechua-mujer-xs/",
+      "image": "",
+      "type": "review",
+      "activities": [
+        "senderismo",
+        "trekking"
+      ],
+      "product_type": "chaqueta",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 88
+    },
+    {
+      "id": 1009,
+      "title": "Quechua MH100 5L niños",
+      "summary": "Mochila infantil Quechua MH100 5L. Cuatro colores oficiales, 150 g, espalda acolchada y promoción Te Equipamos.",
+      "details": "Mochila infantil Quechua MH100 5L. Cuatro colores oficiales, 150 g, espalda acolchada y promoción Te Equipamos.",
+      "url": "https://jorgesport.github.io/te-equipamos/quechua-mh100-5l-promocion/",
+      "image": "https://contents.mediadecathlon.com/p2592386/k$33457db3a05ce6941bccaa9047ea871e/picture.jpg?f=3000x0&format=auto",
+      "type": "offer",
+      "activities": [
+        "senderismo"
+      ],
+      "product_type": "mochila",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 87
+    },
+    {
+      "id": 1010,
+      "title": "Quechua Raincut Mujer: review y oferta impermeable",
+      "summary": "Review profesional del chubasquero Quechua Raincut Mujer: impermeabilidad 5000 mm, cortaviento, ventilación y formato compacto.",
+      "details": "Review profesional del chubasquero Quechua Raincut Mujer: impermeabilidad 5000 mm, cortaviento, ventilación y formato compacto.",
+      "url": "https://jorgesport.github.io/te-equipamos/quechua-raincut-mujer/",
+      "image": "https://contents.mediadecathlon.com/p2644113/k$0f087bd94641b37d5774f3863062e386/picture.jpg?f=1600x0&format=auto",
+      "type": "review",
+      "activities": [
+        "senderismo",
+        "travel"
+      ],
+      "product_type": "chaqueta",
+      "source": "Te Equipamos",
+      "direct": true,
+      "active": true,
+      "score": 86
+    }
+  ]
 }
