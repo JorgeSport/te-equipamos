@@ -205,6 +205,140 @@ js = r'''<script id="teResponsiveActivitiesScript">
 if 'id="teResponsiveActivitiesScript"' not in html:
     html = html.replace('</body>', js + '</body>', 1)
 
+
+# Orden responsive del inicio: primero tarjetas completas, después contenidos relacionados.
+responsive_home_css = r'''/* TE_RESPONSIVE_HOME_ORDER */
+@media(max-width:760px){
+  #portal .main{display:flex;flex-direction:column;min-width:0}
+  #portal .welcome{order:1}
+  #portal #hero{order:2}
+  #portal #topicsSection{order:3}
+  #portal #feedSection{order:4}
+  #portal #homeRelated{order:5}
+  #portal #sectionJourney{order:6}
+  #portal #following{order:7}
+
+  #feed{background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
+  #feed .card{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:0!important;
+    padding:0!important;
+    margin:0 0 18px!important;
+    background:var(--surface)!important;
+    border:1px solid var(--line)!important;
+    border-radius:18px!important;
+    overflow:hidden!important;
+    box-shadow:var(--shadow)!important;
+  }
+  #feed .card>.thumb{
+    order:-1!important;
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:16/9!important;
+    object-fit:cover!important;
+    border-radius:0!important;
+    margin:0!important;
+  }
+  #feed .card>div:first-child{padding:16px 16px 17px!important}
+  #feed .card .title{font-size:21px!important;line-height:1.2!important;margin:7px 0 9px!important}
+  #feed .card .summary{display:block!important;font-size:13px!important;line-height:1.5!important;margin:0 0 13px!important}
+  #feed .card .cardMeta{padding:0!important;font-size:11px!important}
+
+  #hero>.panel:nth-child(2){display:none!important}
+  #homeRelated{
+    display:block;
+    margin-top:28px;
+    padding-top:22px;
+    border-top:1px solid var(--line);
+  }
+  #homeRelated.hidden{display:none!important}
+  #homeRelated .homeRelatedHead{margin:0 0 12px}
+  #homeRelated .homeRelatedHead .kicker{display:block;margin-bottom:5px}
+  #homeRelated .homeRelatedHead h2{margin:0;font-size:23px;letter-spacing:-.03em}
+  #homeRelated .homeRelatedList{border-top:1px solid var(--line)}
+  #homeRelated .homeRelatedItem{
+    width:100%;
+    display:grid;
+    grid-template-columns:92px minmax(0,1fr);
+    gap:12px;
+    align-items:center;
+    padding:13px 0;
+    border:0;
+    border-bottom:1px solid var(--line);
+    background:transparent;
+    color:var(--text);
+    text-align:left;
+    cursor:pointer;
+  }
+  #homeRelated .homeRelatedItem img{
+    width:92px;height:74px;object-fit:cover;border-radius:11px;background:var(--surface2)
+  }
+  #homeRelated .homeRelatedItem small{
+    display:block;margin-bottom:4px;color:var(--accent);font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase
+  }
+  #homeRelated .homeRelatedItem strong{
+    display:block;font-size:16px;line-height:1.28;letter-spacing:-.01em
+  }
+}
+@media(min-width:761px){
+  #homeRelated{display:none!important}
+}
+'''
+if '/* TE_RESPONSIVE_HOME_ORDER */' not in html:
+    html = html.replace('</style>', responsive_home_css + '</style>', 1)
+
+responsive_home_js = r'''<script id="teResponsiveHomeOrder">
+(function(){
+  function ensureRelatedHost(){
+    let host=document.getElementById('homeRelated');
+    if(host)return host;
+    const feed=document.getElementById('feedSection');
+    if(!feed||!feed.parentElement)return null;
+    host=document.createElement('section');
+    host.id='homeRelated';
+    host.className='section hidden';
+    host.setAttribute('aria-label','Contenidos relacionados');
+    feed.insertAdjacentElement('afterend',host);
+    return host;
+  }
+  function renderHomeRelated(){
+    const host=ensureRelatedHost();
+    if(!host)return;
+    if(!window.matchMedia('(max-width:760px)').matches){
+      host.classList.add('hidden');
+      return;
+    }
+    if(typeof state!=='undefined' && (state.q || state.cat!=='Todas')){
+      host.classList.add('hidden');
+      return;
+    }
+    const all=(typeof NEWS!=='undefined'&&Array.isArray(NEWS))?NEWS:[];
+    const featured=all.filter(n=>n.featured).slice(1,4);
+    const related=(featured.length?featured:all.slice(1,4)).filter(Boolean);
+    if(!related.length){
+      host.classList.add('hidden');
+      return;
+    }
+    const escapeValue=typeof esc==='function'?esc:(v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])));
+    const getTitle=typeof cardTitle==='function'?cardTitle:(n=>n.title||'Te Equipamos');
+    const getLabel=typeof cardLabel==='function'?cardLabel:(n=>n.category||'Te Equipamos');
+    host.innerHTML='<div class="homeRelatedHead"><span class="kicker">RELACIONADOS</span><h2>También te puede interesar</h2></div><div class="homeRelatedList">'+related.map(n=>'<button type="button" class="homeRelatedItem" data-article="'+escapeValue(n.id)+'"><img src="'+escapeValue(n.image||'')+'" alt="'+escapeValue(n.title||'')+'" loading="lazy"><span><small>'+escapeValue(getLabel(n))+'</small><strong>'+escapeValue(getTitle(n))+'</strong></span></button>').join('')+'</div>';
+    host.classList.remove('hidden');
+  }
+  const rerender=()=>setTimeout(renderHomeRelated,40);
+  document.addEventListener('click',e=>{
+    if(e.target.closest&&e.target.closest('[data-cat],#clearBtn,[data-resp-activity],[data-activity-filter],[data-tag-filter]'))rerender();
+  });
+  document.addEventListener('input',e=>{if(e.target&&e.target.id==='searchInput')rerender()});
+  window.addEventListener('resize',rerender);
+  window.addEventListener('pageshow',rerender);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',renderHomeRelated,{once:true});else renderHomeRelated();
+})();
+</script>'''
+if 'id="teResponsiveHomeOrder"' not in html:
+    html = html.replace('</body>', responsive_home_js + '</body>', 1)
+
 path.write_text(html, encoding='utf-8')
 
 # La landing principal del repositorio sigue siendo un producto. Su nombre de marca debe volver al Hub oficial.
