@@ -6,6 +6,9 @@ html = path.read_text(encoding='utf-8')
 OFFICIAL_URL='https://jorgesport.github.io/te-equipamos/'
 
 # Remove prior version if present.
+# Remove prior menu shell if present so the installer is idempotent.
+html = re.sub(r'<div class="teHeaderMenuBackdrop"[^>]*>.*?</div>', '', html, count=1, flags=re.S)
+html = re.sub(r'<aside class="teHeaderMenu"[^>]*>.*?</aside>', '', html, count=1, flags=re.S)
 for sid in ['tePremiumHeaderCss']:
     start=html.find(f'<style id="{sid}">')
     if start!=-1:
