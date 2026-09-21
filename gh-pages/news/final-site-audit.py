@@ -25,6 +25,8 @@ old_header = '<header class="top"><div class="row"><button class="icon menuBtn" 
 new_header = '<header class="top"><div class="row"><button class="icon menuBtn" id="menuBtn" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button><a href="https://jorgesport.github.io/te-equipamos-arpenaz-27l/news/" class="brand" aria-label="Ir al inicio de Te Equipamos"><span class="mark">TE</span><span>Te Equipamos</span></a><form class="search" id="searchForm" role="search"><span aria-hidden="true">⌕</span><input id="searchInput" aria-label="Buscar en Te Equipamos" autocomplete="off" enterkeyhint="search" placeholder="Buscar productos, reviews, actividades y consejos"><button type="button" id="clearBtn" aria-label="Limpiar búsqueda" title="Limpiar búsqueda" hidden>×</button></form><div class="actions"><button class="icon" id="themeBtn" type="button" aria-label="Cambiar tema" title="Cambiar tema">☼</button><span class="icon avatar teBrandDot" aria-label="Te Equipamos">TE</span></div></div><nav class="cats" id="cats" aria-label="Secciones de Te Equipamos"></nav><section id="teResponsiveActivities" class="teResponsiveActivities" aria-label="Explorar actividades"></section></header>'
 if old_header in html:
     html = html.replace(old_header, new_header, 1)
+elif 'id="tePremiumHeader"' in html and '/* TE_PREMIUM_HEADER */' in html:
+    pass
 elif 'id="teFinalUxPolishScript"' not in html:
     raise RuntimeError('La cabecera del Hub cambió y requiere revisión antes de aplicar el pulido final')
 
