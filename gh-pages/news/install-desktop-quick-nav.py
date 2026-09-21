@@ -23,8 +23,8 @@ if 'id="teDesktopQuickNav"' not in html:
 css = r'''<style id="teDesktopQuickNavCss">/* TE_DESKTOP_QUICK_NAV */
 #tePremiumHeader .teDesktopQuickNav{
   min-height:40px;display:flex;align-items:center;justify-content:center;gap:30px;
-  padding:0 34px;border-top:1px solid rgba(255,255,255,.055);
-  background:var(--te-header-bg);overflow:hidden;
+  padding:0 34px;border-top:1px solid rgba(29,29,31,.065);
+  background:rgba(255,255,255,.42);overflow:hidden;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   transition:max-height .22s ease,min-height .22s ease,opacity .18s ease,transform .22s ease,border-color .18s ease;
   max-height:40px;opacity:1;transform:translateY(0)
 }
@@ -51,7 +51,7 @@ script = r'''<script id="teDesktopQuickNavScript">/* TE_DESKTOP_QUICK_NAV_JS */
 (function(){
   const host=document.getElementById('teDesktopQuickNav');
   if(!host)return;
-  const defs=[['Todas','Inicio'],['Ventas','Productos'],['Reviews','Reviews'],['Ofertas','Ofertas'],['Novedades','Novedades']];
+  const defs=[['Todas','Inicio'],['Ventas','Productos'],['Reviews','Reviews'],['Ofertas','Ofertas'],['Novedades','Novedades'],['Vídeos','Vídeos'],['Consejos','Consejos']];
   const items=()=>typeof NEWS!=='undefined'&&Array.isArray(NEWS)?NEWS:[];
   function count(section){
     if(section==='Todas')return 1;
@@ -83,4 +83,4 @@ for marker in ['id="teDesktopQuickNav"', '/* TE_DESKTOP_QUICK_NAV */', '/* TE_DE
         raise RuntimeError('Falta marcador de navegación rápida: ' + marker)
 
 path.write_text(html, encoding='utf-8')
-print('Navegación rápida de escritorio instalada: Inicio · Productos · Reviews · Ofertas · Novedades')
+print('Navegación rápida instalada: Inicio · Productos · Reviews · Ofertas · Novedades · Vídeos · Consejos')
