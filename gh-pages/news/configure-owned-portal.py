@@ -18,8 +18,8 @@ html = re.sub(
     count=1,
 )
 
-html = html.replace("c==='Todas'?'Principal':c", "c==='Todas'?'Inicio':c")
-html = html.replace("c==='Todas'?'⌂ Principal':c==='Siguiendo'?'★ Siguiendo':c", "c==='Todas'?'⌂ Inicio':c==='Siguiendo'?'★ Siguiendo':c")
+html = html.replace("c==='Todas'?'Principal':c", "c==='Todas'?'Inicio':c==='Ventas'?'Productos':c")
+html = html.replace("c==='Todas'?'⌂ Principal':c==='Siguiendo'?'★ Siguiendo':c", "c==='Todas'?'⌂ Inicio':c==='Ventas'?'Productos':c==='Siguiendo'?'★ Siguiendo':c")
 
 # Un contenido puede pertenecer a varios menús y a varias actividades reales.
 html = re.sub(
