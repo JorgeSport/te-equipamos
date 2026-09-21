@@ -133,9 +133,9 @@
         const nav=LINKS.map(([label,url])=>`<a href="${url}">${label}</a>`).join('');
         root.innerHTML=`
           <style>
-            :host{display:block;clear:both;color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+            :host{display:block;clear:both;width:100%;margin:0;color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
             *{box-sizing:border-box}
-            footer{margin:0;background:#E6E6E2;color:#1D1D1F;border-top:1px solid #D3D3CF;text-align:center}
+            footer{width:100%;margin:0;background:#E6E6E2;color:#1D1D1F;border-top:1px solid #D3D3CF;text-align:center}
             .wrap{max-width:1180px;margin:0 auto;padding:48px 28px 38px;text-align:center}
             .brand{display:inline-block;color:#1D1D1F;text-decoration:none;font-size:28px;line-height:1;font-weight:780;letter-spacing:-.045em;text-align:center}
             .brand:focus-visible,.links a:focus-visible{outline:2px solid #355345;outline-offset:4px;border-radius:3px}
@@ -167,13 +167,15 @@
   }
 
   function installFooter(){
-    if(document.querySelector('te-equipamos-footer'))return;
-    const footers=[...document.querySelectorAll('footer')];
-    const current=footers.length?footers[footers.length-1]:null;
-    const universal=document.createElement('te-equipamos-footer');
-    universal.setAttribute('data-te-universal-footer','');
-    if(current)current.replaceWith(universal);
-    else document.body.appendChild(universal);
+    let universal=document.querySelector('te-equipamos-footer');
+    if(!universal){
+      universal=document.createElement('te-equipamos-footer');
+      universal.setAttribute('data-te-universal-footer','');
+    }
+    [...document.querySelectorAll('footer')].forEach(footer=>footer.remove());
+    if(universal.parentNode!==document.body || universal!==document.body.lastElementChild){
+      document.body.appendChild(universal);
+    }
   }
 
   function installNewsletterAssets(){
