@@ -46,7 +46,7 @@ required_markers = {
     'Script de actividades responsive': 'id="teResponsiveActivitiesScript"',
     'Metadatos oficiales': '<!-- TE_OFFICIAL_SITE_META -->',
     'Datos estructurados oficiales': 'id="teOfficialSchema"',
-    'Menú de secciones': "const CATS=['Todas','Ventas','Reviews','Vídeos','Consejos','Ofertas','Novedades','Siguiendo'];",
+    'Menú de secciones': "const CATS=['Todas','Ventas','Reviews','Ofertas','Novedades','Vídeos','Consejos','Siguiendo'];",
 }
 for label, marker in required_markers.items():
     if marker not in html: errors.append(f'No se encontró: {label}')
