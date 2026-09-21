@@ -3,6 +3,8 @@
 
   const HOME='https://jorgesport.github.io/te-equipamos/';
   const LOGO=HOME+'logo-te-equipamos.png';
+  const NEWSLETTER_CSS=HOME+'newsletter.css';
+  const NEWSLETTER_JS=HOME+'newsletter.js';
   const LINKS=[
     ['Cómo trabajamos',HOME+'news/metodologia/'],
     ['Anúnciate',HOME+'news/anunciate/'],
@@ -133,7 +135,7 @@
           <style>
             :host{display:block;clear:both;color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
             *{box-sizing:border-box}
-            footer{margin:0;background:#F7F6F2;color:#1D1D1F;border-top:1px solid #DDDCD7}
+            footer{margin:0;background:#F1F1EF;color:#1D1D1F;border-top:1px solid #DDDCD7}
             .wrap{max-width:1180px;margin:0 auto;padding:44px 28px 34px}
             .brand{display:inline-block;color:#1D1D1F;text-decoration:none;font-size:28px;line-height:1;font-weight:780;letter-spacing:-.045em}
             .brand:focus-visible,.links a:focus-visible{outline:2px solid #355345;outline-offset:4px;border-radius:3px}
@@ -174,9 +176,28 @@
     else document.body.appendChild(universal);
   }
 
+  function installNewsletterAssets(){
+    if(isMainHub())return;
+    if(!document.querySelector('link[data-te-newsletter-style]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';
+      link.href=NEWSLETTER_CSS;
+      link.setAttribute('data-te-newsletter-style','');
+      document.head.appendChild(link);
+    }
+    if(!document.querySelector('script[data-te-newsletter-loader]')){
+      const script=document.createElement('script');
+      script.src=NEWSLETTER_JS;
+      script.defer=true;
+      script.setAttribute('data-te-newsletter-loader','');
+      document.head.appendChild(script);
+    }
+  }
+
   function install(){
     installBrand();
     installFooter();
+    installNewsletterAssets();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});
