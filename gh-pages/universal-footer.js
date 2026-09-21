@@ -133,10 +133,10 @@
         const nav=LINKS.map(([label,url])=>`<a href="${url}">${label}</a>`).join('');
         root.innerHTML=`
           <style>
-            :host{display:block;clear:both;width:100%;margin:0;color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+            :host{display:block;clear:both;width:100%;max-width:100vw;min-width:0;margin:0!important;padding:0!important;position:relative!important;inset:auto!important;grid-column:1/-1!important;align-self:stretch!important;flex:0 0 100%!important;overflow:hidden;color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
             *{box-sizing:border-box}
-            footer{width:100%;margin:0;background:#E6E6E2;color:#1D1D1F;border-top:1px solid #D3D3CF;text-align:center}
-            .wrap{max-width:1180px;margin:0 auto;padding:48px 28px 38px;text-align:center}
+            footer{display:block;width:100%;max-width:100vw;min-width:0;margin:0!important;padding:0;background:#E6E6E2;color:#1D1D1F;border-top:1px solid #D3D3CF;text-align:center;overflow:hidden}
+            .wrap{width:100%;max-width:1180px;margin:0 auto;padding:48px 28px 38px;text-align:center}
             .brand{display:inline-block;color:#1D1D1F;text-decoration:none;font-size:28px;line-height:1;font-weight:780;letter-spacing:-.045em;text-align:center}
             .brand:focus-visible,.links a:focus-visible{outline:2px solid #355345;outline-offset:4px;border-radius:3px}
             .tagline{max-width:620px;margin:15px auto 0;color:#6C6B67;font-size:15px;line-height:1.55;text-align:center}
@@ -146,7 +146,9 @@
             .bottom{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;margin-top:34px;padding-top:20px;border-top:1px solid #D3D3CF;color:#787873;font-size:12px;line-height:1.4;text-align:center}
             .signature{color:#6C6B67}
             @media(max-width:680px){
-              .wrap{padding:36px 22px 28px}
+              :host{width:100%!important;max-width:100vw!important;grid-column:1/-1!important;flex-basis:100%!important}
+              footer{width:100%!important;max-width:100vw!important}
+              .wrap{width:100%;max-width:100%;padding:32px 18px 24px}
               .brand{font-size:25px}
               .tagline{font-size:14px}
               .links{gap:13px 22px;margin-top:28px}
@@ -173,6 +175,15 @@
       universal.setAttribute('data-te-universal-footer','');
     }
     [...document.querySelectorAll('footer')].forEach(footer=>footer.remove());
+    universal.style.setProperty('display','block','important');
+    universal.style.setProperty('width','100%','important');
+    universal.style.setProperty('max-width','100vw','important');
+    universal.style.setProperty('min-width','0','important');
+    universal.style.setProperty('grid-column','1 / -1','important');
+    universal.style.setProperty('align-self','stretch','important');
+    universal.style.setProperty('flex','0 0 100%','important');
+    universal.style.setProperty('margin','0','important');
+    universal.style.setProperty('padding','0','important');
     if(universal.parentNode!==document.body || universal!==document.body.lastElementChild){
       document.body.appendChild(universal);
     }
