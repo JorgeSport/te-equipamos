@@ -29,6 +29,9 @@ jobs:
       - name: Sincronizar todo el contenido propio desde GitHub
         run: python gh-pages/news/sync-github-content.py
 
+      - name: Generar feed automático para newsletter
+        run: python gh-pages/news/generate-newsletter-feed.py
+
       - name: Crear lectores para contenidos de otros repositorios
         run: python gh-pages/news/wrap-external-content.py
 
