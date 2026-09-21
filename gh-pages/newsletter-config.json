@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "enabled": true,
   "provider": "brevo",
   "form_url": "https://2660a6b8.sibforms.com/serve/MUIFAKk1vxIQ-Zp87WZ5sPA9PrSQ4A1sE8OZL2z3uGrY0EZzDGwjVYVfoQZtJtpPtO3gvPH7jIfwzFbsTcWFyWkqyKvlcbCjrEVtRkUnscnK15NzWhYTw9ziz_qYkmgyxBMzhFfu5WJCWUfuvkGHyJqR_m_2h4QGiq56c7Bxw5dwmCvQJ9cuEstieR1g4i9T_3MlFTzOMdriDd9ElA==",
@@ -7,11 +7,10 @@
   "double_opt_in_required": true,
   "placements": [
     "hub_home",
-    "editorial"
+    "editorial",
+    "commercial"
   ],
-  "excluded_sections": [
-    "Ventas"
-  ],
+  "excluded_sections": [],
   "interests": [
     "Senderismo y trekking",
     "Running",
@@ -33,6 +32,7 @@
     "cta": "Quiero suscribirme"
   },
   "status": "active",
-  "updated_at": "2026-09-20",
-  "activated_at": "2026-09-20"
+  "updated_at": "2026-09-21",
+  "activated_at": "2026-09-20",
+  "commercial_rule": "Mostrar solo el bloque de suscripción, nunca anuncios externos, en landings comerciales."
 }
