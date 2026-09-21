@@ -32,9 +32,12 @@
     if(!current)return false;
 
     const sections=Array.isArray(current.sections)?current.sections.map(x=>String(x).toLowerCase()):[];
-    const excluded=(config.excluded_sections||[]).map(x=>String(x).toLowerCase());
-    if(sections.some(section=>excluded.includes(section)))return false;
+    const type=String(current.type||'').toLowerCase();
+    const commercial=sections.some(section=>['ventas','ofertas'].includes(section))
+      || ['sale','offer','product'].includes(type)
+      || current.direct===true;
 
+    if(commercial)return (config.placements||[]).includes('commercial');
     return (config.placements||[]).includes('editorial');
   }
 
@@ -66,7 +69,7 @@
         </div>
       </div>`;
 
-    const footer=document.querySelector('footer');
+    const footer=document.querySelector('te-equipamos-footer,[data-te-universal-footer],footer');
     if(footer&&footer.parentNode)footer.parentNode.insertBefore(section,footer);
     else document.body.appendChild(section);
   }
