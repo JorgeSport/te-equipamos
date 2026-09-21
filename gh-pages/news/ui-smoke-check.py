@@ -30,6 +30,8 @@ if not errors:
 
     if '--te-header-bg:#2A2D2A' in html:
         errors.append('La cabecera oscura antigua volvió al artefacto final')
+    if 'api.github.com/users/JorgeSport/repos' in html:
+        errors.append('Sigue activa una consulta GitHub en navegador que puede devolver 403')
 
     if 'data-te-premium-slider-style>\\n' in html:
         errors.append('Hay texto residual \\n después del CSS del slider')
