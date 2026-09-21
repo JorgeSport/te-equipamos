@@ -20,7 +20,7 @@ if not errors:
 
     for marker, label in [
         ('id="tePremiumHeader"', 'cabecera premium'),
-        ('--te-header-bg:rgba(250,250,248,.88)', 'cabecera clara transparente'),
+        ('--te-header-bg:rgba(250,250,248,.88)', 'cabecera clara transparente'),\n        ('display:inline-flex!important;align-items:center!important;width:auto!important', 'marca visible en móvil y escritorio'),
         ('id="teDesktopQuickNav"', 'navegación superior'),
         ('Te Equipamos</span>', 'marca completa'),
     ]:
