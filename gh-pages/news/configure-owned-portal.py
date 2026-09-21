@@ -7,7 +7,7 @@ html = path.read_text(encoding="utf-8")
 # Menú editorial de Te Equipamos. Las actividades viven como una segunda capa de navegación.
 html = re.sub(
     r"const CATS=\[[^;]+\];",
-    "const CATS=['Todas','Ventas','Reviews','Vídeos','Consejos','Ofertas','Novedades','Siguiendo'];",
+    "const CATS=['Todas','Ventas','Reviews','Ofertas','Novedades','Vídeos','Consejos','Siguiendo'];",
     html,
     count=1,
 )
