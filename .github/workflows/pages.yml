@@ -213,6 +213,9 @@ jobs:
           print(f'Newsletter preparado en {count} páginas. Visible solo cuando newsletter-config.json esté activado.')
           PY
 
+      - name: Verificar cabecera newsletter y footer finales
+        run: python gh-pages/news/ui-smoke-check.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
