@@ -70,7 +70,7 @@
       </div>`;
 
     function placeBeforeFooter(){
-      const footer=document.querySelector('te-equipamos-footer,[data-te-universal-footer]');
+      const footer=document.querySelector('te-equipamos-footer,[data-te-universal-footer],#teBusinessFooter,footer');
       if(footer&&footer.parentNode){
         if(section.parentNode!==footer.parentNode || section.nextElementSibling!==footer){
           footer.parentNode.insertBefore(section,footer);
