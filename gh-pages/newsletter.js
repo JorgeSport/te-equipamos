@@ -69,9 +69,24 @@
         </div>
       </div>`;
 
-    const footer=document.querySelector('te-equipamos-footer,[data-te-universal-footer],footer');
-    if(footer&&footer.parentNode)footer.parentNode.insertBefore(section,footer);
-    else document.body.appendChild(section);
+    function placeBeforeFooter(){
+      const footer=document.querySelector('te-equipamos-footer,[data-te-universal-footer]');
+      if(footer&&footer.parentNode){
+        if(section.parentNode!==footer.parentNode || section.nextElementSibling!==footer){
+          footer.parentNode.insertBefore(section,footer);
+        }
+        return true;
+      }
+      return false;
+    }
+    if(!placeBeforeFooter()){
+      document.body.appendChild(section);
+      const observer=new MutationObserver(()=>{
+        if(placeBeforeFooter())observer.disconnect();
+      });
+      observer.observe(document.body,{childList:true,subtree:true});
+      setTimeout(()=>observer.disconnect(),2500);
+    }
   }
 
   async function install(){
