@@ -6,6 +6,7 @@
   --te-line:#DDDCD7;
   --te-accent:#355345;
   --te-accent-soft:#E7ECE8;
+  --te-chrome:#F1F1EF;
   --te-header-height:68px;
 }
 
@@ -14,7 +15,7 @@
   top:0;
   z-index:100;
   width:100%;
-  background:color-mix(in srgb,var(--te-bg) 92%,transparent);
+  background:color-mix(in srgb,var(--te-chrome) 96%,transparent);
   border-bottom:1px solid var(--te-line);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
