@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 path = Path(__file__).resolve().parent / "index.html"
 html = path.read_text(encoding="utf-8")
