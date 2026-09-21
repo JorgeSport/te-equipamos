@@ -54,6 +54,17 @@ hub = hub.replace(f'content="{NEWS_BASE}"', f'content="{BASE}"')
 hub = hub.replace(f'"url":"{NEWS_BASE}"', f'"url":"{BASE}"')
 hub = hub.replace('href="./metodologia/"', f'href="{PUBLIC_ROOT}news/metodologia/"')
 
+# La lista de contenidos ya se sincroniza durante el build. Evitamos consultar
+# la API pública de GitHub desde el navegador, porque puede alcanzar el rate limit
+# y mostrar errores 403 sin aportar nada a la experiencia del usuario.
+hub = re.sub(
+    r'async function showCurrentContent\(\)\{.*?\}\s*showCurrentContent\(\);',
+    "function showCurrentContent(){const id=new URLSearchParams(location.search).get('id');id?renderArticle(id):renderPortal();}\\nshowCurrentContent();",
+    hub,
+    count=1,
+    flags=re.S,
+)
+
 # La interfaz enriquece estas zonas con JavaScript, pero los enlaces esenciales
 # también deben existir en el HTML inicial. Así los buscadores y los usuarios
 # sin JavaScript pueden descubrir las fichas sin alterar el diseño hidratado.
