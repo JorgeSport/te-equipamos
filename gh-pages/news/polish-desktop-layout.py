@@ -6,8 +6,8 @@ html = path.read_text(encoding='utf-8')
 css = r'''/* TE_DESKTOP_POLISH */
 .teDesktopUtility,.teRailExtra{display:none}
 @media(min-width:1101px){
-  .row{max-width:1600px;margin:0 auto;grid-template-columns:220px minmax(440px,820px) 1fr;gap:18px;padding:0 28px}
-  .cats{max-width:1600px;margin:0 auto;padding-left:292px;gap:6px}
+  .row{max-width:1520px;margin:0 auto;grid-template-columns:220px minmax(440px,820px) 1fr;gap:18px;padding:0 30px}
+  .cats{max-width:1520px;margin:0 auto;padding:0 30px;gap:30px;justify-content:center}
   .chip{padding:9px 16px}
   .shell{max-width:1600px;grid-template-columns:190px minmax(0,1fr) 300px;gap:24px;padding:28px 28px 70px}
   .side .nav{display:none!important}
