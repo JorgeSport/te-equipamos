@@ -160,6 +160,12 @@ jobs:
       - name: Adaptar actividades a responsive y cerrar identidad
         run: python gh-pages/news/finalize-portal.py
 
+      - name: Instalar cabecera premium clara
+        run: python gh-pages/news/install-premium-header.py
+
+      - name: Instalar navegación superior premium
+        run: python gh-pages/news/install-desktop-quick-nav.py
+
       - name: Control de calidad antes de publicar
         run: python gh-pages/news/quality-check.py
 
