@@ -135,15 +135,15 @@
           <style>
             :host{display:block;clear:both;color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
             *{box-sizing:border-box}
-            footer{margin:0;background:#F1F1EF;color:#1D1D1F;border-top:1px solid #DDDCD7}
-            .wrap{max-width:1180px;margin:0 auto;padding:44px 28px 34px}
-            .brand{display:inline-block;color:#1D1D1F;text-decoration:none;font-size:28px;line-height:1;font-weight:780;letter-spacing:-.045em}
+            footer{margin:0;background:#E6E6E2;color:#1D1D1F;border-top:1px solid #D3D3CF;text-align:center}
+            .wrap{max-width:1180px;margin:0 auto;padding:48px 28px 38px;text-align:center}
+            .brand{display:inline-block;color:#1D1D1F;text-decoration:none;font-size:28px;line-height:1;font-weight:780;letter-spacing:-.045em;text-align:center}
             .brand:focus-visible,.links a:focus-visible{outline:2px solid #355345;outline-offset:4px;border-radius:3px}
-            .tagline{max-width:560px;margin:15px 0 0;color:#6C6B67;font-size:15px;line-height:1.55}
-            .links{display:flex;flex-wrap:wrap;gap:14px 30px;margin-top:32px}
+            .tagline{max-width:620px;margin:15px auto 0;color:#6C6B67;font-size:15px;line-height:1.55;text-align:center}
+            .links{display:flex;justify-content:center;flex-wrap:wrap;gap:14px 30px;margin-top:32px;text-align:center}
             .links a{color:#6C6B67;text-decoration:none;font-size:15px;line-height:1.35;transition:color .18s ease}
             .links a:hover{color:#355345}
-            .bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:34px;padding-top:20px;border-top:1px solid #E5E3DE;color:#8A8882;font-size:12px;line-height:1.4}
+            .bottom{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;margin-top:34px;padding-top:20px;border-top:1px solid #D3D3CF;color:#787873;font-size:12px;line-height:1.4;text-align:center}
             .signature{color:#6C6B67}
             @media(max-width:680px){
               .wrap{padding:36px 22px 28px}
@@ -151,7 +151,7 @@
               .tagline{font-size:14px}
               .links{gap:13px 22px;margin-top:28px}
               .links a{font-size:14px}
-              .bottom{align-items:flex-start;flex-direction:column;gap:7px;margin-top:28px}
+              .bottom{align-items:center;flex-direction:column;gap:7px;margin-top:28px}
             }
           </style>
           <footer aria-label="Te Equipamos">
