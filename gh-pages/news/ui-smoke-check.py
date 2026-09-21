@@ -20,7 +20,8 @@ if not errors:
 
     for marker, label in [
         ('id="tePremiumHeader"', 'cabecera premium'),
-        ('--te-header-bg:rgba(250,250,248,.88)', 'cabecera clara transparente'),\n        ('display:inline-flex!important;align-items:center!important;width:auto!important', 'marca visible en móvil y escritorio'),
+        ('--te-header-bg:rgba(250,250,248,.88)', 'cabecera clara transparente'),
+        ('display:inline-flex!important;align-items:center!important;width:auto!important', 'marca visible en móvil y escritorio'),
         ('id="teDesktopQuickNav"', 'navegación superior'),
         ('Te Equipamos</span>', 'marca completa'),
     ]:
@@ -30,9 +31,10 @@ if not errors:
     if '--te-header-bg:#2A2D2A' in html:
         errors.append('La cabecera oscura antigua volvió al artefacto final')
 
-    body = html[html.find('<body'):html.find('<body') + 300]
-    if '\\n' in body:
-        errors.append('Hay texto residual \\n visible al inicio del body')
+    if 'data-te-premium-slider-style>\\n' in html:
+        errors.append('Hay texto residual \\n después del CSS del slider')
+    if 'data-te-premium-slider></script>\\n' in html:
+        errors.append('Hay texto residual \\n después del JS del slider')
 
     for marker, label in [
         ('width:100%;\n  margin:0;\n  padding:56px 24px', 'newsletter full-width'),
@@ -41,13 +43,22 @@ if not errors:
         if marker not in css:
             errors.append(f'No está activo: {label}')
 
-    if 'placeBeforeFooter' not in njs:
-        errors.append('La newsletter no está fijada antes del pie universal')
+    if 'placeBeforeFooter' not in njs or '#teBusinessFooter,footer' not in njs:
+        errors.append('La newsletter no está fijada antes del footer del Hub')
 
     for marker, label in [
-        ('document.body.appendChild(universal)', 'pie al final del body'),
-        ('text-align:center', 'pie centrado'),
-        (':host{display:block;clear:both;width:100%', 'pie full-width'),
+        ('id="teBusinessFooter"', 'footer del Hub'),
+        ('background:#E6E6E2', 'footer gris'),
+        ('width:100%', 'footer a ancho completo'),
+        ('text-align:center', 'footer centrado'),
+    ]:
+        if marker not in html:
+            errors.append(f'No está activo: {label}')
+
+    for marker, label in [
+        ('document.body.appendChild(universal)', 'footer universal al final del body'),
+        ('text-align:center', 'footer universal centrado'),
+        (':host{display:block;clear:both;width:100%', 'footer universal full-width'),
     ]:
         if marker not in fjs:
             errors.append(f'No está activo: {label}')
@@ -58,4 +69,4 @@ if errors:
         print(' - ' + error)
     raise SystemExit(1)
 
-print('UI SMOKE CHECK OK · cabecera clara · newsletter responsive · pie centrado y al final')
+print('UI SMOKE CHECK OK · marca visible · sin texto residual · newsletter antes del footer · footer responsive')
