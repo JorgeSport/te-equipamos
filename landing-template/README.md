@@ -52,6 +52,31 @@ Ejemplo a evitar:
 
 `card_title`: `Gafas Roadr 100 Categoría 3 · ciclismo y urbano`
 
+## SEO social inteligente · regla obligatoria
+
+Te Equipamos separa dos objetivos distintos:
+
+- `seo_title` y `seo_description`: orientados a buscadores.
+- `card_title` y `summary`: orientados al Hub y a la vista previa al compartir en Facebook, WhatsApp, Telegram, X y otras plataformas que lean Open Graph.
+
+La landing debe mantener automáticamente esta correspondencia:
+
+- `card_title` → `og:title` y `twitter:title`;
+- `summary` → `og:description` y `twitter:description`;
+- `image` → `og:image` y `twitter:image`;
+- `url` → `og:url`;
+- `og:site_name` → `Te Equipamos`;
+- `og:locale` → `es_PE`;
+- `twitter:card` → `summary_large_image`.
+
+También deben existir textos alternativos para la imagen social mediante `og:image:alt` y `twitter:image:alt`.
+
+No crear un título social independiente si `card_title` ya representa correctamente el enfoque editorial. El objetivo es que la misma idea profesional que aparece en la tarjeta del Hub acompañe al enlace cuando se comparte fuera de Te Equipamos.
+
+El Publicador normaliza y valida estos metadatos antes de crear el repositorio. El workflow de la landing vuelve a validarlos antes del despliegue.
+
+**Importante:** Facebook, WhatsApp y otras plataformas pueden conservar una vista previa antigua en caché aunque el HTML ya haya sido corregido. Ese comportamiento externo no significa que la landing esté mal publicada.
+
 ## WhatsApp: comportamiento obligatorio
 
 No basta con enlazar al número.
