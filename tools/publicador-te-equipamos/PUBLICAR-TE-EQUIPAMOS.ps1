@@ -9,7 +9,7 @@ param(
     [string]$HubRepo = "JorgeSport/te-equipamos"
 )
 
-$PublisherVersion = "2026.09.20.4"
+$PublisherVersion = "2026.09.23.1"
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
