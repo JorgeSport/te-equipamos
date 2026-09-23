@@ -322,18 +322,33 @@ Así, un contenido sobre sandalias debe mostrar primero otros contenidos de sand
 
 ## REGLA SOCIAL ESTRATÉGICA
 
-Cuando la landing se comparta en redes sociales, el título de la vista previa no debe limitarse al nombre del producto ni al `seo_title`.
+Te Equipamos separa el SEO de buscador del SEO social.
+
+- `seo_title` y `seo_description` se optimizan para buscadores.
+- `card_title` y `summary` se optimizan para el Hub y para la vista previa al compartir.
+
+Cuando la landing se comparta en Facebook, WhatsApp, Telegram, X u otra plataforma compatible con Open Graph, la vista previa no debe limitarse al nombre técnico del producto ni copiar `seo_title`.
 
 Usa automáticamente:
 
 - `card_title` como `og:title` y `twitter:title`;
 - `summary` como `og:description` y `twitter:description`;
 - `image` como `og:image` y `twitter:image`;
-- `url` como `og:url`.
+- `url` como `og:url`;
+- `Te Equipamos` como `og:site_name`;
+- `es_PE` como `og:locale`;
+- `summary_large_image` como `twitter:card`;
+- un texto alternativo real para `og:image:alt` y `twitter:image:alt`.
 
-El objetivo es que el enlace compartido conserve el mismo enfoque estratégico del Hub: curiosidad, beneficio, contraste, pregunta útil o dato concreto que invite a abrir la landing, sin clickbait ni afirmaciones inventadas.
+El objetivo es que el enlace compartido conserve el mismo enfoque estratégico y profesional del Hub: beneficio real, curiosidad, contraste, pregunta útil o dato concreto que invite a abrir la landing, sin clickbait ni afirmaciones inventadas.
 
-El Publicador Te Equipamos normaliza estos metadatos antes de publicar. No crees un segundo título social independiente si `card_title` ya cumple esta función.
+No crees un segundo título social independiente si `card_title` ya cumple esta función.
+
+Antes de entregar el ZIP, comprueba que los metadatos sociales coinciden exactamente con `card_title`, `summary`, `image` y `url`.
+
+El Publicador Te Equipamos vuelve a normalizar y validar estos metadatos antes de publicar.
+
+Ten en cuenta que Facebook, WhatsApp y otras plataformas pueden conservar temporalmente una vista previa antigua en caché aunque el HTML publicado ya sea correcto.
 
 ## PRECIOS · REGLA GLOBAL TE SYSTEM
 
