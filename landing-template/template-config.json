@@ -1,5 +1,5 @@
 {
-  "template_version": "1.8",
+  "template_version": "1.9",
   "brand": "Te Equipamos",
   "market": "Perú",
   "language": "es",
@@ -116,17 +116,34 @@
     "fallback_description_source": "seo_description",
     "image_source": "image",
     "url_source": "url",
+    "locale": "es_PE",
+    "site_name": "Te Equipamos",
     "automatic_metadata": [
+      "og:type",
+      "og:site_name",
+      "og:locale",
       "og:title",
       "og:description",
       "og:image",
+      "og:image:alt",
       "og:url",
       "twitter:card",
       "twitter:title",
       "twitter:description",
-      "twitter:image"
+      "twitter:image",
+      "twitter:image:alt"
     ],
-    "rule": "Usar el enfoque estratégico y de curiosidad del Hub también al compartir la landing en redes sociales, sin clickbait ni datos inventados."
+    "required_alignment": {
+      "og:title": "card_title",
+      "og:description": "summary",
+      "og:image": "image",
+      "og:url": "url",
+      "twitter:title": "card_title",
+      "twitter:description": "summary",
+      "twitter:image": "image"
+    },
+    "rule": "El SEO de buscador y el SEO social son capas distintas. seo_title/seo_description se optimizan para buscadores; card_title/summary se usan en Hub y vistas previas sociales. La vista previa debe conservar el enfoque editorial estratégico del Hub, sin clickbait ni datos inventados.",
+    "cache_note": "Las redes sociales pueden conservar vistas previas antiguas. Un HTML correcto no garantiza actualización inmediata de una caché externa."
   },
   "related_content_strategy": {
     "product_type_required": true,
