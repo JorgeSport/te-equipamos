@@ -20,7 +20,7 @@ Este paquete reduce la publicación de una landing nueva a un proceso casi de un
 12. activa GitHub Pages con GitHub Actions;
 13. ejecuta y espera el despliegue de la landing;
 14. ejecuta y espera la actualización del Hub principal de Te Equipamos;
-15. abre la nueva landing al terminar.
+15. deja visibles las URLs de la landing, el Hub y el repositorio al terminar.
 
 ## Primera vez en este PC
 
@@ -50,6 +50,24 @@ Opción rápida:
 5. espera hasta ver `PUBLICACIÓN COMPLETADA`.
 
 También puedes hacer doble clic en `PUBLICAR-TE-EQUIPAMOS.bat` y pegar la ruta cuando la pida.
+
+## Protección del propio publicador
+
+El lanzador ya no sustituye el motor de PowerShell inmediatamente después de descargarlo.
+
+Antes de activar una actualización:
+
+1. descarga la nueva versión a un archivo temporal;
+2. analiza su sintaxis con el parser oficial de PowerShell;
+3. conserva una copia local válida en la carpeta `respaldo/`;
+4. solo reemplaza el motor activo si la versión descargada es válida;
+5. si la versión local queda dañada, restaura automáticamente `PUBLICAR-TE-EQUIPAMOS-ULTIMO-ESTABLE.ps1`;
+6. si tampoco existe un respaldo local válido, recupera `PUBLICAR-TE-EQUIPAMOS-ESTABLE.ps1` desde GitHub;
+7. si ninguna copia supera la validación, se detiene sin publicar ni modificar proyectos.
+
+Además, GitHub Actions ejecuta `.github/workflows/validate-publisher.yml` en Windows cuando cambia el publicador. El workflow comprueba la sintaxis de la versión actual y de la versión estable.
+
+La versión estable de GitHub se mantiene separada del archivo de desarrollo para que una modificación futura defectuosa no elimine el último punto de recuperación conocido.
 
 ## Protección contra errores
 
