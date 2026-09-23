@@ -1,0 +1,64 @@
+name: Validar publicador Te Equipamos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/publicador-te-equipamos/**"
+      - ".github/workflows/validate-publisher.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  powershell-syntax:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validar sintaxis PowerShell
+        shell: powershell
+        run: |
+          $files = @(
+            "tools/publicador-te-equipamos/PUBLICAR-TE-EQUIPAMOS.ps1",
+            "tools/publicador-te-equipamos/PUBLICAR-TE-EQUIPAMOS-ESTABLE.ps1"
+          )
+
+          foreach ($file in $files) {
+            if (-not (Test-Path $file)) {
+              throw "Falta archivo obligatorio: $file"
+            }
+
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $file),
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+
+            if ($errors.Count -gt 0) {
+              Write-Host "Errores de sintaxis en $file"
+              $errors | ForEach-Object { Write-Host $_.Message }
+              exit 1
+            }
+
+            Write-Host "OK: $file"
+          }
+
+      - name: Comprobar archivos de recuperacion
+        shell: powershell
+        run: |
+          $bat = Get-Content "tools/publicador-te-equipamos/PUBLICAR-TE-EQUIPAMOS.bat" -Raw
+          foreach ($marker in @(
+            "PUBLICAR-TE-EQUIPAMOS-ESTABLE.ps1",
+            "ULTIMO-ESTABLE",
+            "ValidatePs1",
+            "FatalRecovery"
+          )) {
+            if ($bat -notlike "*$marker*") {
+              throw "El lanzador no contiene la proteccion esperada: $marker"
+            }
+          }
+          Write-Host "OK: lanzador con validacion, respaldo y recuperacion."
