@@ -81,7 +81,7 @@ jobs:
 
           # SEO social obligatorio: Hub y redes deben compartir la misma estrategia editorial.
           def meta_content(kind, key):
-              pattern = rf'<meta\\s+{kind}=["\\\']{re.escape(key)}["\\\'][^>]*content=["\\\']([^"\\\']*)["\\\'][^>]*>'
+              pattern = rf"""<meta\s+{kind}=["']{re.escape(key)}["'][^>]*content=["']([^"']*)["'][^>]*>"""
               match = re.search(pattern, html, flags=re.I)
               return html_lib.unescape(match.group(1)).strip() if match else ''
 
