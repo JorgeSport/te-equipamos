@@ -9,7 +9,7 @@ param(
     [string]$HubRepo = "JorgeSport/te-equipamos"
 )
 
-$PublisherVersion = "2026.09.23.1"
+$PublisherVersion = "2026.09.23.2"
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -232,11 +232,26 @@ function Normalize-SocialStrategy([string]$HtmlPath, [string]$ManifestPath) {
         $socialDescription = [string](Get-JsonPropertyValue $item "seo_description")
         $socialDescription = $socialDescription.Trim()
     }
+    if ([string]::IsNullOrWhiteSpace($socialDescription)) {
+        Stop-Publish "No existe una descripcion estrategica para redes sociales."
+    }
+    if ([string]::IsNullOrWhiteSpace($image)) {
+        Stop-Publish "Falta la imagen social en te-equipamos.json."
+    }
+    if ([string]::IsNullOrWhiteSpace($url)) {
+        Stop-Publish "Falta la URL publica para redes sociales."
+    }
+
+    $imageAlt = "Imagen de " + $fallbackTitle.Trim()
+    if ([string]::IsNullOrWhiteSpace($fallbackTitle)) {
+        $imageAlt = $socialTitle
+    }
 
     $encodedTitle = [System.Net.WebUtility]::HtmlEncode($socialTitle)
     $encodedDescription = [System.Net.WebUtility]::HtmlEncode($socialDescription)
     $encodedImage = [System.Net.WebUtility]::HtmlEncode($image.Trim())
     $encodedUrl = [System.Net.WebUtility]::HtmlEncode($url.Trim())
+    $encodedImageAlt = [System.Net.WebUtility]::HtmlEncode($imageAlt)
 
     function Set-MetaProperty([string]$Source, [string]$Property, [string]$Value) {
         if ([string]::IsNullOrWhiteSpace($Value)) { return $Source }
@@ -258,20 +273,39 @@ function Normalize-SocialStrategy([string]$HtmlPath, [string]$ManifestPath) {
         return $Source -replace '</head>', ("  " + $replacement + [Environment]::NewLine + "</head>")
     }
 
+    $html = Set-MetaProperty $html "og:type" "website"
+    $html = Set-MetaProperty $html "og:site_name" "Te Equipamos"
+    $html = Set-MetaProperty $html "og:locale" "es_PE"
     $html = Set-MetaProperty $html "og:title" $encodedTitle
     $html = Set-MetaProperty $html "og:description" $encodedDescription
-    if (-not [string]::IsNullOrWhiteSpace($encodedImage)) {
-        $html = Set-MetaProperty $html "og:image" $encodedImage
-    }
-    if (-not [string]::IsNullOrWhiteSpace($encodedUrl)) {
-        $html = Set-MetaProperty $html "og:url" $encodedUrl
-    }
+    $html = Set-MetaProperty $html "og:image" $encodedImage
+    $html = Set-MetaProperty $html "og:image:alt" $encodedImageAlt
+    $html = Set-MetaProperty $html "og:url" $encodedUrl
 
     $html = Set-MetaName $html "twitter:card" "summary_large_image"
     $html = Set-MetaName $html "twitter:title" $encodedTitle
     $html = Set-MetaName $html "twitter:description" $encodedDescription
-    if (-not [string]::IsNullOrWhiteSpace($encodedImage)) {
-        $html = Set-MetaName $html "twitter:image" $encodedImage
+    $html = Set-MetaName $html "twitter:image" $encodedImage
+    $html = Set-MetaName $html "twitter:image:alt" $encodedImageAlt
+
+    # Validacion final: no publicar si Hub y redes dejan de estar alineados.
+    $requiredSocialMarkers = @(
+        '<meta property="og:type" content="website">',
+        '<meta property="og:site_name" content="Te Equipamos">',
+        '<meta property="og:locale" content="es_PE">',
+        '<meta property="og:title" content="' + $encodedTitle + '">',
+        '<meta property="og:description" content="' + $encodedDescription + '">',
+        '<meta property="og:image" content="' + $encodedImage + '">',
+        '<meta property="og:url" content="' + $encodedUrl + '">',
+        '<meta name="twitter:card" content="summary_large_image">',
+        '<meta name="twitter:title" content="' + $encodedTitle + '">',
+        '<meta name="twitter:description" content="' + $encodedDescription + '">',
+        '<meta name="twitter:image" content="' + $encodedImage + '">'
+    )
+    foreach ($marker in $requiredSocialMarkers) {
+        if ($html -notlike ("*" + $marker + "*")) {
+            Stop-Publish "El SEO social no quedo alineado con card_title, summary, image y url."
+        }
     }
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
