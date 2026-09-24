@@ -118,6 +118,11 @@
 .te-newsletter__icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
 .te-newsletter__action strong{color:#232623;font-size:15px;line-height:1.25}
 .te-newsletter__cta{
+  appearance:none;
+  -webkit-appearance:none;
+  border:0;
+  cursor:pointer;
+  font-family:inherit;
   display:inline-flex;
   align-items:center;
   justify-content:center;
