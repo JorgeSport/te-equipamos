@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parent.parent
 DATA_FILE = Path(__file__).resolve().parent / "news-data.json"
 OUTPUT = ROOT / "newsletter-feed.xml"
+JSON_OUTPUT = ROOT / "newsletter-feed.json"
 
 SITE_URL = "https://jorgesport.github.io/te-equipamos/"
 FEED_URL = SITE_URL + "newsletter-feed.xml"
@@ -152,10 +153,49 @@ def main() -> None:
     ET.indent(tree, space="  ")
     tree.write(OUTPUT, encoding="utf-8", xml_declaration=True)
 
-    print(f"Newsletter RSS: {len(prepared)} contenidos con fecha publicados.")
+    json_items = []
+    for published, item, title, summary, url in prepared:
+        json_items.append({
+            "title": title,
+            "summary": summary,
+            "url": url,
+            "image": clean(item.get("image")),
+            "published_at": published.date().isoformat(),
+            "section": section_of(item),
+            "kind": item_kind(item),
+            "product_type": clean(item.get("product_type")) or "equipamiento",
+            "activities": [
+                clean(value)
+                for value in (item.get("activities") if isinstance(item.get("activities"), list) else [])
+                if clean(value)
+            ],
+            "tags": [
+                clean(value)
+                for value in (item.get("tags") if isinstance(item.get("tags"), list) else [])
+                if clean(value)
+            ],
+            "source_repo": clean(item.get("source_repo")),
+        })
+
+    json_feed = {
+        "version": 1,
+        "brand": "Te Equipamos",
+        "site_url": SITE_URL,
+        "feed_url": SITE_URL + "newsletter-feed.json",
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "count": len(json_items),
+        "items": json_items,
+    }
+    JSON_OUTPUT.write_text(
+        json.dumps(json_feed, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    print(f"Newsletter RSS/JSON: {len(prepared)} contenidos con fecha publicados.")
     if skipped_without_date:
         print(f"Newsletter RSS: {skipped_without_date} contenidos antiguos sin published_at se omiten para no reenviarlos como nuevos.")
-    print(f"Feed generado: {OUTPUT}")
+    print(f"RSS generado: {OUTPUT}")
+    print(f"JSON generado: {JSON_OUTPUT}")
 
 
 if __name__ == "__main__":
