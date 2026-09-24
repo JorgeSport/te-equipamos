@@ -1,8 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "enabled": true,
-  "provider": "brevo",
-  "form_url": "https://2660a6b8.sibforms.com/serve/MUIFAKk1vxIQ-Zp87WZ5sPA9PrSQ4A1sE8OZL2z3uGrY0EZzDGwjVYVfoQZtJtpPtO3gvPH7jIfwzFbsTcWFyWkqyKvlcbCjrEVtRkUnscnK15NzWhYTw9ziz_qYkmgyxBMzhFfu5WJCWUfuvkGHyJqR_m_2h4QGiq56c7Bxw5dwmCvQJ9cuEstieR1g4i9T_3MlFTzOMdriDd9ElA==",
+  "provider": "klaviyo",
   "privacy_url": "https://jorgesport.github.io/te-equipamos/news/privacidad/",
   "double_opt_in_required": true,
   "placements": [
@@ -31,8 +30,13 @@
     "action_title": "Recibe solo lo que merece la pena abrir.",
     "cta": "Quiero suscribirme"
   },
-  "status": "active",
-  "updated_at": "2026-09-21",
+  "status": "draft_klaviyo_form",
+  "updated_at": "2026-09-25",
   "activated_at": "2026-09-20",
-  "commercial_rule": "Mostrar solo el bloque de suscripción, nunca anuncios externos, en landings comerciales."
+  "commercial_rule": "Mostrar solo el bloque de suscripción, nunca anuncios externos, en landings comerciales.",
+  "klaviyo_public_key": "XpumF8",
+  "klaviyo_form_id": "TDtyXY",
+  "legacy_provider": "brevo",
+  "legacy_form_url": "https://2660a6b8.sibforms.com/serve/MUIFAKk1vxIQ-Zp87WZ5sPA9PrSQ4A1sE8OZL2z3uGrY0EZzDGwjVYVfoQZtJtpPtO3gvPH7jIfwzFbsTcWFyWkqyKvlcbCjrEVtRkUnscnK15NzWhYTw9ziz_qYkmgyxBMzhFfu5WJCWUfuvkGHyJqR_m_2h4QGiq56c7Bxw5dwmCvQJ9cuEstieR1g4i9T_3MlFTzOMdriDd9ElA==",
+  "note": "Klaviyo integrado en GitHub. El formulario TDtyXY debe estar publicado en Klaviyo para mostrarse."
 }
