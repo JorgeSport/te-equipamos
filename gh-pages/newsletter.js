@@ -41,13 +41,40 @@
     return (config.placements||[]).includes('editorial');
   }
 
+  function ensureKlaviyo(config){
+    if(String(config.provider||'').toLowerCase()!=='klaviyo')return;
+    const key=String(config.klaviyo_public_key||'').trim();
+    if(!key)return;
+    window._klOnsite=window._klOnsite||[];
+    if(document.querySelector('script[data-te-klaviyo]'))return;
+    const script=document.createElement('script');
+    script.async=true;
+    script.dataset.teKlaviyo='true';
+    script.src='https://static.klaviyo.com/onsite/js/'+encodeURIComponent(key)+'/klaviyo.js';
+    document.head.appendChild(script);
+  }
+
+  function openKlaviyoForm(config){
+    const formId=String(config.klaviyo_form_id||'').trim();
+    if(!formId)return false;
+    window._klOnsite=window._klOnsite||[];
+    window._klOnsite.push(['openForm',formId]);
+    return true;
+  }
+
   function render(config){
     if(document.querySelector('[data-te-newsletter]'))return;
     const copy=config.copy||{};
+    const provider=String(config.provider||'').toLowerCase();
     const section=document.createElement('section');
     section.className='te-newsletter';
     section.dataset.teNewsletter='true';
     const chips=Array.isArray(copy.chips)?copy.chips.slice(0,4):['Ofertas','Reviews','Consejos'];
+
+    const action=provider==='klaviyo'
+      ? '<button class="te-newsletter__cta" type="button" data-te-klaviyo-trigger>'+escapeHtml(copy.cta||'Quiero suscribirme')+'</button>'
+      : '<a class="te-newsletter__cta" href="'+escapeHtml(config.form_url||config.legacy_form_url||'#')+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(copy.cta||'Quiero suscribirme')+'</a>';
+
     section.innerHTML=`
       <div class="te-newsletter__card">
         <div class="te-newsletter__content">
@@ -64,10 +91,13 @@
             <svg viewBox="0 0 24 24"><path d="M4 6.5h16v11H4z"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>
           </span>
           <strong>${escapeHtml(copy.action_title||'Recibe solo lo que merece la pena abrir.')}</strong>
-          <a class="te-newsletter__cta" href="${escapeHtml(config.form_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.cta||'Quiero suscribirme')}</a>
-          <span class="te-newsletter__trust">Doble confirmación · reCAPTCHA · Baja cuando quieras</span>
+          ${action}
+          <span class="te-newsletter__trust">Doble confirmación · Baja cuando quieras</span>
         </div>
       </div>`;
+
+    const trigger=section.querySelector('[data-te-klaviyo-trigger]');
+    if(trigger)trigger.addEventListener('click',()=>openKlaviyoForm(config));
 
     function placeBeforeFooter(){
       const footer=document.querySelector('te-equipamos-footer,[data-te-universal-footer],#teBusinessFooter,footer');
@@ -92,9 +122,18 @@
   async function install(){
     try{
       const config=await loadJson(CONFIG_URL);
-      if(!config || config.enabled!==true || !String(config.form_url||'').trim())return;
+      if(!config || config.enabled!==true)return;
       if(config.double_opt_in_required!==true)return;
       if(!await allowedPlacement(config))return;
+
+      const provider=String(config.provider||'').toLowerCase();
+      if(provider==='klaviyo'){
+        if(!String(config.klaviyo_public_key||'').trim() || !String(config.klaviyo_form_id||'').trim())return;
+        ensureKlaviyo(config);
+      }else if(!String(config.form_url||config.legacy_form_url||'').trim()){
+        return;
+      }
+
       render(config);
     }catch(error){
       console.warn('Te Equipamos newsletter:',error);
