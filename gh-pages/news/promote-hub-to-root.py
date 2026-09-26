@@ -13,6 +13,10 @@ PRODUCT_REPOSITORY = "te-equipamos-arpenaz-100-27l"
 PRODUCT_TARGET = "https://jorgesport.github.io/te-equipamos-arpenaz-100-27l/"
 PUBLIC_ROOT = "/te-equipamos/"
 FOOTER_LOADER = '<script defer src="https://jorgesport.github.io/te-equipamos/universal-footer.js" data-te-universal-footer-loader></script>'
+KLAVIYO_TRACKING = '''<script async type="text/javascript" data-te-klaviyo src="https://static.klaviyo.com/onsite/js/XpumF8/klaviyo.js?company_id=XpumF8"></script>
+<script type="text/javascript" data-te-klaviyo-init>
+!function(){if(!window.klaviyo){window._klOnsite=window._klOnsite||[];try{window.klaviyo=new Proxy({},{get:function(n,i){return"push"===i?function(){var n;(n=window._klOnsite).push.apply(n,arguments)}:function(){for(var n=arguments.length,o=new Array(n),w=0;w<n;w++)o[w]=arguments[w];var t="function"==typeof o[o.length-1]?o.pop():void 0,e=new Promise((function(n){window._klOnsite.push([i].concat(o,[function(i){t&&t(i),n(i)}]))}));return e}}})}catch(n){window.klaviyo=window.klaviyo||[],window.klaviyo.push=function(){var n;(n=window._klOnsite).push.apply(n,arguments)}}}}();
+</script>'''
 
 root_index = ROOT / "index.html"
 news_index = NEWS / "index.html"
@@ -117,6 +121,13 @@ if 'data-te-universal-footer-loader' not in hub:
         raise RuntimeError("El Hub no contiene </body> para instalar el footer universal")
     hub = hub.replace('</body>', FOOTER_LOADER + '</body>', 1)
 
+# Klaviyo necesita el script de seguimiento visible en el HTML principal para
+# validar el sitio y mostrar formularios onsite. Se inserta una sola vez.
+if 'data-te-klaviyo' not in hub:
+    if '</body>' not in hub:
+        raise RuntimeError("El Hub no contiene </body> para instalar Klaviyo")
+    hub = hub.replace('</body>', KLAVIYO_TRACKING + '</body>', 1)
+
 root_index.write_text(hub, encoding="utf-8")
 
 # 3) /news/ queda como URL antigua compatible. Conserva query y hash para
@@ -164,6 +175,7 @@ checks = {
     "asset_css_presente": (NEWS / "editorial-experience.css").exists(),
     "asset_js_presente": (NEWS / "editorial-experience.js").exists(),
     "footer_universal": 'data-te-universal-footer-loader' in root_html,
+    "klaviyo_tracking": 'data-te-klaviyo' in root_html and 'company_id=XpumF8' in root_html,
     "enlaces_estaticos": 'class="title" href="' in root_html,
 }
 failed = [name for name, ok in checks.items() if not ok]
@@ -180,5 +192,5 @@ if sitemap.exists():
 
 print(
     "PORTADA OFICIAL ACTIVA · "
-    f"{BASE} · Hub promovido · footer universal activo · /news/ redirige · producto independiente en {PRODUCT_TARGET} · sitemap sin duplicados"
+    f"{BASE} · Hub promovido · footer universal activo · Klaviyo tracking activo · /news/ redirige · producto independiente en {PRODUCT_TARGET} · sitemap sin duplicados"
 )
